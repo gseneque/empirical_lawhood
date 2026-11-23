@@ -16,6 +16,7 @@ import pytest
 
 from empirical_lawhood.execution.local import bounded_process
 from empirical_lawhood.storage import source_closure
+from empirical_lawhood.storage.source_policy import CHECKOUT_GIT_TIMEOUT_SECONDS
 from tests.test_source_origin import ROOT
 
 
@@ -179,9 +180,10 @@ assert GitStudySourceClosureInspector(root).observe(closure) == closure
 print(json.dumps({"commit":closure.implementation_commit,
                   "archive":closure.implementation_sha256,"tree":closure.source_tree_sha256}))
 '''
+    # The child imports the application and performs two independent full source captures.
     result = subprocess.run([sys.executable, "-c", program, str(repo)], cwd=tmp_path,
                             env=dict(os.environ, PYTHONPATH=str(repo / "src"), PYTHONDONTWRITEBYTECODE="1"),
-                            capture_output=True, text=True, timeout=60)
+                            capture_output=True, text=True, timeout=3 * CHECKOUT_GIT_TIMEOUT_SECONDS)
     assert result.returncode == 0, result.stdout + result.stderr
     assert json.loads(result.stdout) == {"commit": commit, "archive": sha256(original_archive).hexdigest(), "tree": tree}
 

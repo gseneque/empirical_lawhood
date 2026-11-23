@@ -5,51 +5,69 @@ from empirical_lawhood.adapters.joint_description.extension import EXTENSION as 
 _protocols_001 = _protocols_001_owner.protocols
 from empirical_lawhood.domains.battery.battery_diagnostic_obstruction.extension import EXTENSION as _protocols_036_owner
 _protocols_036 = _protocols_036_owner.protocols
-from empirical_lawhood.domains.matrix.classical_series.extension import EXTENSION as _protocols_050_owner
-_protocols_050 = _protocols_050_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_equilibrium_bridge.extension import EXTENSION as _protocols_056_owner
-_protocols_056 = _protocols_056_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_experimental_programme.extension import EXTENSION as _protocols_057_owner
+from empirical_lawhood.domains.circuits.thermal_rc.extension import EXTENSION as _protocols_046_owner
+_protocols_046 = _protocols_046_owner.protocols
+from empirical_lawhood.domains.matrix.classical_series.extension import EXTENSION as _protocols_051_owner
+_protocols_051 = _protocols_051_owner.protocols
+from empirical_lawhood.domains.matrix.matrix_equilibrium_bridge.extension import EXTENSION as _protocols_057_owner
 _protocols_057 = _protocols_057_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact.extension import EXTENSION as _protocols_058_owner
+from empirical_lawhood.domains.matrix.matrix_experimental_programme.extension import EXTENSION as _protocols_058_owner
 _protocols_058 = _protocols_058_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_factor_confirmation.extension import EXTENSION as _protocols_059_owner
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.compact.extension import EXTENSION as _protocols_059_owner
 _protocols_059 = _protocols_059_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_factor_response.extension import EXTENSION as _protocols_060_owner
+from empirical_lawhood.domains.matrix.matrix_factor_confirmation.extension import EXTENSION as _protocols_060_owner
 _protocols_060 = _protocols_060_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_history_analysis.extension import EXTENSION as _protocols_061_owner
+from empirical_lawhood.domains.matrix.matrix_factor_response.extension import EXTENSION as _protocols_061_owner
 _protocols_061 = _protocols_061_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_researcher_programme.extension import EXTENSION as _protocols_067_owner
-_protocols_067 = _protocols_067_owner.protocols
-from empirical_lawhood.domains.matrix.matrix_scheduled_programme.extension import EXTENSION as _protocols_070_owner
-_protocols_070 = _protocols_070_owner.protocols
-from empirical_lawhood.domains.matrix.model_free.extension import EXTENSION as _protocols_071_owner
+from empirical_lawhood.domains.matrix.matrix_history_analysis.extension import EXTENSION as _protocols_062_owner
+_protocols_062 = _protocols_062_owner.protocols
+from empirical_lawhood.domains.matrix.matrix_researcher_programme.extension import EXTENSION as _protocols_068_owner
+_protocols_068 = _protocols_068_owner.protocols
+from empirical_lawhood.domains.matrix.matrix_scheduled_programme.extension import EXTENSION as _protocols_071_owner
 _protocols_071 = _protocols_071_owner.protocols
-from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.extension import EXTENSION as _protocols_102_owner
-_protocols_102 = _protocols_102_owner.protocols
-from empirical_lawhood.domains.rubisco.rubisco_response.extension import EXTENSION as _protocols_103_owner
-_protocols_103 = _protocols_103_owner.protocols
-from empirical_lawhood.methods.mass_balance_revision.extension import EXTENSION as _protocols_111_owner
-_protocols_111 = _protocols_111_owner.protocols
-from empirical_lawhood.methods.mass_balance_starter.extension import EXTENSION as _protocols_112_owner
-_protocols_112 = _protocols_112_owner.protocols
+from empirical_lawhood.domains.matrix.model_free.extension import EXTENSION as _protocols_072_owner
+_protocols_072 = _protocols_072_owner.protocols
+from empirical_lawhood.domains.matrix.orientation_response.extension import EXTENSION as _protocols_073_owner
+_protocols_073 = _protocols_073_owner.protocols
+from empirical_lawhood.domains.matrix.path_thermodynamics.extension import EXTENSION as _protocols_074_owner
+_protocols_074 = _protocols_074_owner.protocols
+from empirical_lawhood.domains.matrix.projected_memory.extension import EXTENSION as _protocols_077_owner
+_protocols_077 = _protocols_077_owner.protocols
+from empirical_lawhood.domains.matrix.waveform_preparation.extension import EXTENSION as _protocols_081_owner
+_protocols_081 = _protocols_081_owner.protocols
+from empirical_lawhood.domains.quantum.marked_event_response.extension import EXTENSION as _protocols_082_owner
+_protocols_082 = _protocols_082_owner.protocols
+from empirical_lawhood.domains.rubisco.rubisco_prediction.kinetic_join.extension import EXTENSION as _protocols_108_owner
+_protocols_108 = _protocols_108_owner.protocols
+from empirical_lawhood.domains.rubisco.rubisco_response.extension import EXTENSION as _protocols_109_owner
+_protocols_109 = _protocols_109_owner.protocols
+from empirical_lawhood.methods.mass_balance_revision.extension import EXTENSION as _protocols_117_owner
+_protocols_117 = _protocols_117_owner.protocols
+from empirical_lawhood.methods.mass_balance_starter.extension import EXTENSION as _protocols_118_owner
+_protocols_118 = _protocols_118_owner.protocols
 
 EXPERIMENT_PROTOCOL_DECLARATIONS = tuple(sorted((
     *_protocols_000,
     *_protocols_001,
     *_protocols_036,
-    *_protocols_050,
-    *_protocols_056,
+    *_protocols_046,
+    *_protocols_051,
     *_protocols_057,
     *_protocols_058,
     *_protocols_059,
     *_protocols_060,
     *_protocols_061,
-    *_protocols_067,
-    *_protocols_070,
+    *_protocols_062,
+    *_protocols_068,
     *_protocols_071,
-    *_protocols_102,
-    *_protocols_103,
-    *_protocols_111,
-    *_protocols_112,
+    *_protocols_072,
+    *_protocols_073,
+    *_protocols_074,
+    *_protocols_077,
+    *_protocols_081,
+    *_protocols_082,
+    *_protocols_108,
+    *_protocols_109,
+    *_protocols_117,
+    *_protocols_118,
 ), key=lambda declaration: declaration.protocol_id))

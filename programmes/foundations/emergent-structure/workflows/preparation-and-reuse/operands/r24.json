@@ -1,0 +1,2755 @@
+{
+  "context": {},
+  "format": 1,
+  "members": {
+    "calibration/native": {
+      "path": "r24/artifacts/runs/calibration-completion.beaa894f919259ee0f5b08e153758939/outputs/finite-response-law.native-evaluate/report.json",
+      "sha256": "3f6dd4e6aac622e1aa7defa449e3933076af22832d319cf62e098ef59ce7d5d3",
+      "size": 4717324,
+      "source": "series"
+    },
+    "disjoint/000": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r000.json",
+      "sha256": "6b68f0442928f5a25632a42c897c1278a21dfc7fd7ffe00ef68abd7d7e7d0329",
+      "size": 377820,
+      "source": "series"
+    },
+    "disjoint/000/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r000.evaluate-use/product.canonical.json",
+      "sha256": "aded0fdaecafdb746d08a41de04f78931e38e874d9067e058032c0233aa20ff7",
+      "size": 7051618,
+      "source": "series"
+    },
+    "disjoint/000/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r000.seal-control/product.canonical.json",
+      "sha256": "fe116314cb3e0b10917eda88568c4f6cd592ea5ccfd93fbc5a9e83a0c20d255c",
+      "size": 11420253,
+      "source": "series"
+    },
+    "disjoint/001": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r001.json",
+      "sha256": "2f4491caec0d4c25d977ee6840d78b243142405de43d30bb721170d804ee5d0d",
+      "size": 377251,
+      "source": "series"
+    },
+    "disjoint/001/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r001.evaluate-use/product.canonical.json",
+      "sha256": "70a5976e48390071937ea6ffdcee46fbb768a89f71bb9ce437cffc7c13abf7ad",
+      "size": 7051583,
+      "source": "series"
+    },
+    "disjoint/001/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r001.seal-control/product.canonical.json",
+      "sha256": "ffcb7acc73068c46122ab84f8fd7202e9f34f12982de8c645ad0c0101b73f491",
+      "size": 11419763,
+      "source": "series"
+    },
+    "disjoint/002": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r002.json",
+      "sha256": "cc768d8ad3170c066d8273a417e47c40c360672c31730e0bffbd4f9149a5c91a",
+      "size": 375941,
+      "source": "series"
+    },
+    "disjoint/002/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r002.evaluate-use/product.canonical.json",
+      "sha256": "e8be378f49ac4b1f0432df0a4eeddff085113703505d052f50141111f6315f11",
+      "size": 7051036,
+      "source": "series"
+    },
+    "disjoint/002/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r002.seal-control/product.canonical.json",
+      "sha256": "67fad297f8bfebff407aa7878df0a8128341d35d7094f666f95d0d05f9d1817a",
+      "size": 11419519,
+      "source": "series"
+    },
+    "disjoint/003": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r003.json",
+      "sha256": "5350e69250c20ab19881142cb4540e29f2f5e174605d31eadae19368e6a5f15d",
+      "size": 376944,
+      "source": "series"
+    },
+    "disjoint/003/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r003.evaluate-use/product.canonical.json",
+      "sha256": "9d8a6e41a00cbc463c185e6b8b78d582681567bc528c181462cd19a7f3001d6a",
+      "size": 7052098,
+      "source": "series"
+    },
+    "disjoint/003/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r003.seal-control/product.canonical.json",
+      "sha256": "dbb5c33a459504913c80e89dbbda13cc18b0361d7bc35e30dedacfcccd3b1b1f",
+      "size": 11420761,
+      "source": "series"
+    },
+    "disjoint/004": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r004.json",
+      "sha256": "8492d376d1059ed902489b4c3279896ef9c61f63894d7c92e8b9e16884f68810",
+      "size": 377270,
+      "source": "series"
+    },
+    "disjoint/004/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r004.evaluate-use/product.canonical.json",
+      "sha256": "556cc5b5a82128b76a72caee52729da2818cc05e6da725cb04ed5b2868b7adc9",
+      "size": 7052061,
+      "source": "series"
+    },
+    "disjoint/004/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r004.seal-control/product.canonical.json",
+      "sha256": "eb6e75b8f8b966b7d4396d26e4d4d98fc6b4ec09285d325cc85b24481d8ab1a6",
+      "size": 11420505,
+      "source": "series"
+    },
+    "disjoint/005": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r005.json",
+      "sha256": "5a8c83018baf8d9137a4e68b948206910f9ecc71b8b2edd643f4dc41fe8bccfa",
+      "size": 376518,
+      "source": "series"
+    },
+    "disjoint/005/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r005.evaluate-use/product.canonical.json",
+      "sha256": "3ad69be770258013b05d7ce116e8c980ed39f8ca01faef7bbee88f8474ab3e1a",
+      "size": 7051759,
+      "source": "series"
+    },
+    "disjoint/005/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r005.seal-control/product.canonical.json",
+      "sha256": "d1590bf6135d7b6a0cde6845dbe744fb47bfe0929bd81afd4aae80e513d75606",
+      "size": 11420487,
+      "source": "series"
+    },
+    "disjoint/006": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r006.json",
+      "sha256": "1ad223029336fc90313b29d1ef1d335b24589061311aaa47c443bbb3b7881f79",
+      "size": 376479,
+      "source": "series"
+    },
+    "disjoint/006/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r006.evaluate-use/product.canonical.json",
+      "sha256": "4decba2da03bb31aca70b7cda2f40e2130a6d6459beab2634d03eca15b6a84e3",
+      "size": 7051898,
+      "source": "series"
+    },
+    "disjoint/006/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r006.seal-control/product.canonical.json",
+      "sha256": "6059ce6f034b65e09f2c24c8a5d7a73e111a514ee6dbcdb6cb1eb78f56867035",
+      "size": 11420387,
+      "source": "series"
+    },
+    "disjoint/007": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r007.json",
+      "sha256": "bbc7ee40a63f3a518d40a2759aebdf15505bf5b3066797fd01c4dffaa8201c94",
+      "size": 377065,
+      "source": "series"
+    },
+    "disjoint/007/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r007.evaluate-use/product.canonical.json",
+      "sha256": "fc49059326f35d6b0e2016274a5b36587ae5189c2f624de0a47be609ccf91b16",
+      "size": 7051823,
+      "source": "series"
+    },
+    "disjoint/007/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r007.seal-control/product.canonical.json",
+      "sha256": "477d653c2327eaa49fbc30de6b8452d1cb731148a35e1b07c7801b00a46147d9",
+      "size": 11420128,
+      "source": "series"
+    },
+    "disjoint/008": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r008.json",
+      "sha256": "21f1c989d0949e34fabc0eb4a3f859de54b0f68d92b005d7840fd6f84e90a0d9",
+      "size": 376984,
+      "source": "series"
+    },
+    "disjoint/008/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r008.evaluate-use/product.canonical.json",
+      "sha256": "f08078de94633f28aafafa6b782a4fe7901a592b7a9ac5c8fe415f7e9922cca0",
+      "size": 7051813,
+      "source": "series"
+    },
+    "disjoint/008/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r008.seal-control/product.canonical.json",
+      "sha256": "311834d896dc93b7f742f00851e6b8d780f248f95b23dd5acad31fc169eb99ad",
+      "size": 11420479,
+      "source": "series"
+    },
+    "disjoint/009": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r009.json",
+      "sha256": "c07090b21e1be5f3383c1e03d665ff35ee5794b90099a0e0167370914393238c",
+      "size": 376726,
+      "source": "series"
+    },
+    "disjoint/009/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r009.evaluate-use/product.canonical.json",
+      "sha256": "f6215cdfecc48bcda7766ed0ac7fc0d91d36bfd1b2cc587b8bfa16af5f85a459",
+      "size": 7051398,
+      "source": "series"
+    },
+    "disjoint/009/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r009.seal-control/product.canonical.json",
+      "sha256": "568c14cfb7acebad5cfa82d9a23ddbc2c330ad1b3d8ad1b3d4253b8c3f0353b6",
+      "size": 11419791,
+      "source": "series"
+    },
+    "disjoint/010": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r010.json",
+      "sha256": "6cd29e8de7809f51b8e2c2e74ee0e1b20c4b563d985c5e5310710e4f7baa5350",
+      "size": 377031,
+      "source": "series"
+    },
+    "disjoint/010/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r010.evaluate-use/product.canonical.json",
+      "sha256": "008a2cdce613ac758f92d3131f336e51cd48b0d1614f3a5b1e60e154950e54f6",
+      "size": 7051411,
+      "source": "series"
+    },
+    "disjoint/010/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r010.seal-control/product.canonical.json",
+      "sha256": "b9d14e4b377956c5608b605f63027e1d80e2f1e5f2802d07b6be53bf6891df0c",
+      "size": 11419715,
+      "source": "series"
+    },
+    "disjoint/011": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r011.json",
+      "sha256": "d77f2a5771d0e1ee24de368a8ee8c387d580e851364c291662b20b2143c10ab9",
+      "size": 377035,
+      "source": "series"
+    },
+    "disjoint/011/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r011.evaluate-use/product.canonical.json",
+      "sha256": "bcc57330c9c71c645dca0a57e927ac99b23fa84682f76262f2fa73ccbf6a26fd",
+      "size": 7051710,
+      "source": "series"
+    },
+    "disjoint/011/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r011.seal-control/product.canonical.json",
+      "sha256": "b0a211c114b6f2516de2a3a8fbfbe9beccb314e5cd0d3b11e48a288132c2dfdd",
+      "size": 11420291,
+      "source": "series"
+    },
+    "disjoint/012": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r012.json",
+      "sha256": "9962b5222fd730c7b4ec8184f55d365fd4c5de3c22e72787d27b10c81cc6951a",
+      "size": 376833,
+      "source": "series"
+    },
+    "disjoint/012/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r012.evaluate-use/product.canonical.json",
+      "sha256": "71ad0947d55b7025908a1ab453216b2314da16b5107e6509051a076f7912f3e7",
+      "size": 7051851,
+      "source": "series"
+    },
+    "disjoint/012/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r012.seal-control/product.canonical.json",
+      "sha256": "a801b72d6a8e4ce6f81092c914707ec7a2a06f0cda89de83e3ecd9073ec9b1c1",
+      "size": 11420376,
+      "source": "series"
+    },
+    "disjoint/013": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r013.json",
+      "sha256": "cbd39abb267e5b941ab9c2411fa8f64cb6e5d27e0282f70a8c7035675cfd80d2",
+      "size": 376170,
+      "source": "series"
+    },
+    "disjoint/013/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r013.evaluate-use/product.canonical.json",
+      "sha256": "25f2beae34427cdfa487ca94a29e452334a8920c80f649e0f98cf5ec30ae08f4",
+      "size": 7051018,
+      "source": "series"
+    },
+    "disjoint/013/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r013.seal-control/product.canonical.json",
+      "sha256": "f2f2045b4c873089fbce6da9b4b50ccdf20556679141f2a02aabb40433bd23ae",
+      "size": 11419296,
+      "source": "series"
+    },
+    "disjoint/014": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r014.json",
+      "sha256": "d8d40b4c4c4c92e5df8af956c3328a3252ae687c7e5c25edb18c2792b580d3b6",
+      "size": 376335,
+      "source": "series"
+    },
+    "disjoint/014/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r014.evaluate-use/product.canonical.json",
+      "sha256": "b993ac79912c3c7bffcebd3ecb41ad071ffb04f8fb553a766a4f2246fc3b3128",
+      "size": 7051064,
+      "source": "series"
+    },
+    "disjoint/014/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r014.seal-control/product.canonical.json",
+      "sha256": "c85e561306fbebaf32a83d2059fc29c98dfb9482cdb34b4646bdbee754c4f627",
+      "size": 11419340,
+      "source": "series"
+    },
+    "disjoint/015": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r015.json",
+      "sha256": "99dbcfd421e346cc39460c048cc80359dce837d55ba91eadaa8d86d0e18e3504",
+      "size": 376825,
+      "source": "series"
+    },
+    "disjoint/015/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r015.evaluate-use/product.canonical.json",
+      "sha256": "f614b98f3a4af8e5d7fc4b843191704e8030de320c8fc3d93868a55f5776de7e",
+      "size": 7051933,
+      "source": "series"
+    },
+    "disjoint/015/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r015.seal-control/product.canonical.json",
+      "sha256": "2257b2cf05a6dc40a5440ae46b2aaa3b2669389f27e8ab2541998e74ca02a54d",
+      "size": 11420716,
+      "source": "series"
+    },
+    "disjoint/016": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r016.json",
+      "sha256": "17f4aa2fe8cfe3f856c08d191d4afd97d3dcef4f1f325317a0b10e41a7a97438",
+      "size": 377372,
+      "source": "series"
+    },
+    "disjoint/016/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r016.evaluate-use/product.canonical.json",
+      "sha256": "26d3b7337a164304af60826baba29c8e8bff00f02a4305c077cc8badb97c582a",
+      "size": 7052234,
+      "source": "series"
+    },
+    "disjoint/016/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r016.seal-control/product.canonical.json",
+      "sha256": "7b94540bf3f3c1f49c56a6f22e81f564777341a6c77284c8d7b8d7d656941ab4",
+      "size": 11420956,
+      "source": "series"
+    },
+    "disjoint/017": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r017.json",
+      "sha256": "7a271ebca13a5447e0036c35922049ec3391cd7bc66a4a75880a558dc23ce9e0",
+      "size": 377488,
+      "source": "series"
+    },
+    "disjoint/017/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r017.evaluate-use/product.canonical.json",
+      "sha256": "a57747fe4639f276ec0cf41fd4b6d97a86919132e25325230d53ab543c80504d",
+      "size": 7051172,
+      "source": "series"
+    },
+    "disjoint/017/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r017.seal-control/product.canonical.json",
+      "sha256": "df9ef61c7cb6327baed926c9c9ea760d96bead6f9ce3e6bc6693b7dd56f422de",
+      "size": 11419501,
+      "source": "series"
+    },
+    "disjoint/018": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r018.json",
+      "sha256": "6523bcd0940c3a27e7002b57f8fad0fc894036e2819426c4b6c6158980beff10",
+      "size": 376412,
+      "source": "series"
+    },
+    "disjoint/018/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r018.evaluate-use/product.canonical.json",
+      "sha256": "42f47f8fee50535c36b810e62f70fbf456b6009dc4fd91410718e542053f8ef6",
+      "size": 7051298,
+      "source": "series"
+    },
+    "disjoint/018/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r018.seal-control/product.canonical.json",
+      "sha256": "3b8fbd306a44c7914c1dc68fc50b11bb952044b9e1098b94ab9479f2da0cb948",
+      "size": 11419922,
+      "source": "series"
+    },
+    "disjoint/019": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r019.json",
+      "sha256": "4f8a02b71b6d450716fed2e2ecd6d2338154890b5343d564f1ecd2231fa223aa",
+      "size": 376463,
+      "source": "series"
+    },
+    "disjoint/019/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r019.evaluate-use/product.canonical.json",
+      "sha256": "f1c9835d028ec0331f707fb2dd2fc5153f50f47cdf121a5102f4e7c571dfa8f0",
+      "size": 7051545,
+      "source": "series"
+    },
+    "disjoint/019/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r019.seal-control/product.canonical.json",
+      "sha256": "99a27c83cb765f31f9eef395cddba278e44ab52ecbaf9955c158afb8b758d02c",
+      "size": 11419785,
+      "source": "series"
+    },
+    "disjoint/020": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r020.json",
+      "sha256": "574cf55e467bc098ee76712495b480d7339f46fdd89cbfed9328f85300ad6c0e",
+      "size": 235226,
+      "source": "series"
+    },
+    "disjoint/020/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r020.evaluate-use/product.canonical.json",
+      "sha256": "781fa8abc9b9f5a455c292e49129589801aec8940ac128741924dadc4f8420fa",
+      "size": 4091323,
+      "source": "series"
+    },
+    "disjoint/020/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r020.seal-control/product.canonical.json",
+      "sha256": "93a2bfe3d81eb779cd813b4cab9354e69d0d802a7b335dadc03fd6640f1d38fc",
+      "size": 7305242,
+      "source": "series"
+    },
+    "disjoint/021": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r021.json",
+      "sha256": "3da9314c37372dfb113945f097347d366ad01bdaeddc4272fef212a493dee244",
+      "size": 330296,
+      "source": "series"
+    },
+    "disjoint/021/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r021.evaluate-use/product.canonical.json",
+      "sha256": "9a1e759d211661ceaba3bc0dc69201c39924a98174b333c63949c9e71093d26e",
+      "size": 6073588,
+      "source": "series"
+    },
+    "disjoint/021/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r021.seal-control/product.canonical.json",
+      "sha256": "143270a3697c208f11c3037bbfe91f0460ca53ab3cef696f164da1dff8f920a7",
+      "size": 10061198,
+      "source": "series"
+    },
+    "disjoint/022": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r022.json",
+      "sha256": "4abd2bbff195956523f12b41f45e5cae9ca3777eb0a1eae4b6a859df8064fad1",
+      "size": 376637,
+      "source": "series"
+    },
+    "disjoint/022/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r022.evaluate-use/product.canonical.json",
+      "sha256": "6e99bf6e344284bc3005d37edc8dc1674f74ebaaebd1a1caae909ce0f4e763cd",
+      "size": 7051410,
+      "source": "series"
+    },
+    "disjoint/022/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r022.seal-control/product.canonical.json",
+      "sha256": "7e6eae659ddb2eb6d302dbc5d27524951962513f5458ba331f434b030f3d034a",
+      "size": 11419701,
+      "source": "series"
+    },
+    "disjoint/023": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r023.json",
+      "sha256": "ac26165c9d30d9b156a4b13ff9bfa1fd17592dfa0ad4dca8c5299ceb6c82bb12",
+      "size": 376240,
+      "source": "series"
+    },
+    "disjoint/023/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r023.evaluate-use/product.canonical.json",
+      "sha256": "7af11423fa8fc043ff1604af056c6d8adbb14b79a484979590228c0342af3361",
+      "size": 7051227,
+      "source": "series"
+    },
+    "disjoint/023/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r023.seal-control/product.canonical.json",
+      "sha256": "c7bcb28c2fff7961670eeab7c7126e9ab44d7d4c77d05fb13f40fe23cd7461c3",
+      "size": 11419593,
+      "source": "series"
+    },
+    "disjoint/024": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r024.json",
+      "sha256": "ddd2c855b858cfedad47e2f5ebab70ff96d4ce9ea9e45a1f067f95a584284c0f",
+      "size": 376596,
+      "source": "series"
+    },
+    "disjoint/024/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r024.evaluate-use/product.canonical.json",
+      "sha256": "da34fa5a5619a82ec9286a242cec4889e698eba418b0932e12581b1d4a9689d0",
+      "size": 7051563,
+      "source": "series"
+    },
+    "disjoint/024/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r024.seal-control/product.canonical.json",
+      "sha256": "3a11440553012b15007506be7f7f82ca036283947a03a1c03cda2fee22f00a46",
+      "size": 11420118,
+      "source": "series"
+    },
+    "disjoint/025": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r025.json",
+      "sha256": "e681758386cd837b808fecf53c02de8f7e226fdc4a4cbd1ea46c8cff6c663bd7",
+      "size": 376108,
+      "source": "series"
+    },
+    "disjoint/025/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r025.evaluate-use/product.canonical.json",
+      "sha256": "154fb248f261072445ebf6ddcb0a772aeafd4221f86edac5b762140150831807",
+      "size": 7050794,
+      "source": "series"
+    },
+    "disjoint/025/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r025.seal-control/product.canonical.json",
+      "sha256": "a8160ce69a19114d78664f41da6726e768c8bf3f711a0f2c85182d64820000f8",
+      "size": 11418860,
+      "source": "series"
+    },
+    "disjoint/026": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r026.json",
+      "sha256": "e01b66e737876f33927c1f57a799fe814b5af5451db0c977a840bbbd99f2419a",
+      "size": 377847,
+      "source": "series"
+    },
+    "disjoint/026/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r026.evaluate-use/product.canonical.json",
+      "sha256": "26307cac664909d669364cfc591cb79ccaa9035ed329469cba99e1632d2864a6",
+      "size": 7051572,
+      "source": "series"
+    },
+    "disjoint/026/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r026.seal-control/product.canonical.json",
+      "sha256": "6946ea46124a0dceae3662b58b7ed0b3e25efca0c4fa621b8d03358a5c7993cd",
+      "size": 11419790,
+      "source": "series"
+    },
+    "disjoint/027": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r027.json",
+      "sha256": "0f235160f705c319878e5da596e87faa96d587c60dc0c71de20bc7eafd4af3f6",
+      "size": 377210,
+      "source": "series"
+    },
+    "disjoint/027/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r027.evaluate-use/product.canonical.json",
+      "sha256": "f20e6703108676dfd71c4ecf63541f77a2486590de54106fde5b2aac408ec43c",
+      "size": 7051789,
+      "source": "series"
+    },
+    "disjoint/027/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r027.seal-control/product.canonical.json",
+      "sha256": "a79d25fb3d5d0d1c6c7d4e0595160e7a0f918be728e5bc4bb4bacf976f080a65",
+      "size": 11420580,
+      "source": "series"
+    },
+    "disjoint/028": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r028.json",
+      "sha256": "a5ebcd342c202028c114c8ad783372ce4a4ab41a3245c23553fdaf279a859068",
+      "size": 376568,
+      "source": "series"
+    },
+    "disjoint/028/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r028.evaluate-use/product.canonical.json",
+      "sha256": "7eb0960486e9e927d728e9fcb341bcb3682c12b9ee5e8cf184de2a144db65c2c",
+      "size": 7051905,
+      "source": "series"
+    },
+    "disjoint/028/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r028.seal-control/product.canonical.json",
+      "sha256": "fb0515700602b2030f7f9f4d3964587ef274397451f28eb43fe4ea418120e82a",
+      "size": 11420408,
+      "source": "series"
+    },
+    "disjoint/029": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r029.json",
+      "sha256": "e1ca1d0df8c10bb908944b436f30ced310639649f76f08760553572a230bd4fd",
+      "size": 236275,
+      "source": "series"
+    },
+    "disjoint/029/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r029.evaluate-use/product.canonical.json",
+      "sha256": "cd07a980906294bb65185541b934315dcc89dac6447c04c95c0549c813360b4e",
+      "size": 4091949,
+      "source": "series"
+    },
+    "disjoint/029/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r029.seal-control/product.canonical.json",
+      "sha256": "904f6aa7fc53cd5afd68614c78450fda673ecdb7af3a936e6f2030c3d83ddc29",
+      "size": 7306110,
+      "source": "series"
+    },
+    "disjoint/030": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r030.json",
+      "sha256": "3ad523ed61f54b5f9fa21bf5e8c960f4c71c211a1583b11a0bfb7095f594e6b3",
+      "size": 376189,
+      "source": "series"
+    },
+    "disjoint/030/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r030.evaluate-use/product.canonical.json",
+      "sha256": "54125cd11f001c04f91ba755cf9d79ac2064296ea20addc5cb88b975ddd0f550",
+      "size": 7051222,
+      "source": "series"
+    },
+    "disjoint/030/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r030.seal-control/product.canonical.json",
+      "sha256": "dc845e6aa72fec2d0d64c6153bbe716055aeb7fb7e5a58927ae3fda1746b93b9",
+      "size": 11419601,
+      "source": "series"
+    },
+    "disjoint/031": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r031.json",
+      "sha256": "4eba5aadd177fc23220ae854b717830df6af051746f777059e90ae43a0d10c52",
+      "size": 377668,
+      "source": "series"
+    },
+    "disjoint/031/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r031.evaluate-use/product.canonical.json",
+      "sha256": "236451b1a90c3163de26bcb99c5702f2067a21848e40839112c5146d0153584c",
+      "size": 7052120,
+      "source": "series"
+    },
+    "disjoint/031/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r031.seal-control/product.canonical.json",
+      "sha256": "3e365ba0fa9fe26ea570c92733e816d4db5b2d8301c3e505168de4cf8d01dd55",
+      "size": 11420856,
+      "source": "series"
+    },
+    "disjoint/032": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r032.json",
+      "sha256": "92390663377aece4be80d24688c8e91af05337bb80ba1f044a89f2fbaec9c3dc",
+      "size": 377121,
+      "source": "series"
+    },
+    "disjoint/032/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r032.evaluate-use/product.canonical.json",
+      "sha256": "841d77ac61e585b5ba9b6a923c89ae5532a944075997a6d4f3e002930bdafbf8",
+      "size": 7051760,
+      "source": "series"
+    },
+    "disjoint/032/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r032.seal-control/product.canonical.json",
+      "sha256": "204f27cc64ce4ce64f5a7b23d66b42b82a107cfda176f8728d7b2439734f5520",
+      "size": 11420628,
+      "source": "series"
+    },
+    "disjoint/033": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r033.json",
+      "sha256": "e158759a504a9649d3844a5ae77d0b8b7f73138f598d51d995a477a7966a494f",
+      "size": 375483,
+      "source": "series"
+    },
+    "disjoint/033/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r033.evaluate-use/product.canonical.json",
+      "sha256": "b41ff9d43db5d5b3817cc4dc81dc6a99d34901ec4a51a27360520ed674a3cd88",
+      "size": 7050880,
+      "source": "series"
+    },
+    "disjoint/033/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r033.seal-control/product.canonical.json",
+      "sha256": "12b95110e9c9db0e2a74c81f2cd65dcc65b6cdcea904ab964e19a15539eb967f",
+      "size": 11419327,
+      "source": "series"
+    },
+    "disjoint/034": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r034.json",
+      "sha256": "9d5fbe90e634d18f371a99cf1a27172544f41f2f66789f2bd21755ae960e0bc9",
+      "size": 376546,
+      "source": "series"
+    },
+    "disjoint/034/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r034.evaluate-use/product.canonical.json",
+      "sha256": "96d56422e0ae74d4f3e4992724d385bcad2d83c4d8c5ffbc8568fe37a0d91f81",
+      "size": 7051742,
+      "source": "series"
+    },
+    "disjoint/034/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r034.seal-control/product.canonical.json",
+      "sha256": "5610cb6aeacbca24de1727ad6fd8d7a4423befdea7a7d76e16f7590b6d6d9986",
+      "size": 11420378,
+      "source": "series"
+    },
+    "disjoint/035": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r035.json",
+      "sha256": "2d0f69d5cba2567493c3a22a349e5ed0fcd76933661642b9753515595cd2c6d4",
+      "size": 375997,
+      "source": "series"
+    },
+    "disjoint/035/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r035.evaluate-use/product.canonical.json",
+      "sha256": "c014ccf3635081b27808d23607515813564affdf7d2b25e1c9811f5e6140ee71",
+      "size": 7050802,
+      "source": "series"
+    },
+    "disjoint/035/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r035.seal-control/product.canonical.json",
+      "sha256": "c67986d6c4e620d319f14e8975f5ed16864b617a1ac333cb32594b51addd9520",
+      "size": 11419025,
+      "source": "series"
+    },
+    "disjoint/036": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r036.json",
+      "sha256": "b9f80758a68e6c0c3d642371222539f896c800e3c55ae3ed7398237cd360c875",
+      "size": 377308,
+      "source": "series"
+    },
+    "disjoint/036/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r036.evaluate-use/product.canonical.json",
+      "sha256": "c2ead28247effbced99cff875454393694815271578acf018671f4d6b7161198",
+      "size": 7052064,
+      "source": "series"
+    },
+    "disjoint/036/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r036.seal-control/product.canonical.json",
+      "sha256": "f2ce8f89d84a0a60c3011a2099cedc6d8cb0ae6862094175dff585a9b76c0aba",
+      "size": 11420848,
+      "source": "series"
+    },
+    "disjoint/037": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r037.json",
+      "sha256": "4bd0f293d8422d3c1544a1acbffcc684b4589d689635f4cceaf8f1e8d753a9b1",
+      "size": 235261,
+      "source": "series"
+    },
+    "disjoint/037/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r037.evaluate-use/product.canonical.json",
+      "sha256": "a20ad01a1854ed0df0001335b56ed25225afa903bab88360c6c6c0c535e221a1",
+      "size": 4091213,
+      "source": "series"
+    },
+    "disjoint/037/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r037.seal-control/product.canonical.json",
+      "sha256": "f136b1c36d6428350a9deb1a893d689582f8c08442f2d78c5604a8baa306cb3f",
+      "size": 7305009,
+      "source": "series"
+    },
+    "disjoint/038": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r038.json",
+      "sha256": "58cee05f9789f532162e6fbfbd87476c66c54723dde3e5cc6d0e5a36c9e8cb56",
+      "size": 376747,
+      "source": "series"
+    },
+    "disjoint/038/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r038.evaluate-use/product.canonical.json",
+      "sha256": "c23230512007e9de8adc177e8008e17a203036f4624ce5380f4b9dc34e69e425",
+      "size": 7051441,
+      "source": "series"
+    },
+    "disjoint/038/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r038.seal-control/product.canonical.json",
+      "sha256": "bc4f3dee57ce1964f4df9569777a99f3faf7581ad7013332b81014df56878817",
+      "size": 11419800,
+      "source": "series"
+    },
+    "disjoint/039": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r039.json",
+      "sha256": "3f56a11c1e2597a411f7f9b62da99713c619f07afd4741758a0c03cee0456993",
+      "size": 375829,
+      "source": "series"
+    },
+    "disjoint/039/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r039.evaluate-use/product.canonical.json",
+      "sha256": "54ecd01fe8c127be2383fb3b4b98d3be07c9ef2eb3892d2a4fa07c1ea9f22c6b",
+      "size": 7050998,
+      "source": "series"
+    },
+    "disjoint/039/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r039.seal-control/product.canonical.json",
+      "sha256": "af6904cb155243a840b340c8ee0c3507c2f56fe28197a980794a9d90d4fa493e",
+      "size": 11419298,
+      "source": "series"
+    },
+    "disjoint/040": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r040.json",
+      "sha256": "3bdfa7c92c36d061bf675f539c7f466dd6637a124593b984c161d08f1a88b50f",
+      "size": 376831,
+      "source": "series"
+    },
+    "disjoint/040/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r040.evaluate-use/product.canonical.json",
+      "sha256": "4448f991120a6c63d4e8951283831ab782cda230bc90194f54e756443aa56855",
+      "size": 7051765,
+      "source": "series"
+    },
+    "disjoint/040/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r040.seal-control/product.canonical.json",
+      "sha256": "958dc63fe9c948a3e46af4ee22ab080bffdead42d31ccc0e09571df3609d23f2",
+      "size": 11420403,
+      "source": "series"
+    },
+    "disjoint/041": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r041.json",
+      "sha256": "7c169916d34b1553a53b83186e7918527da83f2a83645160b178aaefc1d35ef4",
+      "size": 376906,
+      "source": "series"
+    },
+    "disjoint/041/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r041.evaluate-use/product.canonical.json",
+      "sha256": "6ed57174d51213fb89ed2ba71c801ee495b2cbf0a273790a31fe2bbc46ed9d41",
+      "size": 7051533,
+      "source": "series"
+    },
+    "disjoint/041/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r041.seal-control/product.canonical.json",
+      "sha256": "20da5cf2f317ef25523b9eebd0f5844030594c339b1cd92c67dff5ca475214e6",
+      "size": 11419866,
+      "source": "series"
+    },
+    "disjoint/042": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r042.json",
+      "sha256": "4dafa2114be7c5c7fe0d1f5f6f66eb437c8379a147583e83a4223d9bfcc9d874",
+      "size": 376199,
+      "source": "series"
+    },
+    "disjoint/042/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r042.evaluate-use/product.canonical.json",
+      "sha256": "b4a0c888633a60ef923030920455d7e2b01bef300cb4bef89fe83929ed95736a",
+      "size": 7051362,
+      "source": "series"
+    },
+    "disjoint/042/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r042.seal-control/product.canonical.json",
+      "sha256": "ce1898b598744832a3932443b4d798c6e66a2d6116d29d02bfebcea5ba7e7c13",
+      "size": 11419677,
+      "source": "series"
+    },
+    "disjoint/043": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r043.json",
+      "sha256": "ba1d9f138233610ceb6632fa458415362dadb48f233234c0ac2058a0b710487e",
+      "size": 329867,
+      "source": "series"
+    },
+    "disjoint/043/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r043.evaluate-use/product.canonical.json",
+      "sha256": "2df3f443ce445194bcd1daa430e3ad1655d74039dd2618053b75d91837b76433",
+      "size": 6062590,
+      "source": "series"
+    },
+    "disjoint/043/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r043.seal-control/product.canonical.json",
+      "sha256": "ab452148b864fc575ec8e25c6f7fc03dd0a75232be14288f4285dd3f87c5355c",
+      "size": 10045036,
+      "source": "series"
+    },
+    "disjoint/044": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r044.json",
+      "sha256": "1c37ade6a19b7969277719f6482b2689c010fe0fb87f0b4e06422ec9df9995a0",
+      "size": 377032,
+      "source": "series"
+    },
+    "disjoint/044/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r044.evaluate-use/product.canonical.json",
+      "sha256": "adf9a379d1b19d487ccbe344e3ee48e303f88c8838650286f2cee227b39c8f05",
+      "size": 7052023,
+      "source": "series"
+    },
+    "disjoint/044/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r044.seal-control/product.canonical.json",
+      "sha256": "36aa617d2441b9baafe96b34dd85aea9649ccdaf4a40ad719856962b35a6ac47",
+      "size": 11420411,
+      "source": "series"
+    },
+    "disjoint/045": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r045.json",
+      "sha256": "b283c17adaebd66831fdf24fec1d5eab4e0ab24fc4bbbd30b8aa9ff0c532164b",
+      "size": 376260,
+      "source": "series"
+    },
+    "disjoint/045/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r045.evaluate-use/product.canonical.json",
+      "sha256": "a40a461dca9c1e283b1a21c4f3d40b6b951469368626f3a11a88986e76f1d1d2",
+      "size": 7051353,
+      "source": "series"
+    },
+    "disjoint/045/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r045.seal-control/product.canonical.json",
+      "sha256": "590cd124a219e6db77f146cedba06f6b385599011354204a4078e9724d58ebd6",
+      "size": 11419772,
+      "source": "series"
+    },
+    "disjoint/046": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r046.json",
+      "sha256": "c82e2366de4afa60479965c516e92dbe5ecd098aeeb2a0e14719753550275db8",
+      "size": 376571,
+      "source": "series"
+    },
+    "disjoint/046/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r046.evaluate-use/product.canonical.json",
+      "sha256": "d8d60b3dc8086b6a889c9e02695338f833d74aecc1d1140f2686f3da44dd1cdf",
+      "size": 7051647,
+      "source": "series"
+    },
+    "disjoint/046/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r046.seal-control/product.canonical.json",
+      "sha256": "57e2f2af7d40fb244bce64cc8669927b12b85e9e8400c180b67b75f6006687f2",
+      "size": 11419859,
+      "source": "series"
+    },
+    "disjoint/047": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r047.json",
+      "sha256": "bdbfac3be2429be888a946d2d12f7bcb80e658105acef02734022682ad09121b",
+      "size": 376804,
+      "source": "series"
+    },
+    "disjoint/047/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r047.evaluate-use/product.canonical.json",
+      "sha256": "65be72923cd1bcd94b2b46f482513a90b2293fcc9a8560b7a0ae2af01e680858",
+      "size": 7051212,
+      "source": "series"
+    },
+    "disjoint/047/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r047.seal-control/product.canonical.json",
+      "sha256": "33a61b3bcc66c10d2a18ed834c23e97826d8e78e37a32c9fd0f02f9bec9c130b",
+      "size": 11419580,
+      "source": "series"
+    },
+    "disjoint/048": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r048.json",
+      "sha256": "442402a7823818c7dad9db7fa169e788a2ae4e0d50b756c2a463fa37e696163c",
+      "size": 376877,
+      "source": "series"
+    },
+    "disjoint/048/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r048.evaluate-use/product.canonical.json",
+      "sha256": "a94879a39d788e49e835e1ee21d91cb1065ed862b68440fa37c84e8c1dcbe602",
+      "size": 7051206,
+      "source": "series"
+    },
+    "disjoint/048/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r048.seal-control/product.canonical.json",
+      "sha256": "878838dc7ec6b58318f2280eae45db99abc12a88255142480fc2b70c248baf98",
+      "size": 11419753,
+      "source": "series"
+    },
+    "disjoint/049": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r049.json",
+      "sha256": "f19eaf8005db99a4e72f2f06f3757f1e6a9ea2374766eaff5d15b3d428ee670e",
+      "size": 377611,
+      "source": "series"
+    },
+    "disjoint/049/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r049.evaluate-use/product.canonical.json",
+      "sha256": "7b2a30387111c843436139e473d5967cb1fa57647aefeac4d1808d26ddfb3c55",
+      "size": 7052102,
+      "source": "series"
+    },
+    "disjoint/049/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r049.seal-control/product.canonical.json",
+      "sha256": "8ad115e169553ba5d05b306155ecb865ac2bdb9282534cf12a8a0f1733fab1c6",
+      "size": 11420846,
+      "source": "series"
+    },
+    "disjoint/050": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r050.json",
+      "sha256": "6af1aa370a133cc6009118c5698a51262f558c296755eaf103426af15741aea1",
+      "size": 236094,
+      "source": "series"
+    },
+    "disjoint/050/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r050.evaluate-use/product.canonical.json",
+      "sha256": "03c90d341852350fcd387569b45e0bf057fbbe41e7ab9b8912f2131c19c33c4d",
+      "size": 4092128,
+      "source": "series"
+    },
+    "disjoint/050/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r050.seal-control/product.canonical.json",
+      "sha256": "55ec3209307f4d49a7af4b1caf03f1794e1d544fc11aad860f1cfdb6f1f666bd",
+      "size": 7306474,
+      "source": "series"
+    },
+    "disjoint/051": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r051.json",
+      "sha256": "0d5c763ef5c87b473d60c2cdd5ef41e4c922135ee1e359fd6d5b76cfa0f4dbbf",
+      "size": 235832,
+      "source": "series"
+    },
+    "disjoint/051/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r051.evaluate-use/product.canonical.json",
+      "sha256": "6997f9f750a9de2411c4290d84d19a78dd7abc1f4dcd400a2a3fdf6edbd27fa6",
+      "size": 4091924,
+      "source": "series"
+    },
+    "disjoint/051/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r051.seal-control/product.canonical.json",
+      "sha256": "6c586a5af468be5a1a8d89a192e34e3da6659af151c6138398c836be0d1eb5a6",
+      "size": 7306244,
+      "source": "series"
+    },
+    "disjoint/052": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r052.json",
+      "sha256": "9cda3da9f06e29b29830ff97672e8e8a064242a4ee5960d1dc8337da9900e197",
+      "size": 377232,
+      "source": "series"
+    },
+    "disjoint/052/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r052.evaluate-use/product.canonical.json",
+      "sha256": "ffba3ca9251aa588f60e966b46fe605d0cab0948911d3d7569baa2c00cf51dc7",
+      "size": 7051446,
+      "source": "series"
+    },
+    "disjoint/052/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r052.seal-control/product.canonical.json",
+      "sha256": "19125289c2b42b675a33df76211c7177936255d60210746492a7e2ef65fcd25c",
+      "size": 11420021,
+      "source": "series"
+    },
+    "disjoint/053": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r053.json",
+      "sha256": "8580b4243d4910dbbf4a3c1a84bab5908e9cbe9e451238523d675e972cff89ae",
+      "size": 376970,
+      "source": "series"
+    },
+    "disjoint/053/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r053.evaluate-use/product.canonical.json",
+      "sha256": "e6cee0bc3c753967f596cc6074cad375995366301c429918a8f3088ccab88a92",
+      "size": 7051807,
+      "source": "series"
+    },
+    "disjoint/053/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r053.seal-control/product.canonical.json",
+      "sha256": "97c5f8d235703f17a53f302cd921bc5cb077b1d6d37359dda2ed4bfd1e092bc7",
+      "size": 11420041,
+      "source": "series"
+    },
+    "disjoint/054": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r054.json",
+      "sha256": "fa477aab5b872c2762676b998809e529563350a03fa8899e458b185bc69ffe43",
+      "size": 377740,
+      "source": "series"
+    },
+    "disjoint/054/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r054.evaluate-use/product.canonical.json",
+      "sha256": "27ccaa683eb051d1726dcb8c47ab8b83e60d8e7aa16daf0048cac2d32451c0c6",
+      "size": 7051842,
+      "source": "series"
+    },
+    "disjoint/054/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r054.seal-control/product.canonical.json",
+      "sha256": "5caa92a2efff5120c248ec533c34b6eef36797c603c57ebc079a36bd0873aa32",
+      "size": 11420443,
+      "source": "series"
+    },
+    "disjoint/055": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r055.json",
+      "sha256": "c4c7b89ed52a457a643bf427969500424f4ec075d441bf3b9c3e14f8f7989048",
+      "size": 376766,
+      "source": "series"
+    },
+    "disjoint/055/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r055.evaluate-use/product.canonical.json",
+      "sha256": "2bda8ff93cdf99571549dc0cd81afe8994e223208daccb080c35ad08854a9cb6",
+      "size": 7051636,
+      "source": "series"
+    },
+    "disjoint/055/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r055.seal-control/product.canonical.json",
+      "sha256": "64367c7749c2a2a44fc9bad3e1391e2237b87fd04a5f73390f0f114491a247c7",
+      "size": 11419835,
+      "source": "series"
+    },
+    "disjoint/056": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r056.json",
+      "sha256": "99cebc7f0bd441b43ed7c1485e75e5eaa3f642cb959943e4dda95566914678e8",
+      "size": 376428,
+      "source": "series"
+    },
+    "disjoint/056/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r056.evaluate-use/product.canonical.json",
+      "sha256": "c3c91c8c6dcd46720f0307bad0443fbb35beea446d60689bb3373ee1102e19b7",
+      "size": 7050976,
+      "source": "series"
+    },
+    "disjoint/056/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r056.seal-control/product.canonical.json",
+      "sha256": "f7a4440cb1f823fd12e8dd383c5a13970a9cb1e26f648bb602ff39a7bfa34f1a",
+      "size": 11419091,
+      "source": "series"
+    },
+    "disjoint/057": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r057.json",
+      "sha256": "20a6e2571cb1048f3c7114309a13eccb58629aa817a1f5cbda64181a44b1d5f3",
+      "size": 377061,
+      "source": "series"
+    },
+    "disjoint/057/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r057.evaluate-use/product.canonical.json",
+      "sha256": "a61a32d1219df719896e2d867e498c33397d3b868f104280425b28ec8e944f2d",
+      "size": 7051832,
+      "source": "series"
+    },
+    "disjoint/057/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r057.seal-control/product.canonical.json",
+      "sha256": "2cacfed02ea7a07192527a5ae6b79cd4154b959b6a8caa400b69e013fe48a892",
+      "size": 11420388,
+      "source": "series"
+    },
+    "disjoint/058": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r058.json",
+      "sha256": "c308c26c7435a7b57ddbef6421e32d027efa83cd96554eab9d645d79f3e152b6",
+      "size": 376194,
+      "source": "series"
+    },
+    "disjoint/058/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r058.evaluate-use/product.canonical.json",
+      "sha256": "e94360375f86a17ee119175cd03eeff0abef3c418eb89d719380b5f8bd12ddd1",
+      "size": 7051260,
+      "source": "series"
+    },
+    "disjoint/058/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r058.seal-control/product.canonical.json",
+      "sha256": "cd434ffade984e4ce0d4cf8709c02122d54071720bf6426362f66a6377daf0ac",
+      "size": 11419679,
+      "source": "series"
+    },
+    "disjoint/059": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r059.json",
+      "sha256": "b015e89535e03f115732e1079ae950a78be31c068171477c5dc650f0fd5921ff",
+      "size": 377188,
+      "source": "series"
+    },
+    "disjoint/059/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r059.evaluate-use/product.canonical.json",
+      "sha256": "b4a933f002ab931b3d86b7a40eb5b25c8f31561347b4a78b86da1e5865e857a7",
+      "size": 7051599,
+      "source": "series"
+    },
+    "disjoint/059/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r059.seal-control/product.canonical.json",
+      "sha256": "efa07ad02213fe6a509881a3a383bb7a99ecb2d458f2e87d9ae514c05401fceb",
+      "size": 11419923,
+      "source": "series"
+    },
+    "disjoint/060": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r060.json",
+      "sha256": "7f38a7d2137962416840362a1502dc3c86e5cad26a40ad48d82263efa335fad6",
+      "size": 376454,
+      "source": "series"
+    },
+    "disjoint/060/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r060.evaluate-use/product.canonical.json",
+      "sha256": "e02f35f8e2d89d3e409d239cb9e9325eb8cc9a62879c36019c2cefb404df0d90",
+      "size": 7051906,
+      "source": "series"
+    },
+    "disjoint/060/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r060.seal-control/product.canonical.json",
+      "sha256": "36da0e80256be9a1a985023b452beeab6aa2e0dd04cc9ef5268f38113da4d1a3",
+      "size": 11420530,
+      "source": "series"
+    },
+    "disjoint/061": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r061.json",
+      "sha256": "a47e5dd9b983e42d25f33aaa269de9d11cf8eceee5e8a2f3b0fb49b2bfde36d8",
+      "size": 377702,
+      "source": "series"
+    },
+    "disjoint/061/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r061.evaluate-use/product.canonical.json",
+      "sha256": "5dd43f30da5ca0e999b582c878e5cd24ba0d87c5c5a3328dd246932bb55c5682",
+      "size": 7051798,
+      "source": "series"
+    },
+    "disjoint/061/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r061.seal-control/product.canonical.json",
+      "sha256": "4c83965f5cf7c9fc18d97947b87671bb7dedac33b79b7ed503dc52c2f8e1a466",
+      "size": 11420266,
+      "source": "series"
+    },
+    "disjoint/062": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r062.json",
+      "sha256": "c086b896e3e7cd10c577db8e2d27a224011f9778311208bffff07b58fc970a13",
+      "size": 235378,
+      "source": "series"
+    },
+    "disjoint/062/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r062.evaluate-use/product.canonical.json",
+      "sha256": "29e6f24308c7911fb7c40867012c299b2286054b2335143b1f30dcca380b9bfa",
+      "size": 4091173,
+      "source": "series"
+    },
+    "disjoint/062/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r062.seal-control/product.canonical.json",
+      "sha256": "39164afcde0468d3cc505de8ef67aa499e90bc3d36e3118dd62a71b92f503498",
+      "size": 7304589,
+      "source": "series"
+    },
+    "disjoint/063": {
+      "path": "r24/artifacts/fresh-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r063.json",
+      "sha256": "76af05d70e12d2120bcec4a0b7baf5d20505ad3874f397463b5ce1de82962c12",
+      "size": 377373,
+      "source": "series"
+    },
+    "disjoint/063/reveal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r063.evaluate-use/product.canonical.json",
+      "sha256": "5a4101d935a397a257552a61a5588985bbd9fedca1894501b68c92642b7ed8dc",
+      "size": 7051596,
+      "source": "series"
+    },
+    "disjoint/063/seal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.e3.r063.seal-control/product.canonical.json",
+      "sha256": "8ad6a86fc6f5d79623be6a4af6def9e2a82de5fa35121dbc35d2491751b44651",
+      "size": 11419698,
+      "source": "series"
+    },
+    "disjoint/cohort": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/finite-response-law.prospective-evaluation.cohort/product.canonical.json",
+      "sha256": "df9182a50e3c2303b0c7905401399278b32adf2dc76a1fee32d4d4e5e6d79ca6",
+      "size": 2684113,
+      "source": "series"
+    },
+    "disjoint/native": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/finite-response-law.native-evaluate/product.canonical.json",
+      "sha256": "bb4ecb98493861e3ffcd52b5fc45b9a2d0800401bb50df17efbeea1701702d3b",
+      "size": 13095305,
+      "source": "series"
+    },
+    "disjoint/terminal": {
+      "path": "r24/artifacts/runs/r24.e3.run-c1fdb43386ca870895ad0f3de37298c9/outputs/finite-response-law.prospective-evaluation.adjudicate/product.canonical.json",
+      "sha256": "dd3287ebf0bc2606772f022412f1d0f8455f74a12bb4f24fba2417b7ad0e79c6",
+      "size": 2500,
+      "source": "series"
+    },
+    "historical/000": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r000.json",
+      "sha256": "d43a804a64d97d379ea4341647763a9df4adfbeab14f70202a0710c96d199d7c",
+      "size": 77375,
+      "source": "series"
+    },
+    "historical/001": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r001.json",
+      "sha256": "b87dce604af367bde8f89bb3ea8a5893068c8ac000348f50ae6d013ab44a7bda",
+      "size": 77422,
+      "source": "series"
+    },
+    "historical/002": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r002.json",
+      "sha256": "f44e0e5b1842abcd4278cade0b3a85f868ce5bccc67dd230ac3f592ec2f3a7f3",
+      "size": 77420,
+      "source": "series"
+    },
+    "historical/003": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r003.json",
+      "sha256": "755ae7e71926a02ffbcf7f99e2066aabd84cb6d4d1b7ccd424c2407fed007318",
+      "size": 77585,
+      "source": "series"
+    },
+    "historical/004": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r004.json",
+      "sha256": "030a4a4c2766cc04556b2151a47b2b59b2475d3f10ef8d3f5a1603eb88633c11",
+      "size": 77569,
+      "source": "series"
+    },
+    "historical/005": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r005.json",
+      "sha256": "40edddf5b3123f3fb7bc0179473812454a29c5d9119a30ee5acb5636bdc6842c",
+      "size": 77411,
+      "source": "series"
+    },
+    "historical/006": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r006.json",
+      "sha256": "9f3e8997cde9fffb2f7b65880f753213fab807637c9d9ddd1027fb53d2f8cdf0",
+      "size": 77457,
+      "source": "series"
+    },
+    "historical/007": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r007.json",
+      "sha256": "3154150efd3eff6186ec854822a30414703a5794bba70b28d6c648c4251ccbe2",
+      "size": 77365,
+      "source": "series"
+    },
+    "historical/008": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r008.json",
+      "sha256": "20d702a5e62a276b38a963ab8e094c96d8b47177729b687cda218b0cbb9e72fb",
+      "size": 77492,
+      "source": "series"
+    },
+    "historical/009": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r009.json",
+      "sha256": "3079d22ce3d7f63c96cdb12c6ad7212e5711e6a4eaae45b747fe010560da79a7",
+      "size": 77451,
+      "source": "series"
+    },
+    "historical/010": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r010.json",
+      "sha256": "7b77c6939c6f424f047e361504bd6e7fab32bf101e04b2120c6b26343452b19a",
+      "size": 77391,
+      "source": "series"
+    },
+    "historical/011": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r011.json",
+      "sha256": "90c933d55f2185faf2886db2e3efb98e15a640e9b44561142dda6af3a5146ea2",
+      "size": 77494,
+      "source": "series"
+    },
+    "historical/012": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r012.json",
+      "sha256": "caae1668409015d8b0dc179d7dc2764be83c30d146d9206a602dd4654c8fba8f",
+      "size": 77576,
+      "source": "series"
+    },
+    "historical/013": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r013.json",
+      "sha256": "9ee252298a1b3ac7e63294ebfea2336b2d5a74a2db29d3c94d0a7b26957f69f0",
+      "size": 77404,
+      "source": "series"
+    },
+    "historical/014": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r014.json",
+      "sha256": "d4482147b61141c5e13796f81704bb1fbee02cdc5bb128c67e88b291c69ef7c3",
+      "size": 77476,
+      "source": "series"
+    },
+    "historical/015": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r015.json",
+      "sha256": "79631728cd668b39f64bae2d0fe1a744a48a9d9a4f67ef37dee3edf5fea80c67",
+      "size": 77512,
+      "source": "series"
+    },
+    "historical/016": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r016.json",
+      "sha256": "c6a444cae711e4aea7a5cb30ee765dc669b77fddf688daa227bc9d37114fa67e",
+      "size": 77469,
+      "source": "series"
+    },
+    "historical/017": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r017.json",
+      "sha256": "b8cde0c3d54d0384a021dddecd5e4e53d2d2dea0ddc88d78dbf5a91f70303b51",
+      "size": 77475,
+      "source": "series"
+    },
+    "historical/018": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r018.json",
+      "sha256": "d66937445b6904ae8dc306869d512d8407cf778da06bb9be0b55f9677b7fee8d",
+      "size": 77646,
+      "source": "series"
+    },
+    "historical/019": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r019.json",
+      "sha256": "30d6e7891ecff118658e478aac08ff10a9fa22feb59b533d437c54742d15c44a",
+      "size": 77510,
+      "source": "series"
+    },
+    "historical/020": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r020.json",
+      "sha256": "155d5eade8a935b2b4f0982083a642d3518ad72214523fd83512cdae5fe9c6ba",
+      "size": 77519,
+      "source": "series"
+    },
+    "historical/021": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r021.json",
+      "sha256": "a1ff80d9135544b3a80cc8675fff0e53d79808df4fe1dd482d4d4c4310ee2b69",
+      "size": 77620,
+      "source": "series"
+    },
+    "historical/022": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r022.json",
+      "sha256": "a067b2ca76bf1b44259dbae08da7431d0e94fa3f47ae5fc490a7a3dbf10ef1a8",
+      "size": 77607,
+      "source": "series"
+    },
+    "historical/023": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r023.json",
+      "sha256": "dc5b4471780f578e6159ea3d02f38b13c4f64f707edb5c079b3692fce7d6cad8",
+      "size": 77505,
+      "source": "series"
+    },
+    "historical/024": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r024.json",
+      "sha256": "b89818a028c8514d42b836836327e025c166a5e0a731c6f559ad3604a01f86d7",
+      "size": 77369,
+      "source": "series"
+    },
+    "historical/025": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r025.json",
+      "sha256": "f06fc38e5d377cd17e7880e679111d5bf1e85bdc3520491adc7b9f02e50bcd04",
+      "size": 77588,
+      "source": "series"
+    },
+    "historical/026": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r026.json",
+      "sha256": "b76512bc374bda0f6ceb4dc0e1954da5eb665ed1fa41c68cb3617c8ec92e5b2d",
+      "size": 77593,
+      "source": "series"
+    },
+    "historical/027": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r027.json",
+      "sha256": "53bd88201c94ce5c4d495e89e4384298c450f55a7759d3b4a597184ea7af158c",
+      "size": 77476,
+      "source": "series"
+    },
+    "historical/028": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r028.json",
+      "sha256": "c2b8dc9be103d8e7589352d50d5581c5434cdba57e56c12d276327a1f314a5e6",
+      "size": 77628,
+      "source": "series"
+    },
+    "historical/029": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r029.json",
+      "sha256": "46060c3bcde83e2a3b931891d82f60b36a925da0ab008bdbec5cd2796121eeb3",
+      "size": 77511,
+      "source": "series"
+    },
+    "historical/030": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r030.json",
+      "sha256": "0ffcd471ac7eda77bf1d2ada011636e4bcd44f04e4b6b0bed8128386409634bd",
+      "size": 77482,
+      "source": "series"
+    },
+    "historical/031": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r031.json",
+      "sha256": "8539815813013fc801e86a9f8139d8179364df3ed77040b1d0b9c41b51151fb6",
+      "size": 77510,
+      "source": "series"
+    },
+    "historical/032": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r032.json",
+      "sha256": "9e44f3df59dec4853c9572280195d89fba133fbf4cf223501485a36e15282aaa",
+      "size": 77518,
+      "source": "series"
+    },
+    "historical/033": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r033.json",
+      "sha256": "efe0093e2af9dafff53ca8120e2c74e9c72487495ceb883d6050a2db02253e3d",
+      "size": 77570,
+      "source": "series"
+    },
+    "historical/034": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r034.json",
+      "sha256": "479b2d6c6c9a4d34609b0a9607d4edcb23db7ab25e235599b9467921620ca2d3",
+      "size": 77463,
+      "source": "series"
+    },
+    "historical/035": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r035.json",
+      "sha256": "e0076be4b6903de935b296566ee5a7069b7ccb79d537cb0fc9e726e648ef5469",
+      "size": 77397,
+      "source": "series"
+    },
+    "historical/036": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r036.json",
+      "sha256": "8982542ab214bf8823fc7338f92a435fe81df874d2cd40e4a8e7f4a5b8a67126",
+      "size": 77509,
+      "source": "series"
+    },
+    "historical/037": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r037.json",
+      "sha256": "c12c4b0bda0dbb004127a1e2ab8683f6b0abf9ec024a59cb97ea041075e4dd2a",
+      "size": 77523,
+      "source": "series"
+    },
+    "historical/038": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r038.json",
+      "sha256": "e3d8738b7e18dd7871e6887bf5c7545edf0b6c630588b9e37ba5d60662f8c727",
+      "size": 77560,
+      "source": "series"
+    },
+    "historical/039": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r039.json",
+      "sha256": "e5703b62ac2d96538799bc5d8c26672f5906a764a5c0a894eb257f73778dd96d",
+      "size": 77559,
+      "source": "series"
+    },
+    "historical/040": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r040.json",
+      "sha256": "589bbae6dbb7ec025cb8f0552934b3fb79f7ae6619e4c74e0cdb4c33c879a720",
+      "size": 77517,
+      "source": "series"
+    },
+    "historical/041": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r041.json",
+      "sha256": "19b6523ed3694fcfb6faf14ee49b55617482c152154996fbb9febde6df2535db",
+      "size": 77404,
+      "source": "series"
+    },
+    "historical/042": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r042.json",
+      "sha256": "356b79615f76f43473b087e5e1603c504faa32ad65030f624ee9c7d83c927862",
+      "size": 77390,
+      "source": "series"
+    },
+    "historical/043": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r043.json",
+      "sha256": "4f6f329c713298bf46bff4403835422f6a1931542a0a6428c5d0b74bf573138f",
+      "size": 77360,
+      "source": "series"
+    },
+    "historical/044": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r044.json",
+      "sha256": "986a77ac9fa47ade8e9070f5bb5cdf592b984d327503a634930a6a00dfeb6dc3",
+      "size": 77496,
+      "source": "series"
+    },
+    "historical/045": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r045.json",
+      "sha256": "1a042676e28974eb8e9f764dbe295ad9f75ffee04a3ad22e3c78414303237acf",
+      "size": 77371,
+      "source": "series"
+    },
+    "historical/046": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r046.json",
+      "sha256": "ee798a48a76bbc5c8af74fb2201c04745533828c188fcdef6783ce8fc33eb35c",
+      "size": 77568,
+      "source": "series"
+    },
+    "historical/047": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r047.json",
+      "sha256": "ca7011dd2933f2de0ceb0379a8d192190c8ba8a130cced804a96acfa5f196ce0",
+      "size": 77580,
+      "source": "series"
+    },
+    "historical/048": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r048.json",
+      "sha256": "a3d58ee97a4d723c2370f11d3e08beda5a8ef95dca8fbda347731ac13ec92d77",
+      "size": 77580,
+      "source": "series"
+    },
+    "historical/049": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r049.json",
+      "sha256": "01ecbb7322f6701a70cb08e8527db9207e617dbd40277ac0d769087ff55122a4",
+      "size": 77588,
+      "source": "series"
+    },
+    "historical/050": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r050.json",
+      "sha256": "31c344fde236c3f2b1ee4c579f65661ffa279644b01e2a2441e5dc9ec1ba4b66",
+      "size": 77426,
+      "source": "series"
+    },
+    "historical/051": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r051.json",
+      "sha256": "bd723cf4486aca2a126f4c0ae44979b2a515b34beb5f161014e7e57607950ca1",
+      "size": 77552,
+      "source": "series"
+    },
+    "historical/052": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r052.json",
+      "sha256": "7ead40998f1d17ea3a90a5e2684bbe97142ab7988bdb97bc87424b71a9bd8ef7",
+      "size": 77370,
+      "source": "series"
+    },
+    "historical/053": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r053.json",
+      "sha256": "a6c8219deca5451fe2e1a5caf55559dc68c45182269500003b5b427cad133f5f",
+      "size": 77498,
+      "source": "series"
+    },
+    "historical/054": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r054.json",
+      "sha256": "b4b848c20aa9722984765759c9453ff2302f649cd5746a277f8691c935e2da9c",
+      "size": 77482,
+      "source": "series"
+    },
+    "historical/055": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r055.json",
+      "sha256": "93fe1b3f28f1ff7a7a1c91c5a75c6b0e7a9a1c0ec284fddc34c60ee108f8d992",
+      "size": 77410,
+      "source": "series"
+    },
+    "historical/056": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r056.json",
+      "sha256": "3fa0fd973a21f30f9e6348907181637dcf9d6b2a3345cd07026d255de2deeba9",
+      "size": 77653,
+      "source": "series"
+    },
+    "historical/057": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r057.json",
+      "sha256": "92b16a49ee967a007df5d06c62f81bf04425b7c8813a473f21e7a125d13e4132",
+      "size": 77444,
+      "source": "series"
+    },
+    "historical/058": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r058.json",
+      "sha256": "fd83edc628423c0601de28d4befc26236c4a77ab11a05c609e458c111c1d8b9a",
+      "size": 77538,
+      "source": "series"
+    },
+    "historical/059": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r059.json",
+      "sha256": "f816ea22190241d07c963a1efbff08b14124679bac9f1232cafc1595d5444f9f",
+      "size": 77544,
+      "source": "series"
+    },
+    "historical/060": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r060.json",
+      "sha256": "1ba758acc7db70c7735dcc87de5c4da096aede7d2b699d1810192207084c2cc4",
+      "size": 77368,
+      "source": "series"
+    },
+    "historical/061": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r061.json",
+      "sha256": "cb48f8a3bc746acef2c2236979304d49db96a9bb59789c61c690ee559b7eef8c",
+      "size": 77509,
+      "source": "series"
+    },
+    "historical/062": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r062.json",
+      "sha256": "80b0d4c7e8b9fc6af46ff258c9a96184b07d21f7fd9e1b25648f2f0226d9c3cb",
+      "size": 77536,
+      "source": "series"
+    },
+    "historical/063": {
+      "path": "r24/artifacts/historical-handoff-errors-01/t1-eval.r063.json",
+      "sha256": "d14667f0a11dbcf493f1b1d484d5b2d644927b51516aadbe5b15d993b1b612a7",
+      "size": 77506,
+      "source": "series"
+    },
+    "interrupted": {
+      "path": "r24/artifacts/evaluation-first-interruption/assigned-roots.json",
+      "sha256": "c3f96229d6f23c16f335513d1342b262154597bae4baf90907fa004a7e9c342a",
+      "size": 44525,
+      "source": "series"
+    },
+    "lower": {
+      "path": "r24/artifacts/runs/r24.m2.run-34baba7f9c4fd64d55b2007648491099/candidate-models/finite-response-law.lower.frozen.canonical.json",
+      "sha256": "05da51d5635f78f80bc70ee24a3ad0d30459561ab8847e1321ed517ee0b117cc",
+      "size": 38224,
+      "source": "series"
+    },
+    "qualification": {
+      "path": "r24/artifacts/runs/r24.m2.run-34baba7f9c4fd64d55b2007648491099/outputs/finite-response-law.calibration.qualify/report.json",
+      "sha256": "36f9673be23b4a7cf4afc53e0755887ad14841ba440b491202cc8e2c5938ade5",
+      "size": 570567,
+      "source": "series"
+    },
+    "retained/000": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r000.json",
+      "sha256": "000ef9274e421138efb8f765172cecfa522eb94e0c09b66b8d8a9ce7abc8f3d0",
+      "size": 239232,
+      "source": "series"
+    },
+    "retained/000/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r000.evaluate-use/product.canonical.json",
+      "sha256": "08a8ba38162615878ad54673e658d80b3889efddcb21ede95434255f330fe946",
+      "size": 4120111,
+      "source": "series"
+    },
+    "retained/000/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r000.seal-control/product.canonical.json",
+      "sha256": "839877a9a6fa90210ce61777ed5637adb0097f1ded38fb8efc127c99570af7ca",
+      "size": 7347242,
+      "source": "series"
+    },
+    "retained/001": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r001.json",
+      "sha256": "6ae66f8824d439812942a2060c14bda4a549575956594fb80133920618046834",
+      "size": 380426,
+      "source": "series"
+    },
+    "retained/001/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r001.evaluate-use/product.canonical.json",
+      "sha256": "6493af58aaceb38730c358ae66123a8b059d96c194ca31af3aa2296b4af80841",
+      "size": 7100197,
+      "source": "series"
+    },
+    "retained/001/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r001.seal-control/product.canonical.json",
+      "sha256": "e03f9dde46d2e1616e756bc896c4a46384ae75df73566b18f83a59ec59fbe33f",
+      "size": 11490697,
+      "source": "series"
+    },
+    "retained/002": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r002.json",
+      "sha256": "225effe0b98004dccb60d710e275d405574ef69342f85f362f190ca7c5547233",
+      "size": 380928,
+      "source": "series"
+    },
+    "retained/002/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r002.evaluate-use/product.canonical.json",
+      "sha256": "68a8bda30a2dcdda8440ef8f1671837f8983691aa080a90f8918d8a3c2583462",
+      "size": 7100729,
+      "source": "series"
+    },
+    "retained/002/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r002.seal-control/product.canonical.json",
+      "sha256": "af44621e66981d0787a7a043f2ec9858c73c68699d1ed16bccff49109c0acf0a",
+      "size": 11491662,
+      "source": "series"
+    },
+    "retained/003": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r003.json",
+      "sha256": "406b1fb1b33bdebdcc030f8121555f3bb28eb6fc80d69fc8e2f138c1f4327e77",
+      "size": 333659,
+      "source": "series"
+    },
+    "retained/003/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r003.evaluate-use/product.canonical.json",
+      "sha256": "1766105e39bfc986918ddd0f18e36f96c9bd78ae97b426c9adc6df5fe741ef71",
+      "size": 6115471,
+      "source": "series"
+    },
+    "retained/003/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r003.seal-control/product.canonical.json",
+      "sha256": "c2d8b0627cf2982429e4004e62482c6389553ba610d8a199d89eda25185e7657",
+      "size": 10122355,
+      "source": "series"
+    },
+    "retained/004": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r004.json",
+      "sha256": "1e02276b0cbce70304573227df273716089e68ffefb25706b2557735e4cc0a62",
+      "size": 380850,
+      "source": "series"
+    },
+    "retained/004/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r004.evaluate-use/product.canonical.json",
+      "sha256": "436d58e02d97f437f76160c01c13ce00f1224fc300bd0322c385285c079def57",
+      "size": 7100758,
+      "source": "series"
+    },
+    "retained/004/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r004.seal-control/product.canonical.json",
+      "sha256": "790de9d9030962cb86e916384f5ab96623bd2727e11310f35db3bcf46548fa63",
+      "size": 11491891,
+      "source": "series"
+    },
+    "retained/005": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r005.json",
+      "sha256": "e154a569b447ce892026e63c73a12dfb1b340b30aba8df0e3a684d1774919335",
+      "size": 379712,
+      "source": "series"
+    },
+    "retained/005/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r005.evaluate-use/product.canonical.json",
+      "sha256": "239e2a43231baaf7c4c354effc2c2e200106109d919b40ce594fb00f3c34d099",
+      "size": 7099682,
+      "source": "series"
+    },
+    "retained/005/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r005.seal-control/product.canonical.json",
+      "sha256": "2277daaba16e2b599ac9352de377ad1b8efd9bd3c5eb035cd8efa42d4f759000",
+      "size": 11490186,
+      "source": "series"
+    },
+    "retained/006": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r006.json",
+      "sha256": "4be45372f570c237e775f92feddf2178588d196361d8c03f60443661d0db19ab",
+      "size": 379577,
+      "source": "series"
+    },
+    "retained/006/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r006.evaluate-use/product.canonical.json",
+      "sha256": "d44f00f6b038f516c2bee9095c2121cbf8836800efc2dac6f18009a9234baa3b",
+      "size": 7099685,
+      "source": "series"
+    },
+    "retained/006/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r006.seal-control/product.canonical.json",
+      "sha256": "577e16a39aeb95df78fdb82d23032517734b37b4d70c76d4132b48bc051cd019",
+      "size": 11490349,
+      "source": "series"
+    },
+    "retained/007": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r007.json",
+      "sha256": "c3d2586af72b719defe79b39838e657df63d858981fcf9d8fe11e0a1cb964373",
+      "size": 239222,
+      "source": "series"
+    },
+    "retained/007/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r007.evaluate-use/product.canonical.json",
+      "sha256": "6df71ceea8f38597e8ff30a2699239ccc4bcf73841bb4cf733ece8bd0079f944",
+      "size": 4120138,
+      "source": "series"
+    },
+    "retained/007/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r007.seal-control/product.canonical.json",
+      "sha256": "962e73a923aecfbdb6a1bb16feaa89df5fe6ecdd7f5f44c215680a639dd50a4f",
+      "size": 7347256,
+      "source": "series"
+    },
+    "retained/008": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r008.json",
+      "sha256": "9e3a0a4ce4f3bf7c50f6e5789eb732d5c0e054c3badfdd748f1edd3b9ff79a0b",
+      "size": 379836,
+      "source": "series"
+    },
+    "retained/008/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r008.evaluate-use/product.canonical.json",
+      "sha256": "cd9a0186ab144ad3a4448297f78dae359ded7a344105ee6cbd8fcae3fa01ab48",
+      "size": 7100360,
+      "source": "series"
+    },
+    "retained/008/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r008.seal-control/product.canonical.json",
+      "sha256": "45279c94cb6fd8874aa1a6c7c57a3c230acbfb5cf9fece9d6d97ba502200568e",
+      "size": 11491331,
+      "source": "series"
+    },
+    "retained/009": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r009.json",
+      "sha256": "b170662ba4c864e0530ec5f9815a45153e222eaf5c556e7456cc6ff4294889a2",
+      "size": 380138,
+      "source": "series"
+    },
+    "retained/009/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r009.evaluate-use/product.canonical.json",
+      "sha256": "ea25996189a882c5fef73b2f31e66d87b64ac6c6647173c0931f154adcbd1500",
+      "size": 7099816,
+      "source": "series"
+    },
+    "retained/009/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r009.seal-control/product.canonical.json",
+      "sha256": "0beed4402e31cab1ff184cb1994701a6b3bfb5c07027afe85441439c8d8f9f85",
+      "size": 11490588,
+      "source": "series"
+    },
+    "retained/010": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r010.json",
+      "sha256": "1f18d9d6d7a9ddf9135eb1821fb081f0e2306152080204ec2ee47a773e8d4952",
+      "size": 380158,
+      "source": "series"
+    },
+    "retained/010/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r010.evaluate-use/product.canonical.json",
+      "sha256": "6fb2ef661fb073aa4b2e828177d971c7135274ed00ab99b7e39a11ef64d34620",
+      "size": 7099819,
+      "source": "series"
+    },
+    "retained/010/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r010.seal-control/product.canonical.json",
+      "sha256": "c999d141d86e78e0363a698baf09e0fc72354dd7d27e90b0425eeb10632b7d9c",
+      "size": 11490601,
+      "source": "series"
+    },
+    "retained/011": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r011.json",
+      "sha256": "1965dada783434430cfed0f322c3097be92cebe187b45a4d198b2100f7869409",
+      "size": 379732,
+      "source": "series"
+    },
+    "retained/011/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r011.evaluate-use/product.canonical.json",
+      "sha256": "f17ff971a040f176255377a8c16869dfb260c17147fa410e3d69a1831439eea9",
+      "size": 7099736,
+      "source": "series"
+    },
+    "retained/011/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r011.seal-control/product.canonical.json",
+      "sha256": "6e70cd2801f68a28b6b1f3660ead5218f4b2460e379e9b426b41fd195fd8f4ee",
+      "size": 11490670,
+      "source": "series"
+    },
+    "retained/012": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r012.json",
+      "sha256": "e3b9bc2d6d21ffad10fb744f7bc46e351988659d59b43b336242e2bb0d4afc7c",
+      "size": 380375,
+      "source": "series"
+    },
+    "retained/012/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r012.evaluate-use/product.canonical.json",
+      "sha256": "a99c82e6de5d7beb0c9bfc4e518f50529588ab93edc8b9b0417d3a3b108b929f",
+      "size": 7100514,
+      "source": "series"
+    },
+    "retained/012/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r012.seal-control/product.canonical.json",
+      "sha256": "299bef156307d4ce943e1ae01fc348b473b87f64a2bcf0eff04e2b93a11d26aa",
+      "size": 11491369,
+      "source": "series"
+    },
+    "retained/013": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r013.json",
+      "sha256": "c82e12a5a20db8ea27a089bd374d03fc00fdc91c3d8611a79d29a781068626e8",
+      "size": 380383,
+      "source": "series"
+    },
+    "retained/013/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r013.evaluate-use/product.canonical.json",
+      "sha256": "a2f30c16c43ba1daca43faed7f7136e0855b9a2896a98c862518898c32225bfb",
+      "size": 7100590,
+      "source": "series"
+    },
+    "retained/013/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r013.seal-control/product.canonical.json",
+      "sha256": "2091d2175745da7ba0c5d8de08de240c45031f2d7a920d5b8d88d357774b7fc4",
+      "size": 11491736,
+      "source": "series"
+    },
+    "retained/014": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r014.json",
+      "sha256": "07ddbe8400535286510bc6d432247995f9bfdb0ca92597d8c20ceca357f5aee9",
+      "size": 379811,
+      "source": "series"
+    },
+    "retained/014/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r014.evaluate-use/product.canonical.json",
+      "sha256": "3549131cce843c71ae0dae76a8bdf0de2684f53360f930e1210847e525f2bd3c",
+      "size": 7099665,
+      "source": "series"
+    },
+    "retained/014/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r014.seal-control/product.canonical.json",
+      "sha256": "d93983b5a4b228fd293c3d3c2ccde3970d1d605f9e504f508b7f36419359cd51",
+      "size": 11490310,
+      "source": "series"
+    },
+    "retained/015": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r015.json",
+      "sha256": "78d345c602480c2970897fa9febdc6531216bb761914b7b5e2ab8dd8c43bf1bb",
+      "size": 380169,
+      "source": "series"
+    },
+    "retained/015/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r015.evaluate-use/product.canonical.json",
+      "sha256": "df3766ebf66f89f8aa2664a843aad53c37c3ce4ccba7f5a20b235f600667d2f4",
+      "size": 7099687,
+      "source": "series"
+    },
+    "retained/015/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r015.seal-control/product.canonical.json",
+      "sha256": "b3c38837e076ccbe297596ddf1341d7df035732b95c164b89b3c4a2198da21eb",
+      "size": 11490408,
+      "source": "series"
+    },
+    "retained/016": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r016.json",
+      "sha256": "c52081b6395847f7643c41e4f432b5b5f39f5673c09344f854896e74b9daf23c",
+      "size": 379984,
+      "source": "series"
+    },
+    "retained/016/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r016.evaluate-use/product.canonical.json",
+      "sha256": "fa9dad438c52f8675882fde4c333643065c214efd8e3b6ad669d4482019efd58",
+      "size": 7099674,
+      "source": "series"
+    },
+    "retained/016/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r016.seal-control/product.canonical.json",
+      "sha256": "83db7399c709f03dbde9dd8d40be1cfe2421b44999f8071000d1a425c2e0ee61",
+      "size": 11490518,
+      "source": "series"
+    },
+    "retained/017": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r017.json",
+      "sha256": "9ad525fb65e78a7a7403fd7d37ccb4062b7e181ac45289f8cd8fb8e5a81da2fc",
+      "size": 380653,
+      "source": "series"
+    },
+    "retained/017/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r017.evaluate-use/product.canonical.json",
+      "sha256": "efdc063d501f95df6f89e7cba3bbb0c4a2180f686a9738640f4c2774e832819d",
+      "size": 7100604,
+      "source": "series"
+    },
+    "retained/017/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r017.seal-control/product.canonical.json",
+      "sha256": "df39184a584d1eeb8ef3a72ad24dcdb7ab5cb8affc4d90195b95f1ddb358d583",
+      "size": 11491374,
+      "source": "series"
+    },
+    "retained/018": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r018.json",
+      "sha256": "0d8ce12469f0c659f6a834a110c5169841df2844daddac1ddd17f1a7310967e2",
+      "size": 379375,
+      "source": "series"
+    },
+    "retained/018/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r018.evaluate-use/product.canonical.json",
+      "sha256": "b261bfb7a99037bc4e3b0fbe28cf2c3ed70cf297b30c9cccce68acb20674fd60",
+      "size": 7099735,
+      "source": "series"
+    },
+    "retained/018/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r018.seal-control/product.canonical.json",
+      "sha256": "335145c0121e0faeeaac653d5089970b6323bd9a45868608b782a2e106c859d4",
+      "size": 11490688,
+      "source": "series"
+    },
+    "retained/019": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r019.json",
+      "sha256": "fb3f12fadccb8a3eb6c4c2d28f856a7e60cc8c1d55d63cb0cb2fb54990278423",
+      "size": 380500,
+      "source": "series"
+    },
+    "retained/019/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r019.evaluate-use/product.canonical.json",
+      "sha256": "f926d10b172ce7971b1e82fdd8e27c08844784635cf5e181bfd84fabc62c83c5",
+      "size": 7100437,
+      "source": "series"
+    },
+    "retained/019/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r019.seal-control/product.canonical.json",
+      "sha256": "cbaeb8f90dcea5c94f5c7ddfe067e5276131f8b84439e43221a2329cd2e8e649",
+      "size": 11491494,
+      "source": "series"
+    },
+    "retained/020": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r020.json",
+      "sha256": "e7987401d100f0cc42b9b194f8c1521beadd0bc5147a8a8cfb1009090213e445",
+      "size": 379661,
+      "source": "series"
+    },
+    "retained/020/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r020.evaluate-use/product.canonical.json",
+      "sha256": "f46228201c68289e8722aeb5b33cc2285b0710ce363cb0e20ec9627424b5266f",
+      "size": 7099695,
+      "source": "series"
+    },
+    "retained/020/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r020.seal-control/product.canonical.json",
+      "sha256": "3ed7beb6be32cc68533a588ae3b55e46d34dafb55c3cf1343100da52d6c74055",
+      "size": 11490506,
+      "source": "series"
+    },
+    "retained/021": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r021.json",
+      "sha256": "90047814a553883cc244933ee354d60d05577c9dee278ce1f5859899ea2246f2",
+      "size": 379525,
+      "source": "series"
+    },
+    "retained/021/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r021.evaluate-use/product.canonical.json",
+      "sha256": "ce4ec5e1e855f15c7bf2d38221f7798d09fd34d7ef5a4adbb2c2db39749d4d89",
+      "size": 7100198,
+      "source": "series"
+    },
+    "retained/021/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r021.seal-control/product.canonical.json",
+      "sha256": "31891238e60df2e64bc99bd744d5aa7b9428b5aba1b178d79ecf85e767151906",
+      "size": 11491250,
+      "source": "series"
+    },
+    "retained/022": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r022.json",
+      "sha256": "edac2425aac53ae7285ef0df7e3cdd193fe9ff068312efe899c515da8af5e1a8",
+      "size": 380449,
+      "source": "series"
+    },
+    "retained/022/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r022.evaluate-use/product.canonical.json",
+      "sha256": "55ab3368bb971916f127124d57e2b12160db0bc1a7ca857e0dcdc1360e7c1c9c",
+      "size": 7100249,
+      "source": "series"
+    },
+    "retained/022/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r022.seal-control/product.canonical.json",
+      "sha256": "cb91343082f84421020030a852d291e55bc05c9cd0f798a631593a8fa95da802",
+      "size": 11491102,
+      "source": "series"
+    },
+    "retained/023": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r023.json",
+      "sha256": "4bbcafed3cbfb5bcda8d650a42a9018124efe27b50d6d04fed897567be3d66eb",
+      "size": 380232,
+      "source": "series"
+    },
+    "retained/023/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r023.evaluate-use/product.canonical.json",
+      "sha256": "fb1e1f94d4286a27537934d4cfa04b3db72bb159cf07007348a70066ec276cfc",
+      "size": 7100443,
+      "source": "series"
+    },
+    "retained/023/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r023.seal-control/product.canonical.json",
+      "sha256": "5220d5966e686d530b7239a52b3dcd3275c337bd0ba08943db966b1eff35c49f",
+      "size": 11491735,
+      "source": "series"
+    },
+    "retained/024": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r024.json",
+      "sha256": "63ca2e8fe52f2478a8fecdd51c1c7225e8b2ecdd07931972bfea4f0996fc2215",
+      "size": 380748,
+      "source": "series"
+    },
+    "retained/024/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r024.evaluate-use/product.canonical.json",
+      "sha256": "673482a7ab34c24fc1908004bbf15cba0499e0de0b80d0aff13ac4a7d7c99089",
+      "size": 7100473,
+      "source": "series"
+    },
+    "retained/024/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r024.seal-control/product.canonical.json",
+      "sha256": "bf642e1cd8e2026c431cbe04a60c4b27c011b276fc03c919fff1582f38d4c212",
+      "size": 11491341,
+      "source": "series"
+    },
+    "retained/025": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r025.json",
+      "sha256": "01c1e94c3087efac352763832578849af626a8cb012d1ca3e50f805ae2362946",
+      "size": 380109,
+      "source": "series"
+    },
+    "retained/025/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r025.evaluate-use/product.canonical.json",
+      "sha256": "f3e8f79afd32724eb69a2988ad52ec7f4f6871b6ebf6855c541fbaa70d8d8ffe",
+      "size": 7100786,
+      "source": "series"
+    },
+    "retained/025/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r025.seal-control/product.canonical.json",
+      "sha256": "ebed9570cbae4a0f8b760144eae95946d836ae9bcb1377af6009d4da535c27cc",
+      "size": 11491812,
+      "source": "series"
+    },
+    "retained/026": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r026.json",
+      "sha256": "e4112a452029320f02c7e526d3197772c33ee23b37491be4a707d4bbe8f48baa",
+      "size": 380371,
+      "source": "series"
+    },
+    "retained/026/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r026.evaluate-use/product.canonical.json",
+      "sha256": "9228865a983dac92a1815970e1b4dddbbac05833c460560cb0399565ddecc9ff",
+      "size": 7100553,
+      "source": "series"
+    },
+    "retained/026/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r026.seal-control/product.canonical.json",
+      "sha256": "9958c27494b9a895e13492ee1d7706f63378ddc11ce61540a5451f663933c268",
+      "size": 11491565,
+      "source": "series"
+    },
+    "retained/027": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r027.json",
+      "sha256": "486ab61ef09cef73d41c403a0d2385d28a1cd0d5c52d0429bab3bb92db6e665f",
+      "size": 379792,
+      "source": "series"
+    },
+    "retained/027/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r027.evaluate-use/product.canonical.json",
+      "sha256": "7a6f78b62c00036c2c256304dfe70628ddeeda4be2c7c42369a04769a866b7ac",
+      "size": 7100082,
+      "source": "series"
+    },
+    "retained/027/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r027.seal-control/product.canonical.json",
+      "sha256": "d83f63ffade898016034c39400b1cfd10fbc6359d31b4cfa0c10eb05dec4c35f",
+      "size": 11490972,
+      "source": "series"
+    },
+    "retained/028": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r028.json",
+      "sha256": "801a6d88fdad5adead53581efd61972ef18e2be59b3a8624266db8fe16db4b3d",
+      "size": 379897,
+      "source": "series"
+    },
+    "retained/028/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r028.evaluate-use/product.canonical.json",
+      "sha256": "4b0a40c5f545a0af28c1974692f7761a7e49fdca5d876eb16ec934ec5923cba6",
+      "size": 7100400,
+      "source": "series"
+    },
+    "retained/028/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r028.seal-control/product.canonical.json",
+      "sha256": "7b2dccfb28b9fe1f97dab1b119b76a66faad66e83f6614f69a5c40b6586d26ad",
+      "size": 11491533,
+      "source": "series"
+    },
+    "retained/029": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r029.json",
+      "sha256": "2da627984fc34bc2f5cc9165755f0cd11221722d34ce00db6376f07b4cec22d7",
+      "size": 380062,
+      "source": "series"
+    },
+    "retained/029/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r029.evaluate-use/product.canonical.json",
+      "sha256": "5fb33335d5edd40cd7ae798a7a39f7d55b14e4f574624583c882187acd7f73b6",
+      "size": 7100084,
+      "source": "series"
+    },
+    "retained/029/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r029.seal-control/product.canonical.json",
+      "sha256": "5d515de4a3f9a3891142d2761fe5ab7f2dd40e015ddc55245d69fe3dc34a811b",
+      "size": 11490993,
+      "source": "series"
+    },
+    "retained/030": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r030.json",
+      "sha256": "ed54db26e054b72c27803f5230e1077a61b87c4e0e89fef16f328c1df43e7ff8",
+      "size": 380568,
+      "source": "series"
+    },
+    "retained/030/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r030.evaluate-use/product.canonical.json",
+      "sha256": "70bc500b6e8af15da8856035a35c98861c124e14d0f2fc9dd0894451691eb8a4",
+      "size": 7100678,
+      "source": "series"
+    },
+    "retained/030/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r030.seal-control/product.canonical.json",
+      "sha256": "c09766ba93d8d316caeb40bcba71554867ff5e9cfd6bc7a49f2e88791bdcc420",
+      "size": 11491708,
+      "source": "series"
+    },
+    "retained/031": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r031.json",
+      "sha256": "5c9857cc30f4539bfb8845cdb9e7305d9bcf681d9e5e52229b30dae43f1d7783",
+      "size": 381028,
+      "source": "series"
+    },
+    "retained/031/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r031.evaluate-use/product.canonical.json",
+      "sha256": "6eef3e1ec5df65db32a6e127198ab53e04afdd8dbeb103828287d1372aecb5ad",
+      "size": 7100793,
+      "source": "series"
+    },
+    "retained/031/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r031.seal-control/product.canonical.json",
+      "sha256": "bd30b232fd676b90aea0c044d03457a4379c5255514ed34a8bf95cab03224180",
+      "size": 11491860,
+      "source": "series"
+    },
+    "retained/032": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r032.json",
+      "sha256": "5bfc4ee823fbf2cb248d6010215e0f8792a4b24a44d9a4e98be75db4437e354e",
+      "size": 380495,
+      "source": "series"
+    },
+    "retained/032/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r032.evaluate-use/product.canonical.json",
+      "sha256": "4db800b6010fab27c75d926bd298a33b667ec60147dcbc1238f706c94e6b203c",
+      "size": 7100538,
+      "source": "series"
+    },
+    "retained/032/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r032.seal-control/product.canonical.json",
+      "sha256": "4d3d082f762a39654fa350c4777d76b765f51252bd10dd2ba48ca2ee0037c7ec",
+      "size": 11491747,
+      "source": "series"
+    },
+    "retained/033": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r033.json",
+      "sha256": "adf7f2fd7ac08617b876e36992463717832cd7fdedb1d2728008d12b590c7f26",
+      "size": 380551,
+      "source": "series"
+    },
+    "retained/033/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r033.evaluate-use/product.canonical.json",
+      "sha256": "96a491ea4b10450773a0652e11a826b9ed9447cd452dd6339cb3a900186ddc54",
+      "size": 7100547,
+      "source": "series"
+    },
+    "retained/033/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r033.seal-control/product.canonical.json",
+      "sha256": "dbc6ceb17572eda5f77194b522c8cdbaa465dac4e4ebe302cf275d3181813493",
+      "size": 11491497,
+      "source": "series"
+    },
+    "retained/034": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r034.json",
+      "sha256": "4135dc988820baea07e8bf6af60f15aee65e7fdc5a7d6446d1e015b2da82697d",
+      "size": 333223,
+      "source": "series"
+    },
+    "retained/034/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r034.evaluate-use/product.canonical.json",
+      "sha256": "d53a78d72c32be0c346e57707fbebab3ffcead67d8d6ae6725fb297396557f36",
+      "size": 6115274,
+      "source": "series"
+    },
+    "retained/034/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r034.seal-control/product.canonical.json",
+      "sha256": "1f49b239adf9cd52ea6a81faa31e24887240b039b80bafd9f7b5d147aeb1cd1d",
+      "size": 10122180,
+      "source": "series"
+    },
+    "retained/035": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r035.json",
+      "sha256": "001130214dae3fb03e399142c7ddb51dae9c3914e484ca9984d49666914e2011",
+      "size": 380554,
+      "source": "series"
+    },
+    "retained/035/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r035.evaluate-use/product.canonical.json",
+      "sha256": "d5a16437fb716bfeeaeb992bc3dbece9be5b98bf9ab60d9ba5ce43c34430c0a8",
+      "size": 7100617,
+      "source": "series"
+    },
+    "retained/035/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r035.seal-control/product.canonical.json",
+      "sha256": "7bf34905d51335a523150fd59da7da5baa932b2e6a5bc79481d67cb15fdab60f",
+      "size": 11491314,
+      "source": "series"
+    },
+    "retained/036": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r036.json",
+      "sha256": "d31e1b20c6443e36fdd34af5a543148447e534e3daac2d6edaeaad581e900d85",
+      "size": 380116,
+      "source": "series"
+    },
+    "retained/036/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r036.evaluate-use/product.canonical.json",
+      "sha256": "a727681e7abb10f242621a6c31b465c722f9d611b798c4a9c7ddb2fdcb78420b",
+      "size": 7100565,
+      "source": "series"
+    },
+    "retained/036/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r036.seal-control/product.canonical.json",
+      "sha256": "bf3cdf9252808e223e19bb3d4b627e9021f2ea17308441eea022bd236f0ff05a",
+      "size": 11491579,
+      "source": "series"
+    },
+    "retained/037": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r037.json",
+      "sha256": "73243a0f55fe1aed924eaad704b5d4099e6d78f92288ff24788a3f9900662259",
+      "size": 379934,
+      "source": "series"
+    },
+    "retained/037/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r037.evaluate-use/product.canonical.json",
+      "sha256": "adc3cd549c78e0371ec60a3edc214ae64c8e345e9d96a968e6b088949328929b",
+      "size": 7099788,
+      "source": "series"
+    },
+    "retained/037/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r037.seal-control/product.canonical.json",
+      "sha256": "c4240a62bfc41e6644f969663b0966ca6202c92f1c5ebaaa24f3d8208d358c3c",
+      "size": 11490345,
+      "source": "series"
+    },
+    "retained/038": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r038.json",
+      "sha256": "520bf6e5cdcbdd049747651d919f90f643327656b1c652b19415c4bb489709db",
+      "size": 381089,
+      "source": "series"
+    },
+    "retained/038/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r038.evaluate-use/product.canonical.json",
+      "sha256": "faa80f37beda0ffc2b81f89ce34d231621e446c9d49d21ea06663e40f4409795",
+      "size": 7100679,
+      "source": "series"
+    },
+    "retained/038/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r038.seal-control/product.canonical.json",
+      "sha256": "97a4448c164b1f46d17823ad5034f09792a42f24d58df95be38f9c22417be03a",
+      "size": 11491716,
+      "source": "series"
+    },
+    "retained/039": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r039.json",
+      "sha256": "a004e6067458189cfa94dd5e7b3dcf409164d62f1f6e40c0491fde12145a04f2",
+      "size": 380198,
+      "source": "series"
+    },
+    "retained/039/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r039.evaluate-use/product.canonical.json",
+      "sha256": "6823fab02971de25b50e7785d758bcfcd349c9cbeec2379ced5b69dd83f2af1a",
+      "size": 7100368,
+      "source": "series"
+    },
+    "retained/039/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r039.seal-control/product.canonical.json",
+      "sha256": "9f42f8a1d54cb46f9dbb190186c44b25b30eae31c18f7144bbd9ffa94150b980",
+      "size": 11491201,
+      "source": "series"
+    },
+    "retained/040": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r040.json",
+      "sha256": "d57707202bec0f46dbff7bddc4063f47de1db730f6b751a97de2ba70f25a7fd3",
+      "size": 379370,
+      "source": "series"
+    },
+    "retained/040/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r040.evaluate-use/product.canonical.json",
+      "sha256": "a1c92aa2bfd2a3c40596a518cbbe319fa0cd2a2902edcb312d10c65a861edc3f",
+      "size": 7099627,
+      "source": "series"
+    },
+    "retained/040/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r040.seal-control/product.canonical.json",
+      "sha256": "7de3203e2fb32d986ca28921c8f0e0959669730c1c6a488ee8ea1f84179fe4ba",
+      "size": 11490453,
+      "source": "series"
+    },
+    "retained/041": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r041.json",
+      "sha256": "098bf5940908fc23983fba9164ea983335c51a439c75ed401c9968c9701e9aea",
+      "size": 380544,
+      "source": "series"
+    },
+    "retained/041/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r041.evaluate-use/product.canonical.json",
+      "sha256": "eb38b8f771d0766c025e50dbb0fedec75201395956c6a8f848c8f832533a4201",
+      "size": 7100252,
+      "source": "series"
+    },
+    "retained/041/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r041.seal-control/product.canonical.json",
+      "sha256": "487675e73742dc9c8809c0644e936bb79365b987bd1b61e2e6ffc7d35faf2e34",
+      "size": 11491042,
+      "source": "series"
+    },
+    "retained/042": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r042.json",
+      "sha256": "adcfb7210da62a8b81780ce5a9823193a0888feaf2f67f60ae80f46d16f0998b",
+      "size": 380272,
+      "source": "series"
+    },
+    "retained/042/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r042.evaluate-use/product.canonical.json",
+      "sha256": "a5eb470b15307b2407f0af4bee3837cd6bfbfc3449bd3aaf0812bf89151197c4",
+      "size": 7100629,
+      "source": "series"
+    },
+    "retained/042/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r042.seal-control/product.canonical.json",
+      "sha256": "23cd475969a6fcbab6ef656e2d92b329739164a7e3d7740aafdcfa39ba40fa56",
+      "size": 11491809,
+      "source": "series"
+    },
+    "retained/043": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r043.json",
+      "sha256": "204fb5ae8bd6b9a662090fd857d5508ebf2ee74c3783b74b488c5496e55b6c16",
+      "size": 380645,
+      "source": "series"
+    },
+    "retained/043/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r043.evaluate-use/product.canonical.json",
+      "sha256": "fde6239e42bd6c6a7f4a88741e0ecaf1cda3625184927d48f1070401c9dad3d7",
+      "size": 7100001,
+      "source": "series"
+    },
+    "retained/043/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r043.seal-control/product.canonical.json",
+      "sha256": "bf792a4f81879149c328709d0b4f9e419982cbf288165f2ea20613d8e765ad39",
+      "size": 11490914,
+      "source": "series"
+    },
+    "retained/044": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r044.json",
+      "sha256": "3209763136b1f1b03e701e27cadfb30d79a6e0304fac3907e673e2d2d435a91c",
+      "size": 379664,
+      "source": "series"
+    },
+    "retained/044/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r044.evaluate-use/product.canonical.json",
+      "sha256": "c59ce4c0617cb9ecf3625f44bd4638266ea9772cc622a0a7d8013e2f292eb6ab",
+      "size": 7099508,
+      "source": "series"
+    },
+    "retained/044/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r044.seal-control/product.canonical.json",
+      "sha256": "1b2eef896d059a35ca9e7dde9a0f6e0ff9c7633f7f2a1a3874517499ea7c943f",
+      "size": 11490279,
+      "source": "series"
+    },
+    "retained/045": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r045.json",
+      "sha256": "a6a5a74217835f667519e44eedf7f27d1feefeca2fdcd1a796af241d93961088",
+      "size": 379721,
+      "source": "series"
+    },
+    "retained/045/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r045.evaluate-use/product.canonical.json",
+      "sha256": "91ded818a38eeba89f2124cc7fe3142c9d4b8461c0251420221969e4f33cd243",
+      "size": 7099899,
+      "source": "series"
+    },
+    "retained/045/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r045.seal-control/product.canonical.json",
+      "sha256": "785fba6e5776191859f59845462219d232eda13f1e714f05519a8bedbc076633",
+      "size": 11490667,
+      "source": "series"
+    },
+    "retained/046": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r046.json",
+      "sha256": "b461da87a61f318214954f5f96872917c441148c829d09d8b656ae98aa82f7d2",
+      "size": 379653,
+      "source": "series"
+    },
+    "retained/046/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r046.evaluate-use/product.canonical.json",
+      "sha256": "dffdab19253e96375ed1a7a0c32e80831b614fa4c4a6bc9d091631fd6bb204a2",
+      "size": 7100115,
+      "source": "series"
+    },
+    "retained/046/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r046.seal-control/product.canonical.json",
+      "sha256": "16d9b7e9780f740939130b2bb9ec3c2dc3ea833de8c32a23a7f111b5fa5a204d",
+      "size": 11491324,
+      "source": "series"
+    },
+    "retained/047": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r047.json",
+      "sha256": "d6814efd4b5ceefae54accf6246042348d704f7b985957842cbaa9ed6071aefa",
+      "size": 379828,
+      "source": "series"
+    },
+    "retained/047/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r047.evaluate-use/product.canonical.json",
+      "sha256": "7cda8092423d64be12174a02b34eee1384d42d6357329d31aee51571d13acd6b",
+      "size": 7099767,
+      "source": "series"
+    },
+    "retained/047/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r047.seal-control/product.canonical.json",
+      "sha256": "8897d49b2c78fa8eb2f46b54091293a5660b36ff72b6f601582023b4ecdd2587",
+      "size": 11490315,
+      "source": "series"
+    },
+    "retained/048": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r048.json",
+      "sha256": "171ee294d90d489228fa17c9a866065314343292c00b20754f52f3d6cfb15ace",
+      "size": 379324,
+      "source": "series"
+    },
+    "retained/048/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r048.evaluate-use/product.canonical.json",
+      "sha256": "02f647927ce6b94d719e282633f6ece503b1cc3391fa83b3da347c115cdb7dbd",
+      "size": 7099661,
+      "source": "series"
+    },
+    "retained/048/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r048.seal-control/product.canonical.json",
+      "sha256": "16ccb7efd0ca029cdb8f34c6a0ba5a25b14d988145042eceb26850082e7bffeb",
+      "size": 11490477,
+      "source": "series"
+    },
+    "retained/049": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r049.json",
+      "sha256": "7e6adaaeae0424eec97e95ee17899a5acb91ac988fa10ae88f0824012a9af773",
+      "size": 380630,
+      "source": "series"
+    },
+    "retained/049/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r049.evaluate-use/product.canonical.json",
+      "sha256": "d7397b8cc75940f17ec40840925f2b39cc90f2a002ae646f142e8c830734e379",
+      "size": 7100385,
+      "source": "series"
+    },
+    "retained/049/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r049.seal-control/product.canonical.json",
+      "sha256": "f7da18d01e122e43530ec482e8d5dc4da30dad6e3f27d0c6a331e1c5b5b59c76",
+      "size": 11491307,
+      "source": "series"
+    },
+    "retained/050": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r050.json",
+      "sha256": "8a60a56152cd7386703b337ae9cd84064e7c0097d05f3fc1bf83842a597cc3fa",
+      "size": 381137,
+      "source": "series"
+    },
+    "retained/050/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r050.evaluate-use/product.canonical.json",
+      "sha256": "1bb867e9363d8f9dd4017a15a8248891c1ffc5e1ebddcb62cf383e01dcd5bc23",
+      "size": 7100494,
+      "source": "series"
+    },
+    "retained/050/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r050.seal-control/product.canonical.json",
+      "sha256": "4854a4bcc04185a34951145dc8f26194e822d9bcdf66a3c52afdb3b0e1b5d2a2",
+      "size": 11491478,
+      "source": "series"
+    },
+    "retained/051": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r051.json",
+      "sha256": "600ba581a60e1865986bca6764570ac22b0af84a0867288a3a5c2f264bdaeffa",
+      "size": 379715,
+      "source": "series"
+    },
+    "retained/051/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r051.evaluate-use/product.canonical.json",
+      "sha256": "3c25c48adcf431b196038c93be0a0e75a9c27dc47430388f80768de26f05e614",
+      "size": 7099915,
+      "source": "series"
+    },
+    "retained/051/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r051.seal-control/product.canonical.json",
+      "sha256": "db4267922e9e1d46483900e77ffdb669ea78f3b5e43b3dca37579e6214948f2f",
+      "size": 11490975,
+      "source": "series"
+    },
+    "retained/052": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r052.json",
+      "sha256": "b7963c8d7c9ff1ee116745af789aa3ec1a97973b40cc256731c779bc2eb6fed0",
+      "size": 380343,
+      "source": "series"
+    },
+    "retained/052/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r052.evaluate-use/product.canonical.json",
+      "sha256": "fc2328708289a3d62de8270eef9227cad08b39e39468aa9cbe2517d42dd59b1b",
+      "size": 7100395,
+      "source": "series"
+    },
+    "retained/052/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r052.seal-control/product.canonical.json",
+      "sha256": "76df7067af87617312153d558ec30f0694107ef56cce58b7d72f2259a755f821",
+      "size": 11491456,
+      "source": "series"
+    },
+    "retained/053": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r053.json",
+      "sha256": "d9433e9e70374d921f0be27b28e0ec9740b341ede6ee3d9e3af53ce0a58e38a5",
+      "size": 380500,
+      "source": "series"
+    },
+    "retained/053/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r053.evaluate-use/product.canonical.json",
+      "sha256": "6604383193ebde4e78d2a1689c82dacc147a48addc4c19e42f77ae03100796ba",
+      "size": 7099719,
+      "source": "series"
+    },
+    "retained/053/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r053.seal-control/product.canonical.json",
+      "sha256": "12a85152a940022c10a037f29d7f0d6659e8b1f59b78228cd1ceca81b3732f55",
+      "size": 11490583,
+      "source": "series"
+    },
+    "retained/054": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r054.json",
+      "sha256": "77e67ac402a31bdf8ac4c27eae46a319ad5d9751549de6f24439590fe606b51e",
+      "size": 379317,
+      "source": "series"
+    },
+    "retained/054/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r054.evaluate-use/product.canonical.json",
+      "sha256": "ed42e31da5ce98f5b710ba9fe245152d24da25e4c1e27821f63cc5f0d689423e",
+      "size": 7099885,
+      "source": "series"
+    },
+    "retained/054/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r054.seal-control/product.canonical.json",
+      "sha256": "c713d1561c7fa2f5fe8ee8cd2e5fff12ebf155a1c6fa53364e78af802260ac4d",
+      "size": 11490821,
+      "source": "series"
+    },
+    "retained/055": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r055.json",
+      "sha256": "72fcdfea28a665f4d6911e0269e516d07332ff2c20f499f01eebd82c5b1077cd",
+      "size": 379536,
+      "source": "series"
+    },
+    "retained/055/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r055.evaluate-use/product.canonical.json",
+      "sha256": "85c18c6b1c623946c856a61bc3884753a281e3ffd7241cefcab595d80659958e",
+      "size": 7099902,
+      "source": "series"
+    },
+    "retained/055/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r055.seal-control/product.canonical.json",
+      "sha256": "a3faf4766c235342ff6621e48020196119b23c91bd1a05403019d260e3a5bba3",
+      "size": 11490798,
+      "source": "series"
+    },
+    "retained/056": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r056.json",
+      "sha256": "0ff104c897c5c49581566dd47361b49841d8afa06dffdb005cc349f6c54f8ff7",
+      "size": 380166,
+      "source": "series"
+    },
+    "retained/056/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r056.evaluate-use/product.canonical.json",
+      "sha256": "ffa08645400eb42ef8ffda7ab35cf245a8016c287432fe8ee33204c74cf2a61e",
+      "size": 7099865,
+      "source": "series"
+    },
+    "retained/056/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r056.seal-control/product.canonical.json",
+      "sha256": "047c0cddea4deab4452ae1b1a62bdaba33f779be19ca797eb0f666f3422be88d",
+      "size": 11490760,
+      "source": "series"
+    },
+    "retained/057": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r057.json",
+      "sha256": "f2bd98b72743475f2859d093cf41931e2ec00ee2c76a61616c945bf906d7d7ad",
+      "size": 380654,
+      "source": "series"
+    },
+    "retained/057/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r057.evaluate-use/product.canonical.json",
+      "sha256": "5538e40910456f8919ee6441e1ff8c9b0e11b384d773f0964c9a788aedd50ed0",
+      "size": 7100361,
+      "source": "series"
+    },
+    "retained/057/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r057.seal-control/product.canonical.json",
+      "sha256": "5bbf63fcc02af7e2e325df8ced92768636bac3889b921bddd54a7e37dc9e547e",
+      "size": 11491494,
+      "source": "series"
+    },
+    "retained/058": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r058.json",
+      "sha256": "2a9cfb9f5f2579b980e153dbf9b7ba3f60693d53abfeb7c37341128ac76c970f",
+      "size": 380388,
+      "source": "series"
+    },
+    "retained/058/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r058.evaluate-use/product.canonical.json",
+      "sha256": "f267c19956b8ca11b5d8a09551624a71a075c2171a9c57e98848d9e980ce416c",
+      "size": 7100704,
+      "source": "series"
+    },
+    "retained/058/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r058.seal-control/product.canonical.json",
+      "sha256": "b1ae1b4120150bc81b820049ef1bd337c4ab6c91b3cad38a40c40d3e44048af0",
+      "size": 11491846,
+      "source": "series"
+    },
+    "retained/059": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r059.json",
+      "sha256": "3ee0b901fb2f9b3ab64786125d5b835a2cca0a95efb05449a4e09096f8382083",
+      "size": 380702,
+      "source": "series"
+    },
+    "retained/059/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r059.evaluate-use/product.canonical.json",
+      "sha256": "2d68bda69f13e63aea76849a9a8c92927b1617a660a2d927b6fad569c6620777",
+      "size": 7099957,
+      "source": "series"
+    },
+    "retained/059/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r059.seal-control/product.canonical.json",
+      "sha256": "5eb2706558bca11dc3616bae8ceed4b4f84ed86b96fdc5eb80ba40db7d4f1953",
+      "size": 11490737,
+      "source": "series"
+    },
+    "retained/060": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r060.json",
+      "sha256": "0032b1d74cdb7dc0a1a57ab01583fdf026699ba89a672238de5153f8e9a81187",
+      "size": 380660,
+      "source": "series"
+    },
+    "retained/060/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r060.evaluate-use/product.canonical.json",
+      "sha256": "11729b227320fb1adcc075cb167c1a476e3b478aca43800d5503ceb45ca164d7",
+      "size": 7100617,
+      "source": "series"
+    },
+    "retained/060/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r060.seal-control/product.canonical.json",
+      "sha256": "a28c02d95fbbb8305ccab77502f51dd5e76e24952fc726e3c3f1c1b0ceb7c65f",
+      "size": 11491907,
+      "source": "series"
+    },
+    "retained/061": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r061.json",
+      "sha256": "050c7b2a2c079c84d5c5f4f7f170761aebb33b46f044730420efcd8912529198",
+      "size": 379543,
+      "source": "series"
+    },
+    "retained/061/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r061.evaluate-use/product.canonical.json",
+      "sha256": "0e011a3ab360beada795dee687b2d7bd50fbd4ea037bd576474b4b7a145f25dd",
+      "size": 7099921,
+      "source": "series"
+    },
+    "retained/061/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r061.seal-control/product.canonical.json",
+      "sha256": "d3a59563d3a69323daca7469f7afed96da1cb810e271abaec6e672e1442cef68",
+      "size": 11490590,
+      "source": "series"
+    },
+    "retained/062": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r062.json",
+      "sha256": "e98f4063d380d8bedb908f9094404ea8b8d57c5dcd49b590cf4bf09ce9f53bd1",
+      "size": 379647,
+      "source": "series"
+    },
+    "retained/062/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r062.evaluate-use/product.canonical.json",
+      "sha256": "476cdf333924eed35fe02e9b6c9207d62fda3aefb35cb34d97fead11fa38e784",
+      "size": 7099971,
+      "source": "series"
+    },
+    "retained/062/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r062.seal-control/product.canonical.json",
+      "sha256": "dcfc9618550f75d5e4dfc07a56d9419f5027c022b1cdc53a8c523a4d6fed21fb",
+      "size": 11490783,
+      "source": "series"
+    },
+    "retained/063": {
+      "path": "r24/artifacts/retained-handoff-errors/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r063.json",
+      "sha256": "e69698034e248f2b878a1182cb7e65727e01e12b74aaffe2cbd10293abd2106a",
+      "size": 379267,
+      "source": "series"
+    },
+    "retained/063/reveal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r063.evaluate-use/product.canonical.json",
+      "sha256": "a9493f3383a8255ae3790a3094dd2f17498c4d448342c8aabec3bf86dcc145ad",
+      "size": 7099795,
+      "source": "series"
+    },
+    "retained/063/seal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/empirical-lawhood.finite-response-law.prospective-evaluation.capacity-02.r063.seal-control/product.canonical.json",
+      "sha256": "fd8534ac8f7939991a2dac7df3d2fc447d4cbd648f800bd7d626f5dcaaeceef0",
+      "size": 11490778,
+      "source": "series"
+    },
+    "retained/cohort": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/finite-response-law.prospective-evaluation.cohort/product.canonical.json",
+      "sha256": "5b8095893c52a189190a1a66a4fed5d893d445dbdf1515ab96091b6b92e122a2",
+      "size": 2742452,
+      "source": "series"
+    },
+    "retained/native": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/finite-response-law.native-evaluate/product.canonical.json",
+      "sha256": "481565989aa7ca8a7793c0099a64809a1a968aa71d4a5f523bf0799ec571e86d",
+      "size": 13225967,
+      "source": "series"
+    },
+    "retained/terminal": {
+      "path": "r24/artifacts/runs/finite.run-cca4a3b32dce3e9594b7af7201b64044/outputs/finite-response-law.prospective-evaluation.adjudicate/product.canonical.json",
+      "sha256": "81d0a5a9134a4fc7b237e6cf31f869dde554793408d2e94e5981a203e15b1b7c",
+      "size": 2500,
+      "source": "series"
+    }
+  },
+  "study": "r24"
+}

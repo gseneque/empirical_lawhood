@@ -8,6 +8,7 @@ from typing import ClassVar
 import h5py  # type: ignore[import-untyped]
 import numpy as np
 
+from empirical_lawhood.adapters.simulators.finite_response_law.native_pair_profile import MAXIMUM_SAMPLED_ROWS, native_pair_array_layout
 from empirical_lawhood.adapters.simulators.prepared_response.native_artifact import ARRAY_NAMES
 from empirical_lawhood.adapters.simulators.prepared_response.native_artifact import METADATA as PREPARED_METADATA
 from empirical_lawhood.adapters.simulators.six_matrix_response.response_source import response_hdf5_read_text, response_hdf5_text, response_hdf5_writer
@@ -63,7 +64,7 @@ class FiniteResponseLawNativePairArtifact(CanonicalRecord):
             expected = d.completed_intervals // (16 * d.refinement) + 1
             if (
                 type(rows) is not int
-                or not 1 <= rows <= 257
+                or not 1 <= rows <= MAXIMUM_SAMPLED_ROWS
                 or not (
                     rows == expected
                     or d.disposition == "OBSERVATION_FAILURE"
@@ -215,15 +216,7 @@ def decode_native_pair(
                 report.sampled_rows[i],
                 report.deliveries[i].completed_intervals,
             )
-            expected = {
-                "ticks": ((rows,), "<i8"),
-                "positions": ((rows, 2, 3, 4, 4), "<c16"),
-                "momenta": ((rows, 2, 3, 4, 4), "<c16"),
-                "couplings": ((rows, 2), "<f8"),
-                "transfer": ((rows, 15, 15), "<f8"),
-                "transfer_known": ((rows,), "bool"),
-                "realized_trace": ((count, 9), "<f8"),
-            }
+            expected = native_pair_array_layout(rows, count)
             for key in group:
                 if not isinstance(group.get(key, getlink=True), h5py.HardLink):
                     raise ValueError(  # noqa: TRY004 - malformed artifact data

@@ -211,6 +211,119 @@ def test_all_assigned_service_keeps_known_nonentry_and_numerical_unknown_separat
     json.dumps(result, allow_nan=False)
 
 
+def test_handoff_policies_preserve_nonentry_and_seal_the_same_entry_before_different_futures(monkeypatch):
+    settings = _settings()
+    options = settings["receiver_study"]["M7"]
+    options.update(handoff_clocks=["fixed", "triggered", "yoked"],
+                   primary_histories=["joint-increasing.fixed", "joint-increasing.triggered"])
+    ids = study.case_ids(settings, "M7")
+    assert "nominal.joint-increasing.triggered" in ids
+    assert "nominal.joint-increasing.yoked" in ids
+    c = settings["native"]
+    row = c["coordinates"][0]
+    _, ideal = native.target_state(c, row)
+    direction = native.native_position_lift(native.physical_chart(c, settings["events"]["receiver_seed"])[0][:, 0])
+    previous = replace(ideal, step_index=15, positions=ideal.positions - 0.01 * direction)
+    cp = {"state": native.checkpoint(replace(ideal, step_index=16)),
+          "tick": 16, "present": True, "incoming_state": native.checkpoint(previous)}
+    history = "joint-increasing.triggered"
+    def measure():
+        return study._event_case(settings, row, 7, history, cp, {}, study._work(), clock="triggered")
+    first = measure()
+    assert first["wait_ticks"] == 0
+    assert first["entry_forecast"]["operand"]["previous_tick"] == 15
+    assert first["entry_forecast"]["operand"]["last_entry_increment"] is True
+    original = study._committed_paths
+    def different_future(settings, row, seed, *args):
+        return original(settings, row, seed + 1, *args)
+    monkeypatch.setattr(study, "_committed_paths", different_future)
+    second = measure()
+    assert first["entry_forecast"] == second["entry_forecast"]
+    assert first["futures"] != second["futures"]
+    cp["incoming_state"] = None
+    missing_previous = measure()
+    assert missing_previous["entry_forecast"]["operand"]["last_entry_increment"] is None
+    source = {"status": "COMPLETED", "unknown_grid_observations": 0}
+    none = study._event_case(settings, row, 7, history, None, source, study._work(), clock="triggered")
+    assert (none["entry_status"], none["status"], none["futures"]) == ("NO_HANDOFF", "COMPLETED", [])
+    source["unknown_grid_observations"] = 1
+    unknown = study._event_case(settings, row, 7, history, None, source, study._work(), clock="triggered")
+    assert unknown["entry_status"] == "UNKNOWN"
+    reference = study._same_entry_forecast_reference(
+        [first, missing_previous, none, unknown], [[0.25, 0.5], [0.0, 0.25], [0.0, 0.0], [0.0, 1.0]],
+    )
+    assert reference["entrant_roots"] == 2
+    assert reference["always_competing_error_completion_bounds"] == [0.125, 0.375]
+    assert reference["sealed_calls_by_root"]["last_entry_increment"] == {"target": 1, "competing": 0, "unknown": 1}
+    assert study._same_entry_forecast_reference([none, unknown], [[0.0, 0.0], [0.0, 1.0]])["always_competing_error_completion_bounds"] is None
+
+
+def test_paired_policy_readout_checks_the_actual_state_and_causal_window():
+    from pathlib import Path
+    from empirical_lawhood.domains.matrix.model_free.handoff_observations import paired_policy_handoffs
+    from empirical_lawhood.domains.matrix.model_free.receiver_equilibrium_events import case_ids
+    from empirical_lawhood.domains.matrix.model_free.records import Product, RootAssignment, json_text
+    from empirical_lawhood.domains.matrix.model_free.design import configs_for
+    from empirical_lawhood.api.model_free_matrix import specification_for
+
+    recipe = Path(__file__).resolve().parents[1] / "programmes/foundations/emergent-structure/workflows/model-free/handoff-entry-pilot.json"
+    spec = specification_for("Exposed checkpoint pairing control", (RootAssignment(7, ("M1", "M7")),), json.loads(recipe.read_text())["settings"])
+    configs = {config.module: config for config in configs_for(spec) if config.phase == "acquire"}
+    source_cases, events = {}, []
+    for slot in case_ids(spec.settings, "M7"):
+        case_id, clock = slot.rsplit(".", 1)
+        case = source_cases.setdefault(case_id, {"case_id": case_id, "checkpoints": {},
+            "observations": [{"tick": t, "present": True} for t in range(0, 1153, 16)]})
+        tick = {"fixed": 1152, "triggered": 128, "yoked": None}[clock]
+        state = None if tick is None else {"step_index": tick, "sha256": "a" * 64}
+        before = None if tick is None else {"step_index": tick - 1, "sha256": "b" * 64}
+        case["checkpoints"][clock] = {"tick": tick, "state": state, "incoming_state": before}
+        events.append({"case_id": slot, "handoff_clock": clock, "handoff_tick": tick,
+            "handoff_checkpoint_sha256": None if state is None else state["sha256"],
+            "wait_ticks": 0, "entry_status": "NO_HANDOFF" if state is None else "NO_STRUCTURAL_ADMISSION"})
+
+    def acquired(module, cases, deps=()):
+        config = configs[module]
+        payload = {"schema": "matrix-model-free-acquisition.v1", "module": module, "seed": 7, "cases": cases}
+        return Product(config.node_id + ".product", config, json_text(payload), deps)
+
+    m1 = acquired("M1", list(source_cases.values()))
+    m7 = acquired("M7", events, (m1.identity,))
+    root = spec.assignments[0].unit_id
+    rows = paired_policy_handoffs(spec, (m1, m7))[root]
+    row = rows["nominal.joint-increasing.triggered"]
+    assert row["handoff_observed_by_both"] and row["preceding_sample_tick"] == 127
+    assert row["trailing_window_observed"] and row["trailing_window_ticks"] == [0, 128]
+    assert rows["nominal.joint-increasing.yoked"]["handoff_checkpoint_sha256"] is None
+    assert paired_policy_handoffs(spec, (m1,)) == {root: None}
+
+    wrong = deepcopy(events)
+    wrong[0]["handoff_checkpoint_sha256"] = "d" * 64
+    with pytest.raises(ValueError, match="another structural handoff"):
+        paired_policy_handoffs(spec, (m1, acquired("M7", wrong, (m1.identity,))))
+    later = deepcopy(source_cases)
+    checkpoint = later["nominal.joint-increasing"]["checkpoints"]["triggered"]
+    checkpoint["tick"] = checkpoint["state"]["step_index"] = 144
+    checkpoint["incoming_state"]["step_index"] = 143
+    later_events = deepcopy(events)
+    event = next(e for e in later_events if e["case_id"] == "nominal.joint-increasing.triggered")
+    event["handoff_tick"] = 144
+    moved = acquired("M1", list(later.values()))
+    with pytest.raises(ValueError, match="first trailing admission window"):
+        paired_policy_handoffs(spec, (moved, acquired("M7", later_events, (moved.identity,))))
+    checkpoint.update(tick=None, state=None, incoming_state=None)
+    event.update(handoff_tick=None, handoff_checkpoint_sha256=None, entry_status="NO_HANDOFF")
+    omitted = acquired("M1", list(later.values()))
+    with pytest.raises(ValueError, match="first trailing admission window"):
+        paired_policy_handoffs(spec, (omitted, acquired("M7", later_events, (omitted.identity,))))
+    source_cases["nominal.joint-increasing"]["observations"][3]["present"] = False
+    changed = acquired("M1", list(source_cases.values()))
+    with pytest.raises(ValueError, match="same root's structural acquisition"):
+        paired_policy_handoffs(spec, (changed, m7))
+    with pytest.raises(ValueError, match="trailing admission window"):
+        paired_policy_handoffs(spec, (changed, acquired("M7", events, (changed.identity,))))
+
+
 def test_primary_energy_contrast_must_share_temperature():
     settings = _settings()
     settings["receiver_study"]["M6"]["primary_pair"] = ["nominal", "high-temperature"]

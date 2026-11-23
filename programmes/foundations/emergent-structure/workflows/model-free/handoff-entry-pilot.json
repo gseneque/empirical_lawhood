@@ -1,0 +1,37 @@
+{
+  "schema": "model-free-matrix-definition.v1",
+  "label": "Handoff-specific structural and physical receiver capacity pilot",
+  "roots": [{"seed": 380260001, "modules": ["M1", "M7"], "role": "development"}],
+  "settings": {
+    "alpha": "0.05",
+    "native": {"preparation_arms": ["baseline", "joint-increasing"]},
+    "formation": {
+      "fixed_tick": 1152, "trigger_deadline": 1152, "trailing_ticks": 128,
+      "observation_stride": 16, "required_sectors": ["Y"], "service_panels": 2,
+      "exposure_matched_recipes": []
+    },
+    "events": {
+      "horizon_ticks": 4096, "replicas": 4, "upper_target": "0.1",
+      "lower_target": "-0.1", "receiver_seed": 0, "require_admitted_entry": true
+    },
+    "inference": {
+      "module_alpha_weights": {"M0": "0.15", "M1": "0.20", "M2": "0.20", "M3": "0.01", "M4": "0.01", "M5": "0.01", "M6": "0.20", "M7": "0.22"}
+    },
+    "receiver_study": {
+      "revision": "matrix-receiver-study.v2", "instrument": null,
+      "M1": {
+        "coordinates": ["nominal", "high-temperature"], "primary_coordinate": "high-temperature",
+        "primary_recipe": "joint-increasing", "minimum_signed_impulse": "0.10",
+        "minimum_delivery": "0.75", "maximum_wrong_delivery": "0.10", "maximum_coverage_loss": "0.0625",
+        "yoked_ticks": [976, null, 1120, 880, 832, 1024, 736, 880, 688, null, 704, 800, 880, 880, 800, 912]
+      },
+      "M7": {
+        "coordinates": ["nominal", "high-temperature"], "primary_coordinate": "high-temperature",
+        "handoff_clocks": ["fixed", "triggered", "yoked"],
+        "primary_histories": ["joint-increasing.fixed", "joint-increasing.triggered"],
+        "interior_radius": "0.025", "entry_window_ticks": 1024, "dwell_ticks": 16
+      }
+    },
+    "resources": {"memory_bytes": 4294967296, "wall_time_seconds": 14400, "output_bytes": 2147483648}
+  }
+}

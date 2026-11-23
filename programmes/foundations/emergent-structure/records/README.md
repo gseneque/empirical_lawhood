@@ -12,7 +12,14 @@ Historical source paths identify original custody, not new executable selections
 
 | Record | Role |
 |---|---|
+| [Signed orientation receiver](matrix-orientation-receiver.md) | Two-lift quotient, practical ambiguity and prospective bit repair |
+| [Projected matrix memory](matrix-projected-memory.md) | Frozen linear controls and independently issued composed-pulse and joint-trajectory forecasts |
+| [Six-matrix dissipation and physical reversal](matrix-path-thermodynamics.md) | Maxwell controls, native recorder, full forward/reverse path and the driven prefix decision |
 | [Current constructed preparation applicability specification](empirical-lawhood.constructed-preparation-applicability.md) | Finding, assessment or retained checkpoint |
+| [Fixed preparation across bath waveforms](matrix-waveform-preparation.md) | R25 population, entry screen, causal forecasts and service criteria |
+| [Structural delivery and commitment at policy handoffs](matrix-handoff-entry.md) | R26 clocks, sibling physical assays and uncertainty on independent roots |
+| [Preparation and reuse results](preparation-and-reuse-results.md) | Fresh R23 preparation and R24 forecast experiments, their preprint comparisons, the R25 waveform screen, the R26 handoff measurements and the R27 preparation selector |
+| [Assigned R24 evaluation roots](preparation-and-reuse-r24-roots.md) | Paired service, false admissions, response losses, interval and handoff checks for both 64-root cohorts and the interrupted allocation |
 | [Current matrix preparation analysis specification](empirical-lawhood.matrix-preparation-analysis.md) | Finding, assessment or retained checkpoint |
 | [Current ordinary preparation applicability specification](empirical-lawhood.preparation-applicability.md) | Finding, assessment or retained checkpoint |
 | [Retained de-anneal paired numerical assay](matrix-deanneal-numerical-assay.md) | Finding, assessment or retained checkpoint |

@@ -25,12 +25,18 @@ The [RC results](records/recursive-prerequisite-results.md) retain the complete 
 
 ## Studies and evidence
 
+The thermal RC reference preserved the forward/reverse likelihood while the summed grounded voltage retained predictive memory. The distinct-rate and equal-rate controls both met their margins. [Thermal dissipation and voltage memory](records/thermal-rc-dissipation.md)
+
+In a monitored chain, the clock alone and the last observed site each merged histories with measurably different consequences for the later event count. Those signed consequences largely cancelled in the mean response to a rate change. [Marked-event results](records/marked-event-response.md)
+
 A study design, also called a protocol, specifies the observations, analysis and outcome rules.
 Read its date and revision before selecting inputs.
 The [scientific record index](records/README.md) provides the retained document census.
 
 | Study | Design | Result | Supported operation | Evidence availability |
 |---|---|---|---|---|
+| Thermal RC dissipation and voltage memory | [Scientific definition](workflows/thermal-rc/experiment.json) | [Original findings and precision limits](records/thermal-rc-dissipation.md) | [Run guide](workflows/thermal-rc/guide.md) | Exact Gaussian model with separate complete and precision evaluations. |
+| Marked event consequences and compressed history | [Scientific definition](workflows/marked-event-response/experiment.json) | [Event consequences and rate response](records/marked-event-response.md) | [Run guide](workflows/marked-event-response/guide.md) | Four-site chain with disjoint training and evaluation and an independently integrated count. |
 | Analytical observation loss | [Study design](workflows/rc-information/guide.md) | [Findings](../../../paper/SOURCES.md#paper-studies-and-current-software) | [Run guide](workflows/rc-information/guide.md) | Analytical input and calculation are included; no sampled confirmation. |
 | Measurement → preparation → response | [Study design](workflows/rc-prerequisite-chain/protocol.md) | [Findings](records/recursive-prerequisite-results.md) | [Run guide](workflows/rc-prerequisite-chain/guide.md) | Exposed numerical designs; original operational custody remains external. |
 | Reactor response and assigned use | [Study design](workflows/reactor-response/authoring.md) | [Findings](../../../paper/SOURCES.md#paper-studies-and-current-software) | [Run guide](workflows/reactor-response/guide.md) | Packaged demo inputs are available; historical cohorts are separate. |

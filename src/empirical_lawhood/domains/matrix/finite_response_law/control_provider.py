@@ -401,12 +401,17 @@ class FiniteResponseLawControlTask:
                     group[LinkedCampaignStageEnvelope.SCHEMA], LinkedCampaignStageEnvelope
                 ) != native_stage(parent):
                     raise ValueError("finite response-law actual parent stage changes its native result")
+                receipt = self.runtime.dependency_receipt(context.run_id, receipt_binding)
+                artifact = input_artifact(port, parent.canonical_bytes())
+                original_parent = getattr(self.runtime, "original_parent", None)
+                if original_parent is not None:
+                    receipt, artifact = original_parent(receipt, artifact)
                 result = join_root_parent(
                     lock=lock,
                     parent=parent,
                     parent_bytes=read_port(group[NATIVE_PAIR_SCHEMA], MAXIMUM_PAIR_BYTES),
-                    receipt=self.runtime.dependency_receipt(context.run_id, receipt_binding),
-                    artifact=input_artifact(port, parent.canonical_bytes()),
+                    receipt=receipt,
+                    artifact=artifact,
                     store=self.runtime.prepared_store,
                     now=self.runtime.now,
                 )
@@ -454,8 +459,14 @@ class FiniteResponseLawControlProvider(CampaignRuntimeProvider):
         if plan.registry_sha256 != self.registry_sha256 or source_records:
             raise ValueError("finite response-law control execution changes its registry/records")
         tasks = control_tasks(self.config)
+        from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import LOCKED_IMPORT_CAPABILITY
+        imported = {t.task_id for t in plan.tasks if t.capability.capability_key == LOCKED_IMPORT_CAPABILITY.capability_key}
+        if imported:
+            expected = {key for key, (_, op) in tasks.items() if op in ("forecast", "reveal-request", "lock-choices")}
+            if set(tasks) & imported != expected:
+                raise ValueError("Locked evaluation must retain every sealed choice")
         values = list(
-            config_payloads(plan, self.manifest, self.config, self.config.config_id, set(tasks))
+            config_payloads(plan, self.manifest, self.config, self.config.config_id, set(tasks) - imported)
         )
         for task in plan.tasks:
             if task.capability.capability_key != self.manifest.capability_key:

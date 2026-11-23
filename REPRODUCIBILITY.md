@@ -8,6 +8,8 @@ This guide gives information about source identities, reproducibility records an
 It separates software reproduction, historical paper derivatives and fresh scientific qualification.
 Use it to retain the records required for a stated result.
 
+For the five foundations synthesis studies on entropy production, memory and response, each linked result identifies its producing source, evaluation cohort and measurements. To run a study, follow its guide from a matching checkout with the locked CPU environment and a new workspace. Studies 1 and 4 each have an additional evaluation panel with its own definition. [Study results and reproduction guides](programmes/foundations/README.md#foundations-synthesis-studies)
+
 `uv.lock` records the target Python dependency solution. The portable reactor
 prefix additionally pins Python 3.11.14 and NumPy 2.4.6 and validates the hashes
 of its three packaged public inputs. Run it as described in

@@ -1360,6 +1360,20 @@
       "supplied_inputs": []
     },
     {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "marked-event-response-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "Specification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/marked-event-response/specification",
+      "schema_resource": "marked-event-response-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
       "authoring_maximum_bytes": 524288,
       "command": "campaign experiment-prepare",
       "consumer": "mass-balance-experiment",
@@ -1413,6 +1427,62 @@
       "preparation_allowed": true,
       "schema_id": "empirical-lawhood/matrix-model-free/specification",
       "schema_resource": "matrix-model-free-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-orientation-response-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "Specification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-orientation-response/specification",
+      "schema_resource": "matrix-orientation-response-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-path-thermodynamics-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "Specification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-path-thermodynamics/specification",
+      "schema_resource": "matrix-path-thermodynamics-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-projected-memory-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "Specification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/matrix-projected-memory/specification",
+      "schema_resource": "matrix-projected-memory-experiment.schema.json",
+      "supplied_inputs": []
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "matrix-waveform-preparation-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "WaveformSpecification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/waveform-preparation/specification",
+      "schema_resource": "matrix-waveform-preparation-experiment.schema.json",
       "supplied_inputs": []
     },
     {
@@ -2190,6 +2260,20 @@
       "supplied_inputs": [
         "programmes/biology/photosynthesis/workflows/rubisco-kinetic-join/experiment.json"
       ]
+    },
+    {
+      "authoring_maximum_bytes": null,
+      "command": "campaign experiment-prepare",
+      "consumer": "thermal-rc-experiment",
+      "consumer_loader": "kernel.decoding.decode_canonical_bytes",
+      "consumer_maximum_bytes": null,
+      "consumer_requires_canonical": true,
+      "disposition": "editable",
+      "owner": "Specification",
+      "preparation_allowed": true,
+      "schema_id": "empirical-lawhood/thermal-rc/specification",
+      "schema_resource": "thermal-rc-experiment.schema.json",
+      "supplied_inputs": []
     },
     {
       "authoring_maximum_bytes": 8388608,

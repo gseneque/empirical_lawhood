@@ -2,6 +2,7 @@
 """Exact receipt custody in disposable stores, without execution or retry grants."""
 
 from dataclasses import dataclass, replace
+from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import ClassVar
@@ -9,7 +10,12 @@ from typing import ClassVar
 import pytest
 
 from tests.test_doctor_profile import _profile
-from empirical_lawhood.domains.matrix.finite_response_law.runtime_ports import FiniteResponseLawControlRuntimeBinding, FiniteResponseLawPreparedStorePort
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedEvaluationInterface
+from empirical_lawhood.domains.matrix.finite_response_law.evaluation_native_records import FiniteResponseLawEvaluationInterface
+from empirical_lawhood.domains.matrix.finite_response_law.instruments import REFERENCE_INSTRUMENT
+from empirical_lawhood.domains.matrix.finite_response_law.runtime_ports import FiniteResponseLawControlRuntimeBinding, FiniteResponseLawPreparedStorePort, RetainedPreparedStorePort
+from empirical_lawhood.execution.controller_evaluation_nested import PreparedCommonStartBinding
+from empirical_lawhood.design.nested_controller_evaluation import CommonStartControllerEvaluationPlan
 from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict, ExternalArtifactPlane, GuardedExternalRoot
 from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
@@ -134,3 +140,38 @@ def test_exact_receipt_requires_authenticated_original_publication(custody):
     path.write_bytes(exact.canonical_bytes() + b" ")
     with pytest.raises(ArtifactIdentityConflict):
         runtime.dependency_receipt(RUN, binding(exact))
+
+
+def test_continuation_authenticates_the_original_common_start(custody):
+    _, _, runtime = custody
+    original = runtime.prepared_store
+    store = RetainedPreparedStorePort(original.root, "continued-events", original.minimum_free_bytes, original)
+    checkpoint = ObjectIdentity("source.checkpoint", "empirical-lawhood/tests/checkpoint", "1.0.0", "1" * 64)
+    plan = replace(checkpoint, object_id="source.plan", object_schema=CommonStartControllerEvaluationPlan.SCHEMA)
+    assignment = replace(checkpoint, object_id="source.root", object_schema="empirical-lawhood/planning/prepared-root-assignment")
+    anchor = PreparedCommonStartBinding("source.start", plan, assignment, checkpoint)
+    subject = ObjectIdentity.from_record(anchor.binding_id, anchor)
+    artifact = original.publish_prepared_record(prefix_id=anchor.binding_id, object_id=anchor.binding_id, record=anchor)
+    assert store.read_prepared_record(prefix_id=anchor.binding_id, subject=subject, artifact=artifact) == anchor.canonical_bytes()
+    with pytest.raises(ArtifactIdentityConflict):
+        store.verify_prepared_subject(prefix_id=anchor.binding_id, subject=replace(subject, object_fingerprint="2" * 64), artifact=artifact)
+
+
+@pytest.mark.parametrize(
+    "interface_type",
+    (FiniteResponseLawEvaluationInterface, FiniteResponseLawAssignedEvaluationInterface),
+)
+def test_parent_join_persists_observed_handoff_in_its_original_schema(custody, interface_type):
+    _, _, runtime = custody
+    checkpoint_type = interface_type.CHECKPOINT_TYPE
+    checkpoint = ObjectIdentity(
+        "synthetic.parent.r1.checkpoint", checkpoint_type.SCHEMA, checkpoint_type.VERSION, "0" * 64
+    )
+    handoff = interface_type(checkpoint, REFERENCE_INSTRUMENT.identity, 4368, (Decimal("0"),) * 24)
+    subject = ObjectIdentity.from_record("synthetic.actual-handoff", handoff)
+    store = runtime.prepared_store
+    artifact = store.publish_prepared_record(
+        prefix_id=RUN, object_id=subject.object_id, record=handoff
+    )
+    recovered = store.read_prepared_record(prefix_id=RUN, subject=subject, artifact=artifact)
+    assert recovered == handoff.canonical_bytes()

@@ -6,6 +6,7 @@ SPDX-License-Identifier: MPL-2.0
 from __future__ import annotations
 
 import builtins
+from hashlib import sha256
 import json
 import os
 from pathlib import Path
@@ -15,7 +16,7 @@ import sys
 import pytest
 from typer.testing import CliRunner
 
-from empirical_lawhood.api.workflows import list_workflows, show_workflow
+from empirical_lawhood.api.workflows import RetainedManifestInput, list_workflows, show_workflow
 from empirical_lawhood.cli.metadata import COMMAND_METADATA, invocation_contracts
 from empirical_lawhood.cli.workflows import workflow_app, workflow_details
 from scripts.generate_workflow_index import render_table
@@ -43,12 +44,13 @@ def test_catalogue_accounts_for_every_bundle_and_input():
                    if p != source_selection)
     assert len(files) == len(declared)
     assert set(declared) == {p.relative_to(ROOT).as_posix() for p in files}
-    for name in declared:
-        path = ROOT / name
-        assert (
-            json.loads(path.read_text())["schema"]
-            == declared[path.relative_to(ROOT).as_posix()].schema_id
-        )
+    for name, item in declared.items():
+        raw = (ROOT / name).read_bytes()
+        if isinstance(item, RetainedManifestInput):
+            assert sha256(raw).hexdigest() == item.content_sha256
+            assert json.loads(raw)["format"] == item.format_version
+        else:
+            assert json.loads(raw)["schema"] == item.schema_id
     for workflow in workflows:
         assert (ROOT / workflow.guide).is_file()
         assert all((ROOT / owner).is_file() for owner in workflow.verification_owners)
@@ -62,6 +64,24 @@ def test_catalogue_accounts_for_every_bundle_and_input():
         assert {p for op in workflow.operations for p in op.inputs} <= {
             p.path for p in workflow.inputs
         }
+
+
+def test_retained_replay_inputs_authenticate_original_manifest_bytes():
+    from dataclasses import replace
+
+    workflow = next(w for w in list_workflows() if w.workflow_id == "matrix-waveform-preparation")
+    assert {Path(item.path).name for item in workflow.inputs} == {
+        "r23.json", "r24.json", "r25.json", "r26.json", "r27.json",
+    }
+    for item in workflow.inputs:
+        raw = (ROOT / item.path).read_bytes()
+        assert isinstance(item, RetainedManifestInput)
+        assert item.schema_id == "matrix-preparation-reuse.operand-manifest.v1"
+        assert item.format_version == json.loads(raw)["format"] == 1
+        assert item.content_sha256 == sha256(raw).hexdigest()
+        assert item.matches_source(raw)
+        assert not item.matches_source(raw + b"\n")
+        assert not replace(item, format_version=2).matches_source(raw)
 
 
 def test_command_effects_and_invocation_requirements_have_existing_owners():

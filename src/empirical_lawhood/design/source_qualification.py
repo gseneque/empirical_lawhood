@@ -124,6 +124,22 @@ class ProspectiveRetainedPredecessor(SourceQualificationRetainedPredecessor):
 
 
 @dataclass(frozen=True, slots=True)
+class ProspectiveRetainedContinuation(ProspectiveRetainedPredecessor):
+    """An acquired segment with its earlier retained start on the same native clock."""
+
+    SCHEMA: ClassVar[str] = 'empirical-lawhood/planning/prospective-retained-continuation'
+    predecessor_segment_id: str
+    start: Decimal
+
+    def __post_init__(self) -> None:
+        super(ProspectiveRetainedContinuation, self).__post_init__()
+        validate_stable_id(self.predecessor_segment_id, field_name="predecessor_segment_id")
+        validate_decimal(self.start, field_name="start", minimum=Decimal(0))
+        if self.start >= self.end:
+            raise ValueError("Retained continuation must advance the native clock")
+
+
+@dataclass(frozen=True, slots=True)
 class FreshSourceQualificationExperiment(CanonicalRecord):
     "Finite measurement/response qualification, with no law/admission/controller overlay."
 
@@ -207,6 +223,16 @@ class FreshSourceQualificationExperiment(CanonicalRecord):
             for s in self.segments
             if s.predecessor_segment_id in retained_by_id
         }
+        for child in retained:
+            if isinstance(child, ProspectiveRetainedContinuation):
+                parent = retained_by_id.get(child.predecessor_segment_id)
+                if parent is None or (
+                    parent.physical_independent_unit_id != child.physical_independent_unit_id
+                    or parent.native_clock_id != child.native_clock_id
+                    or parent.view_ids != child.view_ids or parent.end != child.start
+                ):
+                    raise ValueError("Retained continuation changes its unit, views or predecessor clock")
+                used_retained.add(parent.segment_id)
         if used_retained != set(retained_by_id):
             raise ValueError("qualification retained predecessor is unused")
         if len({r.task_receipt.artifact_id for r in retained}) != len(retained):
@@ -281,7 +307,7 @@ class ProspectiveRetainedSourceQualification(PredecessorBoundSourceQualification
     "Prospective retained-source qualification with strictly outcome-blind retained origins."
 
     SCHEMA: ClassVar[str] = 'empirical-lawhood/planning/prospective-retained-source-qualification'
-    retained_predecessors: tuple[ProspectiveRetainedPredecessor, ...]
+    retained_predecessors: tuple[ProspectiveRetainedPredecessor | ProspectiveRetainedContinuation, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -413,7 +439,7 @@ class ProspectiveRetainedSourceUse(QualifiedSourceUseExperiment):
     """Explicit receipt imports; imports never enter the new acquisition census."""
 
     SCHEMA: ClassVar[str] = 'empirical-lawhood/planning/prospective-retained-source-use'
-    retained_predecessors: tuple[ProspectiveRetainedPredecessor, ...]
+    retained_predecessors: tuple[ProspectiveRetainedPredecessor | ProspectiveRetainedContinuation, ...]
 
     def source_qualification(self) -> ProspectiveRetainedSourceQualification:
         return ProspectiveRetainedSourceQualification(

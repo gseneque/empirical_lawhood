@@ -17,6 +17,8 @@ from empirical_lawhood.domains.matrix.finite_response_law.science import PROGRAM
 from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawControlConfig
 from empirical_lawhood.domains.matrix.finite_response_law.control_provider import control_tasks
 from empirical_lawhood.domains.matrix.finite_response_law.authoring.design import native_budget
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedCalibrationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.native_provider import NATIVE_ADJUDICATION_TASK_ID
 
 
 def native_resource_envelope(
@@ -36,6 +38,8 @@ def native_resource_envelope(
         records=bundle.payloads, template=bundle.standard_context.base.templates[0].protocol
     )
     expected = {s.task_id for s in derive_source_qualification_topology(carrier).stages}
+    if type(source) is FiniteResponseLawAssignedCalibrationConfig:
+        expected.add(NATIVE_ADJUDICATION_TASK_ID)
     controls = tuple(r for r in bundle.payloads if type(r) is FiniteResponseLawControlConfig)
     if controls:
         if len(controls) != 1 or controls[0].source != source:

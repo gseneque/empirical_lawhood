@@ -23,7 +23,7 @@ from empirical_lawhood.science.evidence.evidence import VisibilityCeiling
 from empirical_lawhood.science.records.status import OperationalStatus
 from empirical_lawhood.science.identity.references import ArtifactIdentity
 from empirical_lawhood.science.records.serialization import canonical_json_bytes
-from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactStreamWriteRequest, ArtifactProfile, ArtifactLineageParent, CanonicalTaskReceipt, ReceiptCheck, lineage_parent_sort_key
+from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactStreamWriteRequest, ArtifactProfile, CanonicalTaskReceipt, ReceiptCheck
 from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentParent
 
@@ -176,13 +176,9 @@ def publish_current_issue(plane, handoff, *, label):
         scientific_graph=base.scientific_graph, candidate=ObjectIdentity.from_record(candidate.candidate_id, candidate),
         issued_extension_set=replayed.issued_extensions, execution_resource_envelope_spec=handoff.resources)
     projection = lower_run_plan(plan, context.base.registry)
-    package_parent = ArtifactLineageParent(ObjectIdentity.from_record(package.package_id, package),
-        VisibilityCeiling.PROSPECTIVE, OutcomeAccess.OUTCOME_BLIND)
-    plan_parent = ArtifactLineageParent(ObjectIdentity.from_record(plan.run_plan_id, plan),
-        VisibilityCeiling.PROSPECTIVE, OutcomeAccess.OUTCOME_BLIND)
+    from empirical_lawhood.api.execution import CampaignExecutionService
     sizes = []
-    for name, value, parents in (("campaign-package", package, ()), ("run-plan", plan, (package_parent,)),
-            ("execution-plan", projection, tuple(sorted((package_parent, plan_parent), key=lineage_parent_sort_key)))):
+    for name, value, parents in CampaignExecutionService._plan_control_records(package, plan, projection):
         raw = value.canonical_bytes()
         sizes.append((name, len(raw)))
         print(f"synthetic_{label}_{name}_bytes", len(raw), flush=True)
@@ -193,9 +189,9 @@ def publish_current_issue(plane, handoff, *, label):
             chunks=(raw[index:index + 1024**2] for index in range(0, len(raw), 1024**2)),
             maximum_bytes=len(raw), maximum_chunk_bytes=min(len(raw), 1024**2),
             expected_size_bytes=len(raw), expected_physical_sha256=sha256(raw).hexdigest(),
-            visibility_ceiling=VisibilityCeiling.PROSPECTIVE,
+            visibility_ceiling=VisibilityCeiling.most_restrictive(*(parent.visibility_ceiling for parent in parents)),
             parent_visibility_ceilings=tuple(parent.visibility_ceiling for parent in parents),
-            outcome_access=OutcomeAccess.OUTCOME_BLIND, lineage_parents=parents, minimum_free_bytes=1))
+            outcome_access=CampaignExecutionService._most_restrictive_access(parents), lineage_parents=parents, minimum_free_bytes=1))
     return CurrentIssueFixture(replayed, FiniteResponseLawCurrentPublication(run_id, issued,
         execution_identity, ObjectIdentity.from_record(reveal.authority_id, reveal)), package, tuple(sizes), trust_path, projection)
 
@@ -244,6 +240,7 @@ def publish_current_step_output(plane, issue, *, label, record, task_id=None, in
     coordinator.launch(**dispatch, event_id=f"resource-envelope-event.{attempt}.launch",
         jit_projection=None, jit_graph_signature_manifest=issue.package.jit_graph_signature_manifest)
     requests = []
+    semantics = {r.logical_artifact_id: r.validation for r in plane.semantic_validations.registrations}
     for output in task.outputs:
         raw = record.canonical_bytes() if output.payload_schema == record.SCHEMA else canonical_json_bytes({
             "schema": output.payload_schema, "version": "1.0.0", "value": {
@@ -251,6 +248,7 @@ def publish_current_step_output(plane, issue, *, label, record, task_id=None, in
         requests.append(ArtifactWriteRequest(logical_artifact_id=output.logical_artifact_id,
             relative_path=output.relative_path,
             payload_schema=output.payload_schema, profile=output.profile, media_type=output.media_type,
+            semantic_validation=semantics.get(output.logical_artifact_id),
             publication_scope_id=f"synthetic.{label}.native-outputs.{output.output_id}", publication_scope_relative_root=f"runs/{run_id}/outputs",
             payload=raw, visibility_ceiling=output.visibility_ceiling,
             parent_visibility_ceilings=(), outcome_access=output.outcome_access, minimum_free_bytes=1))

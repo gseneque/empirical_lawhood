@@ -7,7 +7,9 @@ from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedEx
 from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
 from empirical_lawhood.storage.dependency_manifests import DependencyManifestReader
 from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
-from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
+from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactSemanticValidationRegistry
+from empirical_lawhood.execution.providers import capability_semantic_validation_registry
+from empirical_lawhood.execution.task_records import contracts
 from empirical_lawhood.execution.plans import ArtifactOutputSpec
 from empirical_lawhood.adapters.composition.preparation_applicability.inputs import preparation_input_template
 from empirical_lawhood.domains.matrix.preparation_applicability.config import preparation_run_id
@@ -32,6 +34,7 @@ class PreparationApplicabilityCustodyPorts:
     run_id: str
     parent: ArtifactLineageParent
     outputs: tuple[ArtifactOutputSpec, ...]
+    semantics: ArtifactSemanticValidationRegistry
 
     def _models(self):
         return ExternalCandidatePayloadPlane(
@@ -50,7 +53,23 @@ class PreparationApplicabilityCustodyPorts:
         # Each read is scoped to the one authorized input. Full protocols may
         # contain 386 outputs; no global reader bound is relaxed for them.
         outputs = tuple(output for output in self.outputs if output.logical_artifact_id == binding.artifact_id)
-        return DependencyManifestReader(ExternalArtifactPlane(self.root), outputs).read_dependency(context, binding)
+        plane = ExternalArtifactPlane(self.root, semantic_validations=self.semantics)
+        return DependencyManifestReader(plane, outputs).read_dependency(context, binding)
+
+
+def preparation_output_semantics(projection, *, constructed: bool) -> ArtifactSemanticValidationRegistry:
+    """Bind each dependency to the actual method and simulator output contracts."""
+    if constructed:
+        from empirical_lawhood.adapters.simulators.constructed_preparation_applicability import extension as native
+        from empirical_lawhood.domains.matrix.constructed_preparation_applicability import extension as method
+    else:
+        from empirical_lawhood.adapters.simulators.preparation_applicability import extension as native
+        from empirical_lawhood.domains.matrix.preparation_applicability import extension as method
+    return capability_semantic_validation_registry(
+        registry_id=f"execution-semantics.{projection.execution_plan_id}", plan=projection,
+        contracts=(*contracts(native.CAPABILITY, native.OUTPUT_RECORDS),
+                   *contracts(method.CAPABILITY, method.OUTPUT_RECORDS)),
+    )
 
 
 def runtime_platform_ports(*, selection, bundle, projection, root):
@@ -92,7 +111,8 @@ def runtime_platform_ports(*, selection, bundle, projection, root):
     parent = ArtifactLineageParent(ObjectIdentity.from_record(stage.config_id, stage),
                                    VisibilityCeiling.PROSPECTIVE, OutcomeAccess.EVALUATION_SEALED)
     custody = PreparationApplicabilityCustodyPorts(root, projection.source_plan.object_id, parent,
-        tuple(output for task in projection.tasks for output in task.outputs))
+        tuple(output for task in projection.tasks for output in task.outputs),
+        preparation_output_semantics(projection, constructed=constructed))
     limits = PreparationApplicabilityTaskCensus(tuple(task.task_id for task in projection.tasks))
     values = {
         f"{prefix}-method-inputs": tuple(method_inputs), f"{prefix}-method-custody": custody,

@@ -40,7 +40,7 @@ def test_registry_exactly_accounts_for_public_inputs_without_widening_roots():
     for path in specialized:
         declaration = declared[path]
         assert declaration.role.strip()
-        assert json.loads((ROOT / path).read_bytes())["schema"] == declaration.schema_id
+        assert declaration.matches_source((ROOT / path).read_bytes()), path
     assert {path for consumer in CONSUMERS for path in consumer.supplied_inputs if path.startswith("configs/")} == {
         "configs/operator-storage.example.json",
         "configs/operational.example.yaml",

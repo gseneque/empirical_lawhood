@@ -4,15 +4,15 @@ This is evaluator-only projection of authenticated native records. It performs
 no prediction, admission, qualification, selection or complete-case filtering.
 """
 
-from dataclasses import dataclass
-from decimal import Decimal
+from dataclasses import dataclass, field
 
 import numpy as np
 from numpy.typing import NDArray
 
-from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedForceWord
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedEvaluationNativeCompletion
 from empirical_lawhood.domains.matrix.finite_response_law.evaluation_native_records import FiniteResponseLawEvaluationNativeCompletion
-from empirical_lawhood.domains.matrix.finite_response_law.paired_assay import paired_native_assay
+from empirical_lawhood.domains.matrix.finite_response_law.paired_assay import positive_pair_readouts
 from empirical_lawhood.domains.matrix.finite_response_law.science import PARENTS
 
 Array = NDArray[np.float64]
@@ -29,8 +29,18 @@ class EvaluationPanel:
     parent_work: Array
     parent_indices: NDArray[np.int64]
     root_ids: tuple[str, ...]
+    assigned_source: FiniteResponseLawAssignedEvaluationConfig | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
+        if self.assigned_source is None:
+            expected_ids = tuple(f"prospective-evaluation.r{r:03d}" for r in range(64))
+        else:
+            if type(self.assigned_source) is not FiniteResponseLawAssignedEvaluationConfig:
+                raise ValueError("Evaluation panel requires the exact prospective allocation")
+            roots = self.assigned_source.roots
+            expected_ids = tuple(root.stage_unit for root in roots)
+            if not np.array_equal(self.parent_indices, [PARENTS.index(root.assigned_parent) for root in roots]):
+                raise ValueError("Evaluation panel changes an assigned preparation")
         shape = (64, 4, 8, 2, 2)
         if (
             self.y.shape != shape
@@ -49,7 +59,7 @@ class EvaluationPanel:
             or self.parent_indices.shape != (64,)
             or self.parent_indices.dtype != np.int64
             or ((self.parent_indices < 0) | (self.parent_indices >= 5)).any()
-            or self.root_ids != tuple(f"prospective-evaluation.r{r:03d}" for r in range(64))
+            or self.root_ids != expected_ids
             or np.any(self.observed != np.isfinite(self.y))
             or np.any(self.response_valid & ~self.observed[:, :, :2])
             or np.any(self.use_valid & ~self.observed.all(axis=2))
@@ -79,17 +89,18 @@ def evaluation_panel(evaluation: FiniteResponseLawEvaluationNativeCompletion) ->
     source identities are still required; a shadow with failed delivery never
     becomes valid response evidence.
     """
-    if type(evaluation) is not FiniteResponseLawEvaluationNativeCompletion:
+    if type(evaluation) not in (FiniteResponseLawEvaluationNativeCompletion, FiniteResponseLawAssignedEvaluationNativeCompletion):
         raise ValueError("Finite response-law evaluation reduction requires its separate prospective completion record")
     source = evaluation.config.projection.native_spec
+    roots = source.roots
     y = np.full((64, 4, 8, 2, 2), np.nan)
     response_valid = np.zeros((64, 4, 2, 2, 2), dtype=bool)
     use_valid = np.zeros((64, 4, 2, 2), dtype=bool)
     prefix, handoff = (np.full((64, 24, 2), np.nan) for _ in range(2))
     work = np.full((64, 2), np.nan)
-    for r, root in enumerate(source.roots):
-        views = tuple(v for v in evaluation.views if v.root == root)
-        if tuple(v.refinement for v in views) != (1, 2):
+    for r, root in enumerate(roots):
+        views = evaluation.views[2 * r:2 * r + 2]
+        if tuple((v.root, v.refinement) for v in views) != ((root, 1), (root, 2)):
             raise ValueError("Finite response-law evaluation reduction loses one of the two coupled numerical views")
         for v, view in enumerate(views):
             if view.prefix_interface is not None:
@@ -98,20 +109,14 @@ def evaluation_panel(evaluation: FiniteResponseLawEvaluationNativeCompletion) ->
                 handoff[r, :, v] = view.handoff_interface.values
             if view.parent_absolute_density_work is not None:
                 work[r, v] = float(view.parent_absolute_density_work)
-        for k, (magnitude, direction) in enumerate(((8, 0), (8, 1), (16, 0), (16, 1))):
-            word = PreparedForceWord(Decimal(magnitude), direction, 1)
-            assay = paired_native_assay(views, parent=root.assigned_parent, word=word)
-            for readout in assay.readouts:
-                f, v = int(readout.purpose[-1]) - 1, readout.refinement - 1
-                by_source = {w.native_result: w for w in views[v].words}
-                signed = (by_source[readout.selected_source], by_source[readout.opposite_source])
-                valid_delivery = all(w.complete and w.maximum_force_error == 0 for w in signed)
-                use_valid[r, k, f, v] = readout.source_valid
-                for j, value in enumerate(readout.values):
-                    if value is not None:
-                        y[r, k, j, f, v] = float(value)
-                        if j < 2:
-                            response_valid[r, k, j, f, v] = valid_delivery
+        for k, _, readout, valid_delivery in positive_pair_readouts(views, parent=root.assigned_parent):
+            f, v = int(readout.purpose[-1]) - 1, readout.refinement - 1
+            use_valid[r, k, f, v] = readout.source_valid
+            for j, value in enumerate(readout.values):
+                if value is not None:
+                    y[r, k, j, f, v] = float(value)
+                    if j < 2:
+                        response_valid[r, k, j, f, v] = valid_delivery
     return EvaluationPanel(
         y,
         np.isfinite(y),
@@ -120,6 +125,7 @@ def evaluation_panel(evaluation: FiniteResponseLawEvaluationNativeCompletion) ->
         prefix,
         handoff,
         work,
-        np.asarray([PARENTS.index(r.assigned_parent) for r in source.roots], dtype=np.int64),
-        tuple(r.stage_unit for r in source.roots),
+        np.asarray([PARENTS.index(root.assigned_parent) for root in roots], dtype=np.int64),
+        tuple(root.stage_unit for root in roots),
+        assigned_source=source if type(source) is FiniteResponseLawAssignedEvaluationConfig else None,
     )

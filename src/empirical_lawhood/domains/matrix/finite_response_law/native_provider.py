@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from empirical_lawhood.domains.matrix.finite_response_law.evaluation_results import FiniteResponseLawEvaluationCohort
 
 EVALUATOR_TASK_ID = "finite-response-law.native-evaluate"
+NATIVE_ADJUDICATION_TASK_ID = "finite-response-law.native-adjudicate"
 
 
 def projection_stage(report: FiniteResponseLawNativeViewObservation) -> LinkedCampaignStageEnvelope:
@@ -163,6 +164,32 @@ def native_adjudication(
     )
 
 
+def native_measurement_stage(task_id, result):
+    return envelope(task_id, result, result.evaluation_id, LinkedCampaignStageRole.METHOD_IDENTIFICATION,
+        not result.reasons, result.reasons)
+
+
+def read_native_measurement(context, aggregate_task_id, result_type, maximum_bytes):
+    """Read the original measurement and its stage from exactly one completed aggregate."""
+    if (len(context.dependency_receipts) != 1 or context.dependency_receipts[0].task_id != aggregate_task_id
+            or len(context.input_ports) != 3):
+        raise ValueError("Native adjudication lacks its completed aggregate dependency")
+    dependency, = context.dependency_receipts
+    group = _group(context, aggregate_task_id, dependency.output_materialization_ids,
+        (result_type.SCHEMA, LinkedCampaignStageEnvelope.SCHEMA))
+    result = decode_port(group[result_type.SCHEMA], result_type, maximum=maximum_bytes)
+    stage = decode_port(group[LinkedCampaignStageEnvelope.SCHEMA], LinkedCampaignStageEnvelope)
+    if stage != native_measurement_stage(aggregate_task_id, result):
+        raise ValueError("Native adjudication received a detached measurement envelope")
+    return result
+
+
+def _separate_native_adjudication(manifest):
+    from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationNativeEvaluation
+
+    return FiniteResponseLawAssignedCalibrationNativeEvaluation.SCHEMA in manifest.input_schema_ids
+
+
 class FiniteResponseLawNativeEvaluationTask:
     def __init__(self, manifest: CapabilityManifest, config: FiniteResponseLawNativeEvaluationConfig) -> None:
         self.manifest, self.config = manifest, config
@@ -172,14 +199,18 @@ class FiniteResponseLawNativeEvaluationTask:
 
     def execute(self, context: TaskContext) -> RunnerResult:
         try:
-            if (
-                context.task_id != EVALUATOR_TASK_ID
-                or context.scientific_adjudication_context is None
-            ):
-                raise ValueError(
-                    "Finite response-law native evaluator changes its task or lacks adjudication authority"
-                )
             _read_config(context, self.config, self.manifest, 2)
+            separate = _separate_native_adjudication(self.manifest)
+            if separate and context.task_id == NATIVE_ADJUDICATION_TASK_ID:
+                result = read_native_measurement(context, EVALUATOR_TASK_ID, self.evaluation_type,
+                    self.manifest.resource_ceiling.output_bytes)
+                if result.config != self.config:
+                    raise ValueError("Native adjudication received another calibration configuration")
+                verdict = native_adjudication(context, result)
+                return output_result(context, {verdict.SCHEMA: verdict.canonical_bytes()},
+                    ("receipted-native-measurement", "separate-source-completion-adjudication"))
+            if context.task_id != EVALUATOR_TASK_ID or separate != (context.scientific_adjudication_context is None):
+                raise ValueError("Native measurement task or its assigned adjudication authority differs")
             reports = []
             for receipt in context.dependency_receipts:
                 group = _group(
@@ -198,27 +229,17 @@ class FiniteResponseLawNativeEvaluationTask:
             result = self.evaluation_type(
                 self.config, tuple(sorted(reports, key=lambda v: v.report_id))
             )
-            stage = envelope(
-                context.task_id,
-                result,
-                result.evaluation_id,
-                LinkedCampaignStageRole.METHOD_IDENTIFICATION,
-                not result.reasons,
-                result.reasons,
-            )
-            adjudication = native_adjudication(context, result)
+            stage = native_measurement_stage(context.task_id, result)
+            values = {result.SCHEMA: result.canonical_bytes(), stage.SCHEMA: stage.canonical_bytes()}
+            checks = ("complete-native-measurement-census", "independent-unit-accounting")
+            if not separate:
+                adjudication = native_adjudication(context, result)
+                values[adjudication.SCHEMA] = adjudication.canonical_bytes()
+                checks += ("separate-source-completion-adjudication",)
             return output_result(
                 context,
-                {
-                    result.SCHEMA: result.canonical_bytes(),
-                    stage.SCHEMA: stage.canonical_bytes(),
-                    adjudication.SCHEMA: adjudication.canonical_bytes(),
-                },
-                (
-                    "complete-native-measurement-census",
-                    "independent-unit-accounting",
-                    "separate-source-completion-adjudication",
-                ),
+                values,
+                checks,
             )
         finally:
             for port in context.input_ports:
@@ -266,6 +287,8 @@ class FiniteResponseLawNativeMethodProvider(CampaignRuntimeProvider):
             if isinstance(self.config, FiniteResponseLawProjectionConfig)
             else {EVALUATOR_TASK_ID}
         )
+        if _separate_native_adjudication(self.manifest):
+            expected.add(NATIVE_ADJUDICATION_TASK_ID)
         return config_payloads(plan, self.manifest, self.config, self.config.config_id, expected)
 
     def output_semantic_contracts(
@@ -300,7 +323,8 @@ class FiniteResponseLawNativeMethodProvider(CampaignRuntimeProvider):
         return ScientificAdjudicationOutputContract(
             capability_key=self.manifest.capability_key,
             capability_version=self.manifest.capability_version,
-            output_id=f"{EVALUATOR_TASK_ID}.scientific-adjudication",
+            output_id=(f"{NATIVE_ADJUDICATION_TASK_ID}.evaluation" if _separate_native_adjudication(self.manifest)
+                       else f"{EVALUATOR_TASK_ID}.scientific-adjudication"),
             payload_schema=ScientificAdjudicationRecord.SCHEMA,
             fixture_scope_id=None,
             plumbing_only=False,

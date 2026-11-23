@@ -3,6 +3,7 @@
 
 from dataclasses import replace
 from decimal import Decimal
+from hashlib import sha256
 import math
 
 import numpy as np
@@ -18,6 +19,7 @@ from empirical_lawhood.methods.model_free_response import (
 )
 from . import native
 from .receiver_campaign import WORK, decimal_value
+from .records import json_text
 
 DEFAULTS = {
     "M6": {
@@ -67,6 +69,11 @@ def validate(module, opts, base):
             opts["overlap_ess_fraction"], "M6 ESS fraction", maximum=Decimal(1)
         )
     else:
+        clocks = opts.get("handoff_clocks")
+        if "handoff_clocks" in opts and (
+            not _names(clocks) or not set(clocks) <= {"fixed", "triggered", "yoked"}
+        ):
+            raise ValueError("M7 handoff clocks must identify distinct M1 checkpoints")
         if opts["primary_coordinate"] not in opts["coordinates"] or not _names(
             opts["primary_histories"], 2
         ):
@@ -96,9 +103,20 @@ def _coordinates(settings, module):
     return [rows[name] for name in names]
 
 
-def case_ids(settings, module):
+def _event_slots(settings):
+    """Keep the original fixed-handoff identities and label each new policy explicitly."""
     from .science import _recipes
 
+    clocks = settings["receiver_study"]["M7"].get("handoff_clocks")
+    for recipe in _recipes(settings):
+        if clocks is None:
+            yield recipe, "fixed", recipe
+        else:
+            for clock in clocks:
+                yield recipe, clock, recipe + "." + clock
+
+
+def case_ids(settings, module):
     rows = _coordinates(settings, module)
     opts = settings["receiver_study"][module]
     if module == "M6":
@@ -118,13 +136,13 @@ def case_ids(settings, module):
         not settings["receiver_study"]["M1"]["structural_service"]
         or not set(opts["coordinates"])
         <= set(settings["receiver_study"]["M1"]["coordinates"])
-        or not set(opts["primary_histories"]) <= set(_recipes(settings))
+        or not set(opts["primary_histories"]) <= {slot[2] for slot in _event_slots(settings)}
         or opts["dwell_ticks"] >= settings["events"]["horizon_ticks"]
     ):
         raise ValueError(
             "M7 requires the original structural handoffs and a complete physical dwell"
         )
-    return [r["id"] + "." + recipe for r in rows for recipe in _recipes(settings)]
+    return [row["id"] + "." + history for row in rows for _, _, history in _event_slots(settings)]
 
 
 def _work():
@@ -755,7 +773,20 @@ def _committed_paths(
     return output
 
 
-def _event_case(settings, row, seed, history, handoff, source, work):
+def _entry_forecast(seed, histories, handoff_hash, entry_hash, tick, position, increment):
+    """Seal the two sign forecasts at a common physical entry, before any future is acquired."""
+    operand = {
+        "root": seed, "histories": list(histories), "handoff_checkpoint_sha256": handoff_hash,
+        "entry_checkpoint_sha256": entry_hash, "entry_tick": tick,
+        "previous_tick": None if increment is None else tick - 1,
+        "entry_displacement": position, "incoming_increment": increment,
+        "visible_sign": position >= 0,
+        "last_entry_increment": None if increment is None else increment >= 0,
+    }
+    return {"operand": operand, "sha256": sha256(json_text(operand).encode()).hexdigest()}
+
+
+def _event_case(settings, row, seed, history, handoff, source, work, *, clock=None, histories=None):
     c, options, opts = (
         settings["native"],
         settings["events"],
@@ -770,7 +801,20 @@ def _event_case(settings, row, seed, history, handoff, source, work):
         "wait_ticks": 0,
         "futures": [],
     }
+    if clock is not None:
+        saved_state = None if handoff is None else handoff.get("state")
+        case.update(handoff_clock=clock, shared_histories=list(histories or (history,)),
+                    handoff_tick=None if handoff is None else handoff.get("tick"),
+                    handoff_checkpoint_sha256=None if saved_state is None else saved_state["sha256"],
+                    entry_forecast=None)
     if handoff is None or handoff.get("state") is None:
+        if clock is not None:
+            known = (clock == "yoked" and source.get("yoked_tick_assignment") is None
+                     or clock == "triggered" and source["status"] == "COMPLETED"
+                     and source["unknown_grid_observations"] == 0)
+            return {**case, "entry_status": "NO_HANDOFF" if known else "UNKNOWN",
+                    "status": "COMPLETED" if known else "UNAVAILABLE",
+                    "reason": "NO_ASSIGNED_HANDOFF" if known else "UNOBSERVED_HANDOFF"}
         return {
             **case,
             "status": "UNAVAILABLE",
@@ -781,6 +825,8 @@ def _event_case(settings, row, seed, history, handoff, source, work):
     force, _ = native.physical_chart(c, options["receiver_seed"])
     direction = force[:, 0]
     state = native.restore(handoff["state"])
+    if clock is not None and state.step_index != handoff["tick"]:
+        raise ValueError("M7 handoff state differs from its physical clock")
     reference = float(direction @ native.native_position_coordinates(ideal.positions))
 
     def displacement(state):
@@ -825,6 +871,17 @@ def _event_case(settings, row, seed, history, handoff, source, work):
     account = native.protocol_work_account()
     cache = native.BAOABGradientCache()
     previous = None
+    if clock is not None:
+        before = handoff["incoming_state"]
+        if before is not None:
+            incoming = native.restore(before)
+            if incoming.step_index + 1 != state.step_index:
+                raise ValueError("M7 incoming sample must precede its handoff by one reference tick")
+            previous = displacement(incoming)
+        case["coupling_switch"] = {
+            "incoming": [state.alpha_tilde_x, state.alpha_tilde_y],
+            "terminal": [terminal.alpha_tilde_x, terminal.alpha_tilde_y],
+        }
     stream = native.rng(seed, 691)
     try:
         if (state.alpha_tilde_x, state.alpha_tilde_y) != (
@@ -847,6 +904,11 @@ def _event_case(settings, row, seed, history, handoff, source, work):
                     history_increment=None if previous is None else q_now - previous,
                     entry_checkpoint_sha256=native.checkpoint(state)["sha256"],
                 )
+                if clock is not None:
+                    case["entry_forecast"] = _entry_forecast(
+                        seed, case["shared_histories"], case["handoff_checkpoint_sha256"], case["entry_checkpoint_sha256"],
+                        handoff["tick"] + tick, q_now, case["history_increment"],
+                    )
                 break
             if tick < opts["entry_window_ticks"]:
                 previous = q_now
@@ -936,6 +998,26 @@ def _tolerance(bounds, budget):
     return "UNRESOLVED"
 
 
+def _same_entry_forecast_reference(cases, target_bounds):
+    """Score an always-competing forecast on the exact entries used by both cues."""
+    label = {True: "target", False: "competing", None: "unknown"}
+    calls = {name: {"target": 0, "competing": 0, "unknown": 0}
+             for name in ("visible_sign", "last_entry_increment")}
+    entered = []
+    for case, risk in zip(cases, target_bounds, strict=True):
+        if case["entry_status"] != "ENTERED":
+            continue
+        entered.append(risk)
+        sealed = case["entry_forecast"]["operand"]
+        for name, counts in calls.items():
+            counts[label[sealed[name]]] += 1
+    return {
+        "entrant_roots": len(entered),
+        "sealed_calls_by_root": calls,
+        "always_competing_error_completion_bounds": np.mean(entered, axis=0).tolist() if entered else None,
+    }
+
+
 def _synthesise_events(settings, roots, alpha):
     opts, config = settings["receiver_study"]["M7"], settings["events"]
     replica_count = config["replicas"]
@@ -973,7 +1055,7 @@ def _synthesise_events(settings, roots, alpha):
                     "NO_STRUCTURAL_ADMISSION",
                     "NO_INTERIOR_BEFORE_DEADLINE",
                     "UNKNOWN",
-                )
+                ) + (("NO_HANDOFF",) if "handoff_clocks" in opts else ())
             },
             "entry_probability": _bounded_risk(
                 [
@@ -988,7 +1070,11 @@ def _synthesise_events(settings, roots, alpha):
             "mean_paid_entry_wait_physical_time_per_assignment": float(
                 np.mean([c["wait_ticks"] * h for c in cases])
             ),
-            "entry_wait_scope": "AFTER_PAID_M1_FIXED_HANDOFF_INCLUDES_ALL_COMPLETED_WAIT_PREFIXES",
+            "entry_wait_scope": (
+                "AFTER_PAID_M1_ASSIGNED_HANDOFF_INCLUDES_ALL_COMPLETED_WAIT_PREFIXES"
+                if "handoff_clocks" in opts
+                else "AFTER_PAID_M1_FIXED_HANDOFF_INCLUDES_ALL_COMPLETED_WAIT_PREFIXES"
+            ),
         }
         risk_bounds, forecast = (
             [],
@@ -1022,11 +1108,14 @@ def _synthesise_events(settings, roots, alpha):
                 ("visible_sign", case["entry_displacement"]),
                 ("last_entry_increment", case["history_increment"]),
             ]:
-                if cue is None:
+                selected_sign = (None if cue is None else cue >= 0.0)
+                if "entry_forecast" in case:
+                    selected_sign = case["entry_forecast"]["operand"][method]
+                if selected_sign is None:
                     forecast[method].append([0.0, 1.0])
                 else:
                     errors = sum(
-                        (p["event"] == "target") != (cue >= 0.0)
+                        (p["event"] == "target") != selected_sign
                         for p in paths
                         if p["status"] not in ("failed", "truncated")
                     )
@@ -1037,6 +1126,8 @@ def _synthesise_events(settings, roots, alpha):
         result["target_service_per_original_assignment"] = _bounded_risk(
             risk_bounds, allowance
         )
+        if "handoff_clocks" in opts:
+            result["same_entry_forecast_reference"] = _same_entry_forecast_reference(cases, risk_bounds)
         result["previous_motion_and_visible_forecast_risk_among_entered"] = {
             key: None if not values else _bounded_risk(values, allowance)
             for key, values in forecast.items()
@@ -1196,8 +1287,6 @@ def _synthesise_events(settings, roots, alpha):
 
 
 def acquire(settings, seed, module, prerequisites, sampling, assigned_modules):
-    from .science import _recipes
-
     case_ids(settings, module)
     work = _work()
     if module == "M6":
@@ -1206,19 +1295,36 @@ def acquire(settings, seed, module, prerequisites, sampling, assigned_modules):
         by_case = {case["case_id"]: case for case in prerequisites["M1"]["cases"]}
         cases = []
         for row in _coordinates(settings, "M7"):
-            for recipe in _recipes(settings):
+            groups = {}
+            for recipe, clock, history in _event_slots(settings):
                 source = by_case[row["id"] + "." + recipe]
-                cases.append(
-                    _event_case(
-                        settings,
-                        row,
-                        seed,
-                        recipe,
-                        source.get("checkpoints", {}).get("fixed"),
-                        source,
-                        work,
-                    )
-                )
+                handoff = source.get("checkpoints", {}).get(clock)
+                if "handoff_clocks" not in settings["receiver_study"]["M7"]:
+                    cases.append(_event_case(settings, row, seed, history, handoff, source, work))
+                    continue
+                # Classify the complete policy menu from its M1 receipts before
+                # contacting any M7 future. The same preceding cue is also required.
+                key = history
+                if handoff and handoff.get("state"):
+                    incoming = handoff["incoming_state"]
+                    key = (recipe, handoff["tick"], handoff["state"]["sha256"], handoff["present"],
+                           None if incoming is None else incoming["sha256"])
+                groups.setdefault(key, []).append((clock, history, handoff, source))
+            for group in groups.values():
+                clock, history, handoff, source = group[0]
+                histories = tuple(sorted(slot[1] for slot in group))
+                counts = {name: work[name] for name in WORK}
+                case = _event_case(settings, row, seed, history, handoff, source, work,
+                                   clock=clock, histories=histories)
+                case["standalone_native_cost"] = {name: work[name] - counts[name] for name in WORK}
+                cases.append(case)
+                for other_clock, other_history, _, _ in group[1:]:
+                    cases.append({
+                        **case, "case_id": row["id"] + "." + other_history, "entry_history": other_history,
+                        "handoff_clock": other_clock, "shared_acquisition_with": case["case_id"],
+                        "futures": [{name: {**path, "entry_history": other_history}
+                                     for name, path in future.items()} for future in case["futures"]],
+                    })
     return {"cases": cases, "work_accounting": work}
 
 
@@ -1227,6 +1333,21 @@ def analyse(settings, module, payload):
         replicas = settings["events"]["replicas"]
         names = {"h1_dwell", "h2_dwell", "h1_first", "h2_first"}
         for case in payload["cases"]:
+            if "handoff_clocks" in settings["receiver_study"]["M7"]:
+                if case["handoff_clock"] not in settings["receiver_study"]["M7"]["handoff_clocks"]:
+                    raise ValueError("M7 replaced the assigned handoff policy")
+                histories = case["shared_histories"]
+                if histories != sorted(set(histories)) or case["entry_history"] not in histories:
+                    raise ValueError("M7 omitted its policy from the pre-future assignment")
+                expected = None
+                if case["entry_status"] == "ENTERED":
+                    expected = _entry_forecast(
+                        payload["seed"], histories, case["handoff_checkpoint_sha256"],
+                        case["entry_checkpoint_sha256"], case["handoff_tick"] + case["wait_ticks"],
+                        case["entry_displacement"], case["history_increment"],
+                    )
+                if case["entry_forecast"] != expected:
+                    raise ValueError("M7 entry forecast differs from its observed causal operands")
             seen = set()
             for future in case["futures"]:
                 if set(future) != names or case["entry_status"] != "ENTERED":

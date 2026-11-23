@@ -79,7 +79,7 @@ def coupling_gradient_image(positions, selected, scaled_coupling_derivative):
 
 
 def scheduled_force_step(state, *, direction, amplitude, member, numerical_view,
-        next_alpha_tilde_x, next_alpha_tilde_y, standardized_noise, gradient_cache=None):
+        next_alpha_tilde_x, next_alpha_tilde_y, standardized_noise, gradient_cache=None, recorder=None):
     """Both physical sectors, both force kicks and distinct scheduled gradients."""
     parameters(state,member)
     direction = matrix(direction, 'force direction')
@@ -88,10 +88,15 @@ def scheduled_force_step(state, *, direction, amplitude, member, numerical_view,
     dt = float(numerical_view.timestep)
     kick = .5*dt*amplitude*direction
     incoming = state if amplitude == 0 else replace(state,momenta=hermitian_part(state.momenta+kick))
+    captured = [] if recorder is not None and amplitude != 0 else None
     advanced = baoab_step_with_hermitian_noise(incoming,member=member,numerical_view=numerical_view,
         next_alpha_tilde_x=next_alpha_tilde_x,next_alpha_tilde_y=next_alpha_tilde_y,
-        standardized_noise=standardized_noise,gradient_cache=gradient_cache)
-    return advanced if amplitude == 0 else replace(advanced,momenta=hermitian_part(advanced.momenta+kick))
+        standardized_noise=standardized_noise,gradient_cache=gradient_cache,
+        recorder=recorder if captured is None else captured.append)
+    result = advanced if amplitude == 0 else replace(advanced,momenta=hermitian_part(advanced.momenta+kick))
+    if captured is not None:
+        recorder(captured[0].with_external_force(state, result, amplitude * direction))
+    return result
 
 
 def tangent_step(state, advanced, differential, *, direction, force_derivative, member,

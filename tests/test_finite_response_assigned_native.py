@@ -190,6 +190,25 @@ def test_assigned_calibration_native_output_preserves_handoff_and_action() -> No
             assert frame is not None
         pair, payload = encode_native_pair(*values)
         assert type(pair) is FiniteResponseLawAssignedCalibrationPairArtifact
+        if phase == "prefix":
+            import io
+            import h5py
+            from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
+            from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
+            from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+            from empirical_lawhood.storage.artifact_validation import ArtifactIdentityConflict
+            from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+
+            validators = integration_artifact_profile_validators("finite-response-law")
+            request = ArtifactWriteRequest("test.pair", "native/pair.h5", NATIVE_PAIR_SCHEMA,
+                ArtifactProfile.AUDITED_HDF5, "application/x-hdf5", "test.native", "native", payload,
+                VisibilityCeiling.DEVELOPMENT_ONLY, (), OutcomeAccess.DEVELOPMENT_VISIBLE)
+            validators.validate(request)
+            altered = io.BytesIO(payload)
+            with h5py.File(altered, "r+") as handle:
+                handle["half/undeclared"] = [0]
+            with pytest.raises(ArtifactIdentityConflict):
+                validators.validate(replace(request, payload=altered.getvalue()))
         result = FiniteResponseLawAssignedCalibrationTaskResult(
             task,
             predecessor,

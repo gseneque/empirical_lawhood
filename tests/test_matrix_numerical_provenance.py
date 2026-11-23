@@ -169,6 +169,13 @@ def test_supported_runtime_reaches_only_mocked_producer(route, tmp_path, monkeyp
 
 
 def test_complete_producing_manifest_and_reader_environment_are_distinct(monkeypatch):
+    from empirical_lawhood.storage.source_policy import CHECKOUT_GIT_TIMEOUT_SECONDS
+
+    bounded = observation.run_bounded_command
+    def observe_git(argv, **kwargs):
+        assert kwargs["timeout_seconds"] == CHECKOUT_GIT_TIMEOUT_SECONDS
+        return bounded(argv, **kwargs)
+    monkeypatch.setattr(observation, "run_bounded_command", observe_git)
     record = provenance.capture_matrix_provenance(project_root=ROOT)
     names = {name for name, _ in record.package_sources}
     assert {

@@ -1,0 +1,49 @@
+{
+  "context": {},
+  "format": 1,
+  "members": {
+    "closeout": {
+      "path": "r26/artifacts/confirmation-closed-panel-01/scientific-result.json",
+      "sha256": "c9269e38a94eb0dc82345b7e4eefb733c84283f66b033e2d7355ebe35ac9c28b",
+      "size": 1008879,
+      "source": "series"
+    },
+    "definition": {
+      "path": "r26/artifacts/confirmation-definition.json",
+      "sha256": "8e809d129724a2c9abd4c4ce5b5e1754c343ce83b67bc270167885932256f929",
+      "size": 20337,
+      "source": "series"
+    },
+    "handoffs": {
+      "path": "r26/artifacts/confirmation-sibling-handoffs-01/root-handoff-rows.json",
+      "sha256": "794e8c189968beac3bbf2c65aee96362d4ff89c002784890ff93b7d251ba72a8",
+      "size": 1217245,
+      "source": "series"
+    },
+    "recursive/source-snapshot.json": {
+      "path": "r26-confirmation-01/scratch/inputs/source-snapshot.json",
+      "sha256": "22b601dea31f496f260be9e97f9a004112e5b81982094667ad6cf28d91570875",
+      "size": 562619,
+      "source": "series"
+    },
+    "recursive/sources.json": {
+      "path": "r26-confirmation-01/scratch/inputs/sources.json",
+      "sha256": "e6a55ca7ef17a805b741e51853f5826c3c2c549d757daaf1d33eb0a15cef7eee",
+      "size": 254,
+      "source": "series"
+    },
+    "recursive/specification.json": {
+      "path": "r26-confirmation-01/scratch/inputs/specification.json",
+      "sha256": "c04ab4db74d27f52d5694feb845c0f5cf682e5c135a96f4ff60dc73dd41765bd",
+      "size": 44582,
+      "source": "series"
+    },
+    "roots": {
+      "path": "r26/artifacts/confirmation-closed-panel-01/assigned-roots.json",
+      "sha256": "0d9b2106aecae8f1a348d6505cb661039e51f0d2b03959c3027bd2966a3dae0f",
+      "size": 18473211,
+      "source": "series"
+    }
+  },
+  "study": "r26"
+}

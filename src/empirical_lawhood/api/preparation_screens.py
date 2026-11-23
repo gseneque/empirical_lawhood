@@ -14,7 +14,7 @@ from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
 from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from empirical_lawhood.execution.task_records import artifact_identity
-from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
+from empirical_lawhood.api.preparation_result_access import authenticate_preparation_input
 
 
 def ordinary_preparation_operands_export(*, stage, original_f, panels, destination: Path, artifact_writer):
@@ -32,7 +32,7 @@ def ordinary_preparation_operands_export(*, stage, original_f, panels, destinati
         raise FileExistsError("ordinary operands require an explicitly selected empty directory")
     receipts = ExternalTaskReceiptStore(artifact_writer)
     for value in panels:
-        value.authenticate(artifact_writer, receipts, result_access_authenticator=authenticate_preparation_result_access)
+        authenticate_preparation_input(value, artifact_writer, receipts)
     arrays, summary = reduce_ordinary_panels(stage, original_f, panels)
     with report_incomplete_output(destination):
         for name,record in (("stage.canonical.json",stage),("screen-report.canonical.json",summary)):

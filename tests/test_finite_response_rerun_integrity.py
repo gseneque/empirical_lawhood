@@ -202,9 +202,13 @@ def test_authoring_accepts_cli_created_empty_directory_before_closure(tmp_path, 
     assert not tuple(output.iterdir())
 
 
-def test_native_result_summary_is_compact_and_preserves_full_failed_census():
+@pytest.mark.parametrize(("stage", "kind", "roots"), (
+    ("calibration", "calibration-native", 32), ("prospective-evaluation", "evaluation-native", 64),
+))
+def test_native_result_summary_is_compact_and_preserves_full_failed_census(stage, kind, roots):
     from tests.finite_response_custody_fixtures import synthetic_native
-    record = synthetic_native()
+    from tests.test_finite_response_assigned_method_records import _source
+    record = synthetic_native(_source(stage))
     view = record.views[0]
     # A declared native numerical failure remains within the exact typed full
     # roster; no observation or independent root is removed from the result.
@@ -221,8 +225,9 @@ def test_native_result_summary_is_compact_and_preserves_full_failed_census():
         receipt_binding=('synthetic.native', 'native', 'receipt.synthetic.native.attempt-002'))
     summary = application.finite_response_current_result_summary(config=config, record=record)
     assert len(json.dumps(summary).encode()) < len(raw)
-    assert summary['independent_roots'] == len(summary['root_ids']) == 32
-    assert summary['nested_numerical_views'] == len(summary['views']) == 64
+    assert summary['result_kind'] == kind
+    assert summary['independent_roots'] == len(summary['root_ids']) == roots
+    assert summary['nested_numerical_views'] == len(summary['views']) == 2 * roots
     assert summary['native_cell_dispositions']['NUMERICAL_FAILURE'] == 1
     assert sum(summary['native_cell_dispositions'].values()) == summary['assigned_native_cells']
     assert summary['scientific_status'] == 'UNEVALUABLE'

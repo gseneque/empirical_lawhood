@@ -219,13 +219,15 @@ def retained_qualification_input_reasons(
     retained = {r.segment_id: r for r in extension.retained_predecessors}
     tasks = {t.task_id: t for t in plan.tasks}
     reasons = []
-    for segment in extension.segments:
-        prior = retained.get(segment.predecessor_segment_id or "")
-        if prior is None:
-            continue
-        imported = isinstance(extension, ProspectiveRetainedSourceUse)
-        task = tasks.get(prior.segment_id if imported else segment.segment_id)
-        reason = f"QUALIFICATION_RETAINED_INPUT_DIFFERS:{segment.segment_id}"
+    if isinstance(extension, ProspectiveRetainedSourceUse):
+        # Each imported publication has one input task even when many futures share it.
+        targets = ((prior.segment_id, prior) for prior in retained.values())
+    else:
+        targets = ((segment.segment_id, retained[segment.predecessor_segment_id])
+                   for segment in extension.segments if segment.predecessor_segment_id in retained)
+    for task_id, prior in targets:
+        task = tasks.get(task_id)
+        reason = f"QUALIFICATION_RETAINED_INPUT_DIFFERS:{task_id}"
         if not isinstance(task, ExecutionTask):
             reasons.append(reason)
             continue
@@ -274,7 +276,7 @@ def retained_qualification_input_reasons(
         if task.capability.requested_resources.source_scan_bytes < sum(
             a.size_bytes for a, _ in expected
         ):
-            reasons.append(f"QUALIFICATION_RETAINED_SCAN_UNDERBOUND:{segment.segment_id}")
+            reasons.append(f"QUALIFICATION_RETAINED_SCAN_UNDERBOUND:{task_id}")
     return tuple(sorted(set(reasons)))
 
 

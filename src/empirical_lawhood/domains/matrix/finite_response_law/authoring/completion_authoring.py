@@ -21,9 +21,9 @@ from empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.de
 from empirical_lawhood.execution.experiment_authoring import single_experiment_campaign as _campaign, formal_entry as _entry, study_template_from_protocol as _programme_template
 from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
 from empirical_lawhood.execution.protocol_helpers import capability_config_ref as _config_ref
-from empirical_lawhood.domains.matrix.finite_response_law.completion.contracts import FiniteResponseLawAssignedRetainedCompletionConfig, FiniteResponseLawRetainedCompletionConfig
-from empirical_lawhood.domains.matrix.finite_response_law.completion.extension import ASSIGNED_CAPABILITY, CAPABILITY
-from empirical_lawhood.domains.matrix.finite_response_law.completion.extension import ASSIGNED_BINDING, BINDING
+from empirical_lawhood.domains.matrix.finite_response_law.completion.contracts import FiniteResponseLawAssignedCalibrationRetainedConfig, FiniteResponseLawAssignedRetainedCompletionConfig, FiniteResponseLawRetainedCompletionConfig
+from empirical_lawhood.domains.matrix.finite_response_law.completion.extension import ASSIGNED_CAPABILITY, CAPABILITY, CALIBRATION_CAPABILITY
+from empirical_lawhood.domains.matrix.finite_response_law.completion.extension import ASSIGNED_BINDING, BINDING, CALIBRATION_BINDING
 from empirical_lawhood.domains.matrix.finite_response_law.native_records import native_method_types
 from empirical_lawhood.domains.matrix.finite_response_law.authoring.authoring import build_native_authoring
 from empirical_lawhood.domains.matrix.finite_response_law.authoring.exposure import native_seed_ids
@@ -39,14 +39,15 @@ def build_completion_authoring(
     exposed_unit_ids: tuple[str, ...],
     exposed_seed_ids: tuple[str, ...],
 ) -> ResponseGeometryAssayAuthoringBundle:
-    if type(config) not in (
-        FiniteResponseLawRetainedCompletionConfig,
-        FiniteResponseLawAssignedRetainedCompletionConfig,
-    ):
+    definitions = {
+        FiniteResponseLawRetainedCompletionConfig: (CAPABILITY, BINDING),
+        FiniteResponseLawAssignedRetainedCompletionConfig: (ASSIGNED_CAPABILITY, ASSIGNED_BINDING),
+        FiniteResponseLawAssignedCalibrationRetainedConfig: (CALIBRATION_CAPABILITY, CALIBRATION_BINDING),
+    }
+    if type(config) not in definitions:
         raise ValueError("Retained completion requires a closed versioned configuration")
+    capability, binding = definitions[type(config)]
     assigned = type(config) is FiniteResponseLawAssignedRetainedCompletionConfig
-    capability = ASSIGNED_CAPABILITY if assigned else CAPABILITY
-    binding = ASSIGNED_BINDING if assigned else BINDING
     prefix = config.study_prefix
     freeze, aggregate, adjudicate = (
         config.freeze_task_id,

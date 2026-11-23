@@ -31,7 +31,7 @@ from empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.de
 from empirical_lawhood.execution.experiment_authoring import single_experiment_campaign as _campaign, formal_entry as _entry, study_template_from_protocol as _programme_template
 from empirical_lawhood.execution.generated_extension_bundles import GENERATED_EXTENSION_BUNDLE_AGGREGATE
 from empirical_lawhood.domains.matrix.finite_response_law.native_records import FiniteResponseLawProjectionConfig, FiniteResponseLawNativeEvaluationConfig
-from empirical_lawhood.domains.matrix.finite_response_law.native_provider import EVALUATOR_TASK_ID
+from empirical_lawhood.domains.matrix.finite_response_law.native_provider import EVALUATOR_TASK_ID, NATIVE_ADJUDICATION_TASK_ID
 from empirical_lawhood.domains.matrix.finite_response_law.science import PROGRAMME
 from empirical_lawhood.domains.matrix.finite_response_law.contracts import FiniteResponseLawNativeConfig, native_invocations
 from empirical_lawhood.domains.matrix.finite_response_law.protocol import native_protocol_steps
@@ -43,10 +43,11 @@ from empirical_lawhood.adapters.simulators.finite_response_law.extension import 
 from empirical_lawhood.domains.matrix.finite_response_law.native_records import native_method_types
 from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawControlConfig
 from empirical_lawhood.domains.matrix.finite_response_law.evaluation_results import FiniteResponseLawEvaluationRevealConfig, FiniteResponseLawEvaluationCohort, COHORT
-from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedCalibrationConfig, FiniteResponseLawAssignedEvaluationConfig
 from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedEvaluationProjectionConfig, FiniteResponseLawAssignedEvaluationCompletionConfig
 
 
+from empirical_lawhood.adapters.simulators.finite_response_law.locked_evaluation import FiniteResponseLawLockedEvaluationRetention
 from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retention import FiniteResponseLawEvaluationRetention
 
 
@@ -99,7 +100,8 @@ def _template(
         registry,
         prefix=prefix,
         source_task_id=native[0].task_id,
-        terminal_task_id=COHORT if control else EVALUATOR_TASK_ID,
+        terminal_task_id=(COHORT if control else NATIVE_ADJUDICATION_TASK_ID
+            if type(source) is FiniteResponseLawAssignedCalibrationConfig else EVALUATOR_TASK_ID),
         primary_output_ids={
             ScientificStage.PREPARE: "native-result",
             ScientificStage.TRANSFORM: "product" if control else "view-report",
@@ -123,11 +125,19 @@ def _template(
     external = [
         e for e in base.graph.external_inputs if retention is None or e.input_id != source.spec_id
     ]
-    for prior in carrier.retained_predecessors:
-        for artifact in (*prior.artifacts, prior.task_receipt):
+    imported_inputs = {
+        prior.segment_id: (*prior.artifacts, prior.task_receipt) for prior in carrier.retained_predecessors
+    }
+    locked = retention if isinstance(retention, FiniteResponseLawLockedEvaluationRetention) else None
+    if locked is not None:
+        imported_inputs.update({c.task_id: (c.product, c.receipt) for c in locked.choices})
+    access_by_task = {p.segment_id: (p.outcome_access, p.visibility_ceiling) for p in carrier.retained_predecessors}
+    for task_id, artifacts in imported_inputs.items():
+        access, ceiling = access_by_task.get(task_id, (OutcomeAccess.OUTCOME_BLIND, VisibilityCeiling.PROSPECTIVE))
+        for artifact in artifacts:
             role = (
                 ScientificInputRole.PARENT_RECEIPT
-                if artifact == prior.task_receipt
+                if artifact == artifacts[-1]
                 else ScientificInputRole.PREPARED_MEDIUM
             )
             external.append(
@@ -140,8 +150,8 @@ def _template(
                     artifact.payload_schema,
                     artifact.media_type,
                     artifact.size_bytes,
-                    prior.outcome_access,
-                    prior.visibility_ceiling,
+                    access,
+                    ceiling,
                 )
             )
     if control is not None:
@@ -168,7 +178,7 @@ def _template(
                 )
             )
             for task_id, (_, operation) in control_tasks(control).items():
-                if operation not in ("forecast", "lock-choices", "freeze-prior"):
+                if operation not in ("forecast", "lock-choices", "freeze-prior") or task_id in imported_inputs:
                     continue
                 edges.append(
                     CandidateGraphEdge(
@@ -227,6 +237,14 @@ def _template(
                     BarrierKind.NONE,
                 )
             )
+    if locked is not None:
+        for choice in locked.choices:
+            for index, artifact in enumerate((choice.product, choice.receipt)):
+                role = ScientificInputRole.PARENT_RECEIPT if index else ScientificInputRole.PREPARED_MEDIUM
+                edges.append(CandidateGraphEdge(f"edge.{choice.task_id}.retained.{index}", None, None,
+                    artifact.artifact_id, choice.task_id, f"retained-{index}", role, artifact.artifact_id,
+                    artifact.payload_schema, artifact.media_type, artifact.size_bytes, OutcomeAccess.OUTCOME_BLIND,
+                    VisibilityCeiling.PROSPECTIVE, BarrierKind.NONE))
     graph = replace(
         base.graph,
         external_inputs=tuple(sorted(external, key=lambda e: e.input_id)),
@@ -276,6 +294,7 @@ def build_native_authoring(
     new_seed_ids: tuple[str, ...],
     control: FiniteResponseLawControlConfig | None = None,
     retention: FiniteResponseLawEvaluationRetention | None = None,
+    original_design_exposure: tuple[tuple[str, ...], tuple[str, ...]] | None = None,
 ) -> ResponseGeometryAssayAuthoringBundle:
     """Consume operator-authenticated exposure metadata; never inspect sources."""
     from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
@@ -293,6 +312,11 @@ def build_native_authoring(
         from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import SOURCE_CAPABILITY as CONTINUATION_SOURCE, IMPORT_CAPABILITY
         from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.extension import SOURCE_BINDING as CONTINUATION_BINDING, IMPORT_BINDING
 
+        if isinstance(retention, FiniteResponseLawLockedEvaluationRetention):
+            from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import LOCKED_IMPORT_CAPABILITY as import_capability
+            from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.extension import LOCKED_IMPORT_BINDING as import_binding
+        else:
+            import_capability, import_binding = IMPORT_CAPABILITY, IMPORT_BINDING
         source_capability, source_binding = CONTINUATION_SOURCE, CONTINUATION_BINDING
     projection_type, evaluation_config_type, _, view_type, evaluation_type = native_method_types(
         source
@@ -338,7 +362,7 @@ def build_native_authoring(
         requested_rungs=tuple(sorted(EvidenceRung, key=lambda rung: rung.value)) if control else (EvidenceRung.MEASUREMENT,),
     )
     native = native_declarations(source)
-    imported = set() if retention is None else {p.segment_id for p in retention.prefixes}
+    imported = set() if retention is None else {p.segment_id for p in retention.native_origins}
     carrier_class: type[PredecessorBoundSourceQualificationExperiment] = (
         PredecessorBoundSourceQualificationExperiment
         if retention is None
@@ -366,7 +390,7 @@ def build_native_authoring(
         OutcomeAccess.EVALUATION_SEALED,
         retained_predecessors=source.retained_predecessors
         if retention is None
-        else retention.prefixes,
+        else retention.native_origins,
     )
     if control is not None:
         from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.protocol import evaluation_protocol_steps
@@ -391,7 +415,7 @@ def build_native_authoring(
             )
         }
         if retention is not None:
-            manifests[IMPORT_CAPABILITY.capability_key] = IMPORT_CAPABILITY
+            manifests[import_capability.capability_key] = import_capability
         composition_steps = evaluation_protocol_steps(
             source,
             carrier,
@@ -469,7 +493,7 @@ def build_native_authoring(
 
         bindings = (*bindings, CONTROL_BINDING, REVEAL_BINDING)
     if retention is not None:
-        bindings = (*bindings, IMPORT_BINDING)
+        bindings = (*bindings, import_binding)
     decoder_by_schema = {
         d.payload_schema: d for b in bindings for d in b.issued_decoder_registrations
     }
@@ -560,8 +584,11 @@ def build_native_authoring(
                     ),
                 )
             )
-    for prior in carrier.retained_predecessors:
-        for artifact in prior.artifacts:
+    prepared_sources = [(p.artifacts, p.outcome_access, p.visibility_ceiling) for p in carrier.retained_predecessors]
+    if isinstance(retention, FiniteResponseLawLockedEvaluationRetention):
+        prepared_sources.extend(((c.product,), OutcomeAccess.OUTCOME_BLIND, VisibilityCeiling.PROSPECTIVE) for c in retention.choices)
+    for artifacts, access, ceiling in prepared_sources:
+        for artifact in artifacts:
             materialization = ObjectIdentity(
                 artifact.artifact_id, artifact.payload_schema, "1.0.0", artifact.sha256
             )
@@ -571,8 +598,8 @@ def build_native_authoring(
                 source_id=artifact.artifact_id,
                 materialization=materialization,
                 content_sha256=artifact.sha256,
-                outcome_access=prior.outcome_access,
-                visibility_ceiling=prior.visibility_ceiling,
+                outcome_access=access,
+                visibility_ceiling=ceiling,
             )
             qualifications.append(receipt)
             sources.append(
@@ -594,6 +621,20 @@ def build_native_authoring(
     cutoff = InformationCutoff(
         f"{prefix}.design-cutoff", Q_CLOCK, CausalPhase.PRE_ACTION, Decimal(0)
     )
+    # The current allocation census includes acquired preparations. The original
+    # issue fixes which units and seeds were visible when the scientific design was chosen.
+    design_units, design_seeds = exposed_unit_ids, exposed_seed_ids
+    evaluation_seeds = new_seed_ids
+    if isinstance(retention, FiniteResponseLawLockedEvaluationRetention):
+        if original_design_exposure is None:
+            raise ValueError("Locked evaluation needs its original issued design-exposure roster")
+        design_units, design_seeds = original_design_exposure
+        if (not set(design_units) <= set(exposed_unit_ids) or not set(design_seeds) <= set(exposed_seed_ids)
+                or set(design_units).intersection(units) or native_seed_collisions(design_seeds, tuple(sorted(assigned_seeds)))):
+            raise ValueError("Retained evaluation changes the original separation of design and evaluation")
+        evaluation_seeds = tuple(sorted(assigned_seeds))
+    elif original_design_exposure is not None:
+        raise ValueError("Only a locked evaluation can retain its original design-exposure roster")
     design_inputs = tuple(
         sorted(
             (
@@ -606,8 +647,8 @@ def build_native_authoring(
                     OutcomeAccess.DEVELOPMENT_VISIBLE,
                     VisibilityCeiling.OUTCOME_VISIBLE,
                     "owner.empirical-lawhood",
-                    exposed_unit_ids,
-                    exposed_seed_ids,
+                    design_units,
+                    design_seeds,
                 ),
                 DesignInputRecord(
                     f"{prefix}.exposure",
@@ -661,7 +702,7 @@ def build_native_authoring(
 
         capabilities = (*capabilities, CONTROL_CAPABILITY, REVEAL_CAPABILITY)
     if retention is not None:
-        capabilities = (*capabilities, IMPORT_CAPABILITY)
+        capabilities = (*capabilities, import_capability)
     selected = {c.capability_key for c in capabilities}
     registry = CapabilityRegistry(
         f"{prefix}.registry",
@@ -686,10 +727,10 @@ def build_native_authoring(
             VisibilityCeiling.PROSPECTIVE,
         ),
         design_inputs,
-        exposed_unit_ids if control else tuple(sorted(set(exposed_unit_ids).union(units))),
+        design_units if control else tuple(sorted(set(exposed_unit_ids).union(units))),
         tuple(sorted(units)) if control else (),
-        exposed_seed_ids if control else tuple(sorted(set(exposed_seed_ids).union(new_seed_ids))),
-        new_seed_ids if control else (),
+        design_seeds if control else tuple(sorted(set(exposed_seed_ids).union(new_seed_ids))),
+        evaluation_seeds if control else (),
         (),
         system,
         experiment,

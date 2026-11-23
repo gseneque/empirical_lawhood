@@ -164,7 +164,7 @@ def register_preparation_commands(campaign_app: typer.Typer) -> None:
     ) -> None:
         """Prepare the fixed full-size stage/source from actual published inputs."""
         from empirical_lawhood.api.preparation_inputs import create_preparation_selection
-        from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
+        from empirical_lawhood.api.preparation_result_access import authenticate_preparation_input
         from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
         h = _helpers()
         try:
@@ -173,8 +173,9 @@ def register_preparation_commands(campaign_app: typer.Typer) -> None:
             selected = h._configuration(allocation, "matrix-allocation")
             publications = tuple(h._configuration(path, "preparation-published-input") for path in (lower, exposure, conformance))
             q = None if qualification is None else h._configuration(qualification, "preparation-published-input")
+            receipts = ExternalTaskReceiptStore(plane)
             for value in (*publications, *((q,) if q is not None else ())):
-                value.authenticate(plane, ExternalTaskReceiptStore(plane), result_access_authenticator=authenticate_preparation_result_access)
+                authenticate_preparation_input(value, plane, receipts)
             attempt_stage("fixed_preparation_selection_preparation", native_contact="none")
             record = create_preparation_selection(root=root, config_id=config_id, phase=phase, allocation=selected,
                 lower=publications[0], exposure=publications[1], conformance=publications[2], qualification=q, constructed=constructed)

@@ -473,6 +473,10 @@ def read_result(*, directory, artifact_writer, specification, instance, payloads
             raise PermissionError("population synthesis loses an original assigned outcome")
         summaries[product.config.module] = {"identity": product.identity.to_document(), "result": product.payload}
     analyses = {(p.config.module, p.config.assignments[0].seed): p for p in found.values() if p.config.phase == "analyse"}
+    from empirical_lawhood.domains.matrix.model_free.handoff_observations import paired_policy_handoffs
+    handoffs = paired_policy_handoffs(specification, found.values())
+    if handoffs:
+        base["paired_policy_handoffs"] = handoffs
     return {**base, "scientific_completion": "COMPLETED" if len(found) == len(configs) else "INCOMPLETE",
         "completed_operations": len(found), "population_summaries": summaries,
         "roots": [{"seed": r.seed, "unit_id": r.unit_id, "role": r.role, "modules": {m:

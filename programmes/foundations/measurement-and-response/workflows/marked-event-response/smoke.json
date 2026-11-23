@@ -1,0 +1,35 @@
+{
+  "schema": "marked-event-response.definition.v1",
+  "first_root": 557611230,
+  "development_roots": 10,
+  "evaluation_roots": 8,
+  "batch_size": 4,
+  "parameters": {
+    "sites": 4,
+    "particles": 2,
+    "j_xy": "1",
+    "j_z": "1",
+    "gamma": "1",
+    "nodes": 4,
+    "margin": "0.01",
+    "derivative_margin": "0.01",
+    "epsilon": [
+      "0.1",
+      "0.05",
+      "0.025"
+    ],
+    "pooling": [
+      "0",
+      "0.1",
+      "1",
+      "4"
+    ],
+    "shooting_tapes": 2,
+    "splits": {
+      "development": 2,
+      "train": 4,
+      "select": 0,
+      "calibrate": 4
+    }
+  }
+}

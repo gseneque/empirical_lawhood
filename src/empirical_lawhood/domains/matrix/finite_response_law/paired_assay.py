@@ -1,5 +1,6 @@
 "Native signed-pair receiver, preserving future purposes and numerical views.\n\nThis is a measurement binding, not a controller or controller-use verdict. Every differential\nreadout retains both branch result identities and its actual matched HOLD.\n"
 
+from collections.abc import Iterator
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import ClassVar
@@ -172,6 +173,23 @@ def paired_native_assay(
         word,
         tuple(sorted(result, key=lambda r: (r.purpose, r.refinement))),
     )
+
+
+def positive_pair_readouts(
+    views: tuple[FiniteResponseLawNativeViewObservation, ...], *, parent: str,
+) -> Iterator[tuple[int, PreparedForceWord, FiniteResponseLawPairedFutureReadout, bool]]:
+    """Yield the four positive-minus-negative assays and their signed delivery masks."""
+    by_view = [{word.native_result: word for word in view.words} for view in views]
+    pairs = ((8, 0), (8, 1), (16, 0), (16, 1))
+    for pair, (magnitude, direction) in enumerate(pairs):
+        word = PreparedForceWord(Decimal(magnitude), direction, 1)
+        assay = paired_native_assay(views, parent=parent, word=word)
+        for readout in assay.readouts:
+            observations = by_view[readout.refinement - 1]
+            signed = (observations[readout.selected_source], observations[readout.opposite_source])
+            yield pair, word, readout, all(
+                observation.complete and observation.maximum_force_error == 0 for observation in signed
+            )
 
 
 def prepared_paired_readouts(

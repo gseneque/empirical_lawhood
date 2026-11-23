@@ -12,5 +12,7 @@ Historical source paths identify original custody, not new executable selections
 
 | Record | Role |
 |---|---|
+| [Marked event consequences and compressed history](marked-event-response.md) | Activity-weighted lost information, physical perturbation and full-replay control |
+| [Thermal RC dissipation and predictive voltage memory](thermal-rc-dissipation.md) | Exact, finite-lag and sampled evidence on four independent cohorts across the two panels |
 | [Glenn 2026 retrospective archive boundary](glenn-2026-qualification.md) | Finding, assessment or retained checkpoint |
 | [Results of recursive prerequisite construction](recursive-prerequisite-results.md) | Finding, assessment or retained checkpoint |

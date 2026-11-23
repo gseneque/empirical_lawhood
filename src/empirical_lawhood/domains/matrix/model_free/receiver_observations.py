@@ -9,6 +9,7 @@ from scipy.stats import beta
 
 from . import native
 from .receiver_campaign import decimal_value
+from .structural_service_design import paired_delivery_halfwidth
 
 DEFAULTS = {
     "M0": {
@@ -255,11 +256,13 @@ def _formation(settings, seed, work):
     force = directed[:, [c["actions"].index("FACTOR")]]
     receiver = np.concatenate((np.zeros(96), force[:, 0]))[None]
     scale = float(c["amplitude"]) * c["pulse_ticks"] * float(c["timestep"])
+    policy_clocks = "handoff_clocks" in settings["receiver_study"].get("M7", {})
     cases = []
     for row in _coords(settings, "M1"):
         for recipe in _recipes(settings):
             case = native.formation(
-                c, row, recipe, seed, policy, reviewed=True, yoked_tick=yoked
+                c, row, recipe, seed, policy, reviewed=True, yoked_tick=yoked,
+                retain_incoming_state=policy_clocks,
             )
             case["case_id"] = row["id"] + "." + recipe
             case["yoked_tick_assignment"] = yoked
@@ -283,10 +286,24 @@ def _formation(settings, seed, work):
                     "reason": "YOKED_NONENTRY",
                 },
             )
+            acquired_handoffs = {}
             for label, handoff in case["checkpoints"].items():
                 handoff["panel_service"] = []
                 if handoff["state"] is None:
                     continue
+                if policy_clocks:
+                    # Within this root and recipe the actuator, panel noises and
+                    # numerical settings are identical for an identical state.
+                    state_id = handoff["state"]["sha256"]
+                    if state_id in acquired_handoffs:
+                        original = acquired_handoffs[state_id]
+                        handoff["panel_service"] = original["panel_service"]
+                        handoff["shared_assay_with"] = original["assay_clock"]
+                        if "service_failure" in original:
+                            handoff["service_failure"] = original["service_failure"]
+                        continue
+                    acquired_handoffs[state_id] = handoff
+                    handoff["assay_clock"] = label
                 try:
                     for panel in range(policy["service_panels"]):
                         response = native.paired_response(
@@ -810,7 +827,7 @@ def synthesise(settings, module, roots, alpha):
             or c["handoffs"][comparator]["unknown"]
             for c in primary
         )
-        halfwidth = math.sqrt(2 * math.log(16 / alpha) / n)
+        halfwidth = paired_delivery_halfwidth(n, alpha)
         diff = float(np.mean(differences))
         waits = [
             c["handoffs"]["triggered"]["waiting_ticks"]

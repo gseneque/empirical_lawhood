@@ -17,3 +17,11 @@ Run `uv run --no-sync empirical-lawhood campaign preparation-diagnostics --input
 Reinspect using `uv run --no-sync empirical-lawhood campaign preparation-diagnostics-result --input /absolute/new-diagnostics.json --relative-root analyses/my-diagnostics`. The reader verifies current grants, exact terminal receipts, report bytes and lineage without rerunning numerical reductions. If publication is interrupted, inspect the retained attempt and exact publication files; choose a fresh output root rather than overwriting partial evidence.
 
 Reports retain all Q8/E32 roots, separate first/last/both-view/envelope accounting, nonattempt/negative outcomes, selected consumer limits and separate support-only bypass results. Whole-root bootstrap comparisons include excluded roots as zero contributions in the original requested denominator. E32 false-admission and full-valid bounds use the actual complete root counts; missingness is UNEVALUABLE, never silently dropped. These reports do not create scientific qualification, issue authority or a release tag.
+
+To examine the physical change behind a support crossing, pass the same prepared
+diagnostic phase and its guarded artifact plane to `read_preparation_boundary_observations`.
+The readout pairs the actual port-2 force at ticks 4464 and 4496 with its 32-tick
+backward rate in each view. Each H, N and P row retains the seven scored validity
+checks, covered requests, and measured signed-response and preservation quantities
+for all four force pairs and both futures. A declined arm keeps its measured panel.
+The independent unit is the root. [Boundary readout](../../../../../src/empirical_lawhood/api/preparation_boundary_readout.py)

@@ -86,6 +86,7 @@ EVALUATION_CAPABILITY = manifest(
     (
         FiniteResponseLawAssignedCalibrationEvaluationConfig.SCHEMA,
         FiniteResponseLawAssignedCalibrationViewObservation.SCHEMA,
+        FiniteResponseLawAssignedCalibrationNativeEvaluation.SCHEMA,
         LinkedCampaignStageEnvelope.SCHEMA,
     ),
     (
@@ -103,7 +104,7 @@ EVALUATION_CAPABILITY = manifest(
         source_scan_bytes=64 * PROJECTION_CAPABILITY.resource_ceiling.output_bytes
         + 1024**2,
     ),
-    implementation_id="fresh-full-native-census-completion-not-law-qualification",
+    implementation_id="assigned-calibration-measurement-and-receipted-adjudication",
     conformance_ids=(
         "full-32-root-denominator",
         "no-qualification-promotion",

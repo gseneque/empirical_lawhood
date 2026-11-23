@@ -1,0 +1,98 @@
+{
+  "$defs": {
+    "PathDesign_52b167711f9c": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/path-ensemble/design"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "batch_size": {
+              "description": "batch size; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "development_roots": {
+              "description": "development roots; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "evaluation_roots": {
+              "description": "evaluation roots; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "family": {
+              "description": "family; constructor checks semantics and units.",
+              "type": "string"
+            },
+            "first_root": {
+              "description": "first root; constructor checks semantics and units.",
+              "type": "integer"
+            },
+            "parameters_json": {
+              "description": "parameters json; constructor checks semantics and units.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "family",
+            "first_root",
+            "development_roots",
+            "evaluation_roots",
+            "batch_size",
+            "parameters_json"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Specification_4ba8ed040fb0": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "empirical-lawhood/matrix-orientation-response/specification"
+        },
+        "value": {
+          "additionalProperties": false,
+          "properties": {
+            "design": {
+              "$ref": "#/$defs/PathDesign_52b167711f9c",
+              "description": "design; constructor checks semantics and units."
+            }
+          },
+          "required": [
+            "design"
+          ],
+          "type": "object"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      },
+      "required": [
+        "schema",
+        "version",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:empirical-lawhood:configuration:matrix-orientation-response-experiment",
+  "$ref": "#/$defs/Specification_4ba8ed040fb0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structural projection only. Typed owner decides lexical/semantic acceptance; no external prerequisites or authority are checked.",
+  "title": "Matrix Orientation Response Experiment",
+  "x-consumer": "matrix-orientation-response-experiment",
+  "x-consumer-maximum-bytes": null,
+  "x-disposition": "editable",
+  "x-preparation-allowed": true
+}

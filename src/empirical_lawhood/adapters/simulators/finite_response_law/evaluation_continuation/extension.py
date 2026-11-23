@@ -32,9 +32,12 @@ from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts imp
 from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retention import FiniteResponseLawEvaluationRetention
 from empirical_lawhood.adapters.simulators.finite_response_law.evaluation.protocol import evaluation_protocol_steps
 from empirical_lawhood.domains.matrix.finite_response_law.roster import native_declarations, substrate_binding, Q_CLOCK, Q_RECEIVERS
-from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import NAMESPACE, SOURCE_CAPABILITY, SOURCE_COMPONENTS, IMPORT_CAPABILITY, IMPORT_COMPONENTS
+from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import NAMESPACE, SOURCE_CAPABILITY, SOURCE_COMPONENTS, IMPORT_CAPABILITY, IMPORT_COMPONENTS, LOCKED_IMPORT_CAPABILITY, LOCKED_IMPORT_COMPONENTS
+
+from empirical_lawhood.adapters.simulators.finite_response_law.locked_evaluation import FiniteResponseLawLockedEvaluationRetention
 
 IMPORT_RESOLVER_PORT = "finite-response-law.retained-prefix-input-resolver"
+LOCK_IMPORT_CONTROL_PORT = "finite-response-law.retained-prepared-control-store"
 SOURCE_RECORDS = (
     FiniteResponseLawAssignedEvaluationConfig,
     ProspectiveRetainedSourceUse,
@@ -51,6 +54,12 @@ SOURCE_BINDING = replace(
 IMPORT_BINDING = replace(
     executable(IMPORT_CAPABILITY, IMPORT_COMPONENTS, (FiniteResponseLawEvaluationRetention,)),
     required_platform_port_keys=(IMPORT_RESOLVER_PORT,),
+)
+
+
+LOCKED_IMPORT_BINDING = replace(
+    executable(LOCKED_IMPORT_CAPABILITY, LOCKED_IMPORT_COMPONENTS, (FiniteResponseLawLockedEvaluationRetention,)),
+    required_platform_port_keys=tuple(sorted((IMPORT_RESOLVER_PORT, LOCK_IMPORT_CONTROL_PORT))),
 )
 
 
@@ -123,11 +132,14 @@ class FiniteResponseLawContinuationSourceFactory:
             FiniteResponseLawEvaluationRevealConfig,
         }
         by_type = {type(r): r for r in records}
+        locked = FiniteResponseLawLockedEvaluationRetention in by_type
+        if locked:
+            required = (required - {FiniteResponseLawEvaluationRetention}) | {FiniteResponseLawLockedEvaluationRetention}
         if len(records) != 8 or set(by_type) != required:
             raise ValueError("Finite response-law evaluation continuation changes its full composition record census")
         source, carrier = self._records(records)
-        retention = cast(FiniteResponseLawEvaluationRetention, by_type[FiniteResponseLawEvaluationRetention])
-        if retention.source != source or retention.prefixes != carrier.retained_predecessors:
+        retention = cast(FiniteResponseLawEvaluationRetention, by_type[FiniteResponseLawLockedEvaluationRetention if locked else FiniteResponseLawEvaluationRetention])
+        if retention.source != source or (retention.native_origins if locked else retention.prefixes) != carrier.retained_predecessors:
             raise ValueError("Finite response-law evaluation continuation substitutes retained origins")
         return replace(
             template,
@@ -170,12 +182,25 @@ class FiniteResponseLawPrefixImportFactory:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class FiniteResponseLawLockedImportFactory:
+    binding: ExecutableCapabilityBinding = LOCKED_IMPORT_BINDING
+
+    def build_provider(self, *, registry, records, platform_ports):
+        from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.locked_import import LockedImportProvider
+        ports = {p.port_key:p.port for p in platform_ports}
+        if (len(records) != 1 or type(records[0]) is not FiniteResponseLawLockedEvaluationRetention
+                or set(ports) != {IMPORT_RESOLVER_PORT, LOCK_IMPORT_CONTROL_PORT}):
+            raise ValueError("Locked evaluation import needs its original receipt inventory and prepared-store port")
+        return LockedImportProvider(registry, records[0], ports[IMPORT_RESOLVER_PORT], ports[LOCK_IMPORT_CONTROL_PORT])
+
+
 _EXECUTABLE_ID = f"executable-contribution.{NAMESPACE}"
 _EXECUTABLE_VERSION = "1.0.0"
-_EXECUTABLE_FACTORIES = (FiniteResponseLawContinuationSourceFactory(), FiniteResponseLawPrefixImportFactory())
+_EXECUTABLE_FACTORIES = (FiniteResponseLawContinuationSourceFactory(), FiniteResponseLawPrefixImportFactory(), FiniteResponseLawLockedImportFactory())
 _ISSUED_RECORD_TYPES = tuple(
     sorted(
-        (*(r for r in SOURCE_RECORDS if r is not FiniteResponseLawAssignedEvaluationConfig), FiniteResponseLawEvaluationRetention),
+        (*(r for r in SOURCE_RECORDS if r is not FiniteResponseLawAssignedEvaluationConfig), FiniteResponseLawEvaluationRetention, FiniteResponseLawLockedEvaluationRetention),
         key=lambda t: t.SCHEMA,
     )
 )

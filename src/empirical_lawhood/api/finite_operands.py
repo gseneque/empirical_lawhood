@@ -66,14 +66,25 @@ def _export_files(destination: Path, members: Mapping[str, bytes], manifest_name
     _write_new_file(destination / manifest_name, manifest)
 
 
-def original_f_operand_export(destination: Path, *, payload_id: str):
-    """Export the actual original bytes and distinct current original-F record."""
+def _packaged_original_f(payload_id: str):
     from empirical_lawhood.domains.matrix.finite_response_law.original_f import authenticate_original_f_sources, original_f_from_bytes, original_f_source_identities
 
     sources = _public_bytes("original_f", ORIGINAL_F_FILENAMES, (37921, 3919, 1428, 17166, 522736))
     identities = original_f_source_identities(tuple(f"{payload_id}.source.{index}" for index in range(5)))
     authenticate_original_f_sources(identities, sources)
     operand = original_f_from_bytes(sources[0], payload_id=payload_id, source_identities=identities)
+    return operand, sources
+
+
+def load_original_f_operand(*, payload_id: str):
+    """Authenticate the five published original sources and return the frozen numerical operand."""
+    operand, _ = _packaged_original_f(payload_id)
+    return operand
+
+
+def original_f_operand_export(destination: Path, *, payload_id: str):
+    """Export the actual original bytes and distinct current original-F record."""
+    operand, sources = _packaged_original_f(payload_id)
     _export_files(destination, dict(zip(ORIGINAL_F_FILENAMES, sources, strict=True)), "original-f.canonical.json", operand.canonical_bytes())
     return operand
 

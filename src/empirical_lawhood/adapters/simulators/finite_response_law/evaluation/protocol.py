@@ -58,6 +58,8 @@ def evaluation_protocol_steps(
         raise ValueError(
             "Finite response-law evaluation protocol substitutes its exact source/control/projection configuration"
         )
+    from empirical_lawhood.adapters.simulators.finite_response_law.locked_evaluation import FiniteResponseLawLockedEvaluationRetention
+    locked = retention if isinstance(retention, FiniteResponseLawLockedEvaluationRetention) else None
     native = {t.task_id: t for t in native_invocations(source)}
     controls = control_tasks(control)
     projections = {f"{r.root_id}.flh-project.r{v}": r for r in source.roots for v in (1, 2)}
@@ -89,6 +91,9 @@ def evaluation_protocol_steps(
     )
     reveals = set(reveal_tasks(reveal))
     bounds.update({task_id: REVEAL_CAPABILITY.resource_ceiling.output_bytes for task_id in reveals})
+    if locked is not None:
+        # Import products have their original exact sizes, including both native views.
+        bounds.update({key: sum(a.size_bytes for a in members[:-1]) for key, members in locked.import_inputs.items()})
     steps = []
     config: CanonicalRecord
     for task_id in sorted(bounds):
@@ -236,6 +241,21 @@ def evaluation_protocol_steps(
                 1,
                 BarrierKind.FREEZE,
             )
+        if locked is not None and task_id in locked.import_inputs:
+            from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_continuation.discovery import LOCKED_IMPORT_CAPABILITY
+            manifest, config, config_id = LOCKED_IMPORT_CAPABILITY, locked, locked.config_id
+            stage, access, barrier = ScientificStage.FREEZE, OutcomeAccess.OUTCOME_BLIND, BarrierKind.FREEZE
+            dependencies, wall, copies = locked.import_dependencies[task_id], 30, 1
+            members = locked.import_inputs[task_id]
+            prior_bytes = sum(a.size_bytes for a in members)
+            if task_id.endswith(".lock-choices"):
+                # Original and continued prepared-event stores both authenticate the lock subjects.
+                prior_bytes += 8 * members[0].size_bytes
+            if task_id in native:
+                outputs = _outputs(
+                    (("product", FiniteResponseLawAssignedEvaluationTaskResult.SCHEMA), ("stage-envelope", LinkedCampaignStageEnvelope.SCHEMA)),
+                    ("native-observations", NATIVE_PAIR_SCHEMA),
+                )
         scan = (
             copies * len(config.canonical_bytes())
             + prior_bytes

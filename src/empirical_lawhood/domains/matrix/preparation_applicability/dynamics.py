@@ -4,7 +4,7 @@ from decimal import Decimal
 from empirical_lawhood.domains.matrix.input_contracts import MatrixRootAllocation
 from empirical_lawhood.domains.matrix.finite_response_law.preparation_policy_contracts import FiniteResponseLawPreparationSchedule
 from empirical_lawhood.domains.matrix.preparation_applicability.words import WORDS, SCHEDULES
-from typing import Callable, Any
+from typing import TYPE_CHECKING, Callable, Any
 import numpy as np
 
 from empirical_lawhood.domains.matrix.preparation_applicability.records import numbers
@@ -17,6 +17,9 @@ from empirical_lawhood.domains.matrix.six_matrix_response.model import ideal_sta
 from empirical_lawhood.domains.matrix.six_matrix_response.passive_probe import derive_probe_roster
 from empirical_lawhood.domains.matrix.six_matrix_response.response_observer import ResponseGeometryNativePassiveObserver, _decode, _encode
 from empirical_lawhood.domains.matrix.preparation_applicability.phase_records import PreparationApplicabilityNativePhase, PreparationApplicabilityPrefix, PreparationApplicabilityStream
+
+if TYPE_CHECKING:
+    from .waveform_population import WaveformDraw
 
 
 
@@ -34,11 +37,16 @@ def acquire_phase(
     progress: Callable[[int], None] | None = None,
     preparation_schedule: FiniteResponseLawPreparationSchedule | None = None,
     constructed: bool = False,
+    waveform: "WaveformDraw | None" = None,
 ) -> PreparationApplicabilityNativePhase:
     schedule: Any
     start, end = {"prefix": (0, 4096), "parent": (4096, 4496), "future": (4496, 4688)}[phase_name]
     root_id = allocation.root_id
-    if allocation.cohort not in (("constructed",) if constructed else ("q2", "cir1")) or allocation.source_prefix is not None:
+    if waveform is not None and (constructed or waveform.allocation != allocation):
+        raise ValueError("Select one bath source bound to this allocation")
+    if incoming is not None and getattr(incoming, "waveform", None) != waveform:
+        raise ValueError("Native continuation changes its nominal waveform")
+    if allocation.cohort not in (("constructed",) if constructed or waveform is not None else ("q2", "cir1")) or allocation.source_prefix is not None:
         raise ValueError("native wrapper changes its assigned prefix source kind")
     if phase_name == "prefix":
         if incoming is not None:
@@ -93,7 +101,12 @@ def acquire_phase(
         else:
             assert future_index is not None
             purpose = f"future-{future_index + 1}"
-    if constructed:
+    if waveform is not None:
+        from .waveform_population import WaveformNativePhase
+
+        allocated_stream = waveform.stream
+        record_type = WaveformNativePhase
+    elif constructed:
         from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationNativePhase, ConstructedPreparationStream
         from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import nominal_digest
         def allocated_stream(name: str):
@@ -157,14 +170,20 @@ def acquire_phase(
         preparation_schedule=preparation_schedule or (SCHEDULES[schedule_index] if phase_name == "parent" else None),
         applied_force_kicks=2 * raw.completed if phase_name == "future" else 0,
         squared_input=Decimal(str(raw.squared_input)),
+        **({"waveform": waveform} if waveform is not None else {}),
     )
 
 
 def acquire_prefix(
-    allocation: MatrixRootAllocation, source_sha256: str, progress: Callable[[int], None] | None = None, *, constructed: bool = False
+    allocation: MatrixRootAllocation, source_sha256: str, progress: Callable[[int], None] | None = None, *,
+    constructed: bool = False, waveform: "WaveformDraw | None" = None,
 ) -> PreparationApplicabilityPrefix:
     root_id = allocation.root_id
-    if constructed:
+    if waveform is not None:
+        from .waveform_population import WaveformPrefix
+
+        prefix_type = WaveformPrefix
+    elif constructed:
         from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationPrefix
         prefix_type = ConstructedPreparationPrefix
     else:
@@ -178,6 +197,7 @@ def acquire_prefix(
                 phase_name="prefix",
                 allocation=allocation,
                 constructed=constructed,
+                waveform=waveform,
                 refinement=refinement,
                 source_sha256=source_sha256,
                 progress=advance,

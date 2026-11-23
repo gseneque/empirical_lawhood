@@ -6,6 +6,8 @@ This index groups the research by its scientific questions.
 Each programme brings together findings, study designs, source records and supported workflows.
 Choose a question below, or [run the first example](../docs/getting-started.md).
 
+The five foundations synthesis studies ask when information lost from an observation matters to a later prediction. The results span stochastic matrices, a thermal circuit and a monitored chain. [Studies 1–5 and their run guides](foundations/README.md#foundations-synthesis-studies)
+
 | Group | Programme | Scientific question |
 |---|---|---|
 | [Foundations](foundations/README.md) | [Emergent structure](foundations/emergent-structure/README.md) | When does structure support useful response prediction, and can preparation extend that use? |

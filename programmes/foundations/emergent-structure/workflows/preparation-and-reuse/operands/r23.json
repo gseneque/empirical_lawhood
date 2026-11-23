@@ -1,0 +1,1212 @@
+{
+  "context": {
+    "diagnostic_bootstrap": {
+      "E": 295588121375820513522913816808992395599,
+      "Q": 54834549215452694873987951463032873876
+    }
+  },
+  "format": 1,
+  "members": {
+    "E/000/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r000.json",
+      "sha256": "1f6b834472a4ec07db15fdbc585acdca1fcf2efa839697582085cc7345b63c48",
+      "size": 26920,
+      "source": "series"
+    },
+    "E/000/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r000/science.canonical.json",
+      "sha256": "f2ce10546b5e12f0b15739a156a0276af848d9880781efe09c59361930979b88",
+      "size": 6412,
+      "source": "series"
+    },
+    "E/000/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r000/science.canonical.json",
+      "sha256": "7ced03e7d80fd1b5aa19a9de9699dbeac4a02800c4b3e52edb512757f38523e3",
+      "size": 29799,
+      "source": "series"
+    },
+    "E/000/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r000/science.canonical.json",
+      "sha256": "efb4c20dd8afcb42941b63c43f58113b3eb1e15c434651954f4025e73b958777",
+      "size": 352,
+      "source": "series"
+    },
+    "E/001/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r001.json",
+      "sha256": "027efee208c2fb4c62fd2d4ba8efa3855d0e1ceb729be58e922b438d835fb590",
+      "size": 26916,
+      "source": "series"
+    },
+    "E/001/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r001/science.canonical.json",
+      "sha256": "0d7c7254d27bdf3e40c5343e7c43e9cd350123d4f36ebbd15334d318a0492c4d",
+      "size": 6417,
+      "source": "series"
+    },
+    "E/001/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r001/science.canonical.json",
+      "sha256": "136cbd16a7572bd89d0a07b279887d7eb8bff7e3fc65b63b9e9bd18063eabba9",
+      "size": 29798,
+      "source": "series"
+    },
+    "E/001/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r001/science.canonical.json",
+      "sha256": "acebe8575dc27cd10eebaf44b5e168bea4968d163c32abd81b7a7f57ae9c7649",
+      "size": 352,
+      "source": "series"
+    },
+    "E/002/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r002.json",
+      "sha256": "5d36c83c81b2ff87eddda948a8c547525272f1a965326e093155162e49d168e7",
+      "size": 26895,
+      "source": "series"
+    },
+    "E/002/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r002/science.canonical.json",
+      "sha256": "bbcda485f11991a29af323985d466959dea40c09f3e3659e91d93e7e3458779d",
+      "size": 6421,
+      "source": "series"
+    },
+    "E/002/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r002/science.canonical.json",
+      "sha256": "5b19bc7103c3d76294789cbda249375642f45180829f53beea120b8b79866f21",
+      "size": 29807,
+      "source": "series"
+    },
+    "E/002/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r002/science.canonical.json",
+      "sha256": "4a2c323efb270cf4f249ab37a5eefc2c7f55356b90a99af9c2562c6670c986dd",
+      "size": 352,
+      "source": "series"
+    },
+    "E/003/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r003.json",
+      "sha256": "48b132d9992b7dfbc82c4bdaa7159cced9d8ba7dd5fd04d24a8bb72d559e8190",
+      "size": 26906,
+      "source": "series"
+    },
+    "E/003/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r003/science.canonical.json",
+      "sha256": "834af4d9d59772f09adeb9b771a385e1c2ed0202e2471fa0688612bb0ac35f3b",
+      "size": 6419,
+      "source": "series"
+    },
+    "E/003/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r003/science.canonical.json",
+      "sha256": "cef5b7f8708138d0675145e9d894fe6181f649b82c7097ae344766658fa945a4",
+      "size": 29817,
+      "source": "series"
+    },
+    "E/003/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r003/science.canonical.json",
+      "sha256": "2c85f1bf53d0dc5e33ce60ef047fcbc1a805aa4b7f8f65f821b480e53dd84a34",
+      "size": 352,
+      "source": "series"
+    },
+    "E/004/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r004.json",
+      "sha256": "769c7921d21305d86395f6a0b76be07a64ab1ae94881819d3a6d6d5354d7ef10",
+      "size": 26910,
+      "source": "series"
+    },
+    "E/004/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r004/science.canonical.json",
+      "sha256": "17f94619e8675cc29d0b3a95f79c946b9896951d335f70d618f48f4e171e013b",
+      "size": 6412,
+      "source": "series"
+    },
+    "E/004/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r004/science.canonical.json",
+      "sha256": "096e7887248ea80d877b04d2f8a33daad059c1efa31d273ba722d88b9491a5cb",
+      "size": 29804,
+      "source": "series"
+    },
+    "E/004/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r004/science.canonical.json",
+      "sha256": "32ff25671d2edcaedee055dcb6503e22992339be223d7d5468da756f8f829246",
+      "size": 352,
+      "source": "series"
+    },
+    "E/005/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r005.json",
+      "sha256": "9b3fb178e98b75f392c18045bfc05da668cf9c896c396cf2600bb8df5ececd2f",
+      "size": 26911,
+      "source": "series"
+    },
+    "E/005/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r005/science.canonical.json",
+      "sha256": "f46a2aa7c433c15f1068e713204fcb72391b6b208750cdc4b0685d22be51e8b9",
+      "size": 6426,
+      "source": "series"
+    },
+    "E/005/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r005/science.canonical.json",
+      "sha256": "cffab8ce184041e48966f7727098cf6cee2a34b0f2769ea010701b29b9ad1937",
+      "size": 29785,
+      "source": "series"
+    },
+    "E/005/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r005/science.canonical.json",
+      "sha256": "76144b6e7570a8bd98417bb67eae5a25969c9354b9bd4fbe12942528148c1cae",
+      "size": 352,
+      "source": "series"
+    },
+    "E/006/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r006.json",
+      "sha256": "510d58db28efc0c6d778b0a3633293395c76d3456c842c98f614f5766313e815",
+      "size": 26918,
+      "source": "series"
+    },
+    "E/006/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r006/science.canonical.json",
+      "sha256": "9f4a744972ce388a388dd90f40ebea2780bfe0c533fcd6c0f88488992306a170",
+      "size": 6423,
+      "source": "series"
+    },
+    "E/006/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r006/science.canonical.json",
+      "sha256": "f0c82cc48be70b20fc72007c82bffd93d09e7b368c30d707eb46332c5fbbcaf9",
+      "size": 29805,
+      "source": "series"
+    },
+    "E/006/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r006/science.canonical.json",
+      "sha256": "ec03f81147c0fdcfa85f52a6612fb2a27d8807e616124c422300b5047838ff4d",
+      "size": 352,
+      "source": "series"
+    },
+    "E/007/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r007.json",
+      "sha256": "b914a76f4cbd7ff05efdd2f9b4fdef9209d094390683121b392b7ebe3c5fb44e",
+      "size": 26886,
+      "source": "series"
+    },
+    "E/007/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r007/science.canonical.json",
+      "sha256": "637e909901a8312c83b34fea2bcd118408de6cc59e38d9a79d20e72b626188cf",
+      "size": 6421,
+      "source": "series"
+    },
+    "E/007/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r007/science.canonical.json",
+      "sha256": "704e67f4dd457740053a7f07dfbd218ff4d9a59149e56be26e9d7a1b8506cf83",
+      "size": 29796,
+      "source": "series"
+    },
+    "E/007/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r007/science.canonical.json",
+      "sha256": "2f1a8ce746451ccf879b1451fb8afe60d79c47f6f9653372bf29852fc3af45fc",
+      "size": 352,
+      "source": "series"
+    },
+    "E/008/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r008.json",
+      "sha256": "d29b53619b9b71ee617cd3d3568242005eead2f1919d5efb477cce334e961ac7",
+      "size": 26910,
+      "source": "series"
+    },
+    "E/008/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r008/science.canonical.json",
+      "sha256": "93fc65e553b35f6a9e704212cfc7e9cbfe03fbbd7f104c4b4f23b430b97181c6",
+      "size": 6410,
+      "source": "series"
+    },
+    "E/008/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r008/science.canonical.json",
+      "sha256": "e27308ebf3fa9462070c12cd8f510a5488fc932cacb1a70158aa031a0836a0b2",
+      "size": 29800,
+      "source": "series"
+    },
+    "E/008/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r008/science.canonical.json",
+      "sha256": "43d94fcf1b4742db5da5904b204883856c962c51b1a74bf03caa4135d9bad5a1",
+      "size": 352,
+      "source": "series"
+    },
+    "E/009/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r009.json",
+      "sha256": "36c131b1f7fc254d825366ff805248aa64e33c9ea494c92340b1ba4bc78dc0d8",
+      "size": 26903,
+      "source": "series"
+    },
+    "E/009/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r009/science.canonical.json",
+      "sha256": "a8ee5745ffdf5d777d804e83f67fa1b7f6851da08ae4c0a4ff381fc8a205cd5d",
+      "size": 6416,
+      "source": "series"
+    },
+    "E/009/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r009/science.canonical.json",
+      "sha256": "61ea24541854996c200587caaa0b4a6b1b06ff63fc822f62524cb3e84792ae59",
+      "size": 29784,
+      "source": "series"
+    },
+    "E/009/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r009/science.canonical.json",
+      "sha256": "1b96f3d8236fac7daaf65a46da2467c458d02e8976970c81360149bbbfdd36b8",
+      "size": 352,
+      "source": "series"
+    },
+    "E/010/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r010.json",
+      "sha256": "7f3123a442ba2c4d27cfba875a01e775e955a665f990a47b854f4090f281b36b",
+      "size": 26919,
+      "source": "series"
+    },
+    "E/010/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r010/science.canonical.json",
+      "sha256": "47717050b9255b0606f0d4a76832bba2817e441a166c6340d80bf693c15d9337",
+      "size": 6423,
+      "source": "series"
+    },
+    "E/010/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r010/science.canonical.json",
+      "sha256": "458b3f3af2ab5025eee2ff377f15c1b62c50c4d17ebf8937730b8be98b304209",
+      "size": 29793,
+      "source": "series"
+    },
+    "E/010/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r010/science.canonical.json",
+      "sha256": "8908b3d98acdb0fb1381747fbeee7404ba00f793786c60adf384588c20b33886",
+      "size": 352,
+      "source": "series"
+    },
+    "E/011/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r011.json",
+      "sha256": "465952723111f6b760672399dc0cf043920893e02e639951158cdea2eb34caa4",
+      "size": 26927,
+      "source": "series"
+    },
+    "E/011/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r011/science.canonical.json",
+      "sha256": "772b6aca550b85b546aedaaa3f22b1a5a10cbe321da6dfb200c49c2c81595c1d",
+      "size": 6426,
+      "source": "series"
+    },
+    "E/011/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r011/science.canonical.json",
+      "sha256": "50de833aa1bae596780ab87ba94cb671cdc38b8d126056046f5fea48085e17c6",
+      "size": 29807,
+      "source": "series"
+    },
+    "E/011/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r011/science.canonical.json",
+      "sha256": "73f35eb18e35b4ac05754085cc15a2fef258ff6cabc36fe46a4ad36bff165eb1",
+      "size": 352,
+      "source": "series"
+    },
+    "E/012/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r012.json",
+      "sha256": "2802856d6c674b2ee2a6078c931250fc32db3cc78fe457284caf35241700c46f",
+      "size": 26906,
+      "source": "series"
+    },
+    "E/012/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r012/science.canonical.json",
+      "sha256": "da9b8d9e046aff50e222a50810bf1a02e22d6f64c78b7402fdf9f02dff39e749",
+      "size": 6418,
+      "source": "series"
+    },
+    "E/012/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r012/science.canonical.json",
+      "sha256": "0dfb16b2122a7af053b34d43a2077459f0661390105ccfdefa561f7c8d91659d",
+      "size": 29801,
+      "source": "series"
+    },
+    "E/012/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r012/science.canonical.json",
+      "sha256": "f76c9a4a66699bae456de52c22d6a3753fb485a3e7885329d4b45f3bbc22bfbf",
+      "size": 352,
+      "source": "series"
+    },
+    "E/013/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r013.json",
+      "sha256": "3d04e32b769b304bd85f21d09f7f59e8c503de710c1e91caed9b2cb6e1cf1858",
+      "size": 26914,
+      "source": "series"
+    },
+    "E/013/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r013/science.canonical.json",
+      "sha256": "bb8e9634dfe3f991fa24059ae6d438b42f30cd074f11e2b95b04e5888ef82255",
+      "size": 6417,
+      "source": "series"
+    },
+    "E/013/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r013/science.canonical.json",
+      "sha256": "87523f49b37d253c9d7fd45ca8b76b1975f77fd63c1c77aeea45e8bb7ae8e191",
+      "size": 29802,
+      "source": "series"
+    },
+    "E/013/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r013/science.canonical.json",
+      "sha256": "05967ef8464c908a7ab06073a5369f410cbdb38f0e08339ae5b07e9ac72e80a6",
+      "size": 352,
+      "source": "series"
+    },
+    "E/014/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r014.json",
+      "sha256": "e59e8fdd9dbaab0a287ed90b4165f449f5adf779e70b3945ac9bc766efe91433",
+      "size": 26906,
+      "source": "series"
+    },
+    "E/014/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r014/science.canonical.json",
+      "sha256": "6ec4b4a1c589b6dd717ee83fcadc6f82c03607ab02fe630e36e3c3b5aa8e5adf",
+      "size": 6409,
+      "source": "series"
+    },
+    "E/014/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r014/science.canonical.json",
+      "sha256": "d27c8051a59d70eb971ecf84acc0475b8b3766efd5e10e243e48f8e47c89816c",
+      "size": 29774,
+      "source": "series"
+    },
+    "E/014/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r014/science.canonical.json",
+      "sha256": "0d3cbe1751bc0ae27abcc749f9be42827b0a3d494f2428ab2aee018763a2fac2",
+      "size": 352,
+      "source": "series"
+    },
+    "E/015/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r015.json",
+      "sha256": "f9f774fb6f99c9938cb99d16aa34ac328771d7cf4a73bd274e9d4cbdaedc8395",
+      "size": 26920,
+      "source": "series"
+    },
+    "E/015/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r015/science.canonical.json",
+      "sha256": "8e11c2f0ae6f1e1458c51c75fa10fdb59490f24d88c006463567e6921021f3ed",
+      "size": 6416,
+      "source": "series"
+    },
+    "E/015/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r015/science.canonical.json",
+      "sha256": "118fd85af9023509fa2cd7e651fd953a4e8312d948a26653a30302aa38094aa9",
+      "size": 29794,
+      "source": "series"
+    },
+    "E/015/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r015/science.canonical.json",
+      "sha256": "8278806a676cefc0ddb1474a620e44f15c1ee54a94e00f4f678f20d18553a94e",
+      "size": 352,
+      "source": "series"
+    },
+    "E/016/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r016.json",
+      "sha256": "610cc9223aa3da39f1e57020cfc38a756c64e9d4adcee6c8a59d45003c6fb38a",
+      "size": 26903,
+      "source": "series"
+    },
+    "E/016/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r016/science.canonical.json",
+      "sha256": "236d17616e05575bde8ee27aceeda2bfd423db051c4ce07ea28a31e613c12812",
+      "size": 6418,
+      "source": "series"
+    },
+    "E/016/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r016/science.canonical.json",
+      "sha256": "75aaa7187e4240885c0648c645f0e8481d19288cb456e31e73c5a433a9de76d3",
+      "size": 29800,
+      "source": "series"
+    },
+    "E/016/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r016/science.canonical.json",
+      "sha256": "f4732f2aaf72c0e42311efcafc64a1a6a5a1f551ac91ace23a0818edff84ca23",
+      "size": 352,
+      "source": "series"
+    },
+    "E/017/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r017.json",
+      "sha256": "002fbe7f28305d678a68e93eb5af12a1fd272373aa67a50cd741a477b56e55a8",
+      "size": 26929,
+      "source": "series"
+    },
+    "E/017/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r017/science.canonical.json",
+      "sha256": "546d299ca61eac6af376775b2f4b915a519bbd22b7a06d2bf88647209ca18e02",
+      "size": 6426,
+      "source": "series"
+    },
+    "E/017/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r017/science.canonical.json",
+      "sha256": "b07f2b1af4b72796046a2c7836a7e910c562dea1fdb2d85e51b066cb6be3db45",
+      "size": 29805,
+      "source": "series"
+    },
+    "E/017/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r017/science.canonical.json",
+      "sha256": "087602f0fb566121cd2f2ffdd060b9c4633e7d67b4b72c43841b4d500d97caf8",
+      "size": 352,
+      "source": "series"
+    },
+    "E/018/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r018.json",
+      "sha256": "932cb9f37a33344d6393341e82ad57fb27d9d610cb57bcca2aff6e14eff42b1e",
+      "size": 26878,
+      "source": "series"
+    },
+    "E/018/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r018/science.canonical.json",
+      "sha256": "0d74ef60a45cb1dd799cad227914267aad282043bc36c82017a02cb0d776efe9",
+      "size": 6413,
+      "source": "series"
+    },
+    "E/018/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r018/science.canonical.json",
+      "sha256": "0c865f0e9e70b382e2676dbc0fd0ea4e8d2c6e8668e044eeef172254f478d9b7",
+      "size": 29810,
+      "source": "series"
+    },
+    "E/018/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r018/science.canonical.json",
+      "sha256": "53c7ba93b656d714efac9413fd2d962c2dbf6b0937acbe518ca102c4a599ec82",
+      "size": 352,
+      "source": "series"
+    },
+    "E/019/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r019.json",
+      "sha256": "a96d1af64836d973f25a060be4cdb644eada859f9435e2718840a2c94f6123ef",
+      "size": 26911,
+      "source": "series"
+    },
+    "E/019/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r019/science.canonical.json",
+      "sha256": "f0e49780ad9bedb134b47dcb230f2da65868e7567c1a4049ea3d94e7b6024ea3",
+      "size": 6419,
+      "source": "series"
+    },
+    "E/019/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r019/science.canonical.json",
+      "sha256": "bfc4c3d44fe5c33baf3634419cef81f74a750199e4ad0f05f8f854ee0b385f5b",
+      "size": 29796,
+      "source": "series"
+    },
+    "E/019/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r019/science.canonical.json",
+      "sha256": "9d56afca32ef014d1db44cb439135d9e300c0fb8a3f33ff4acd937d7a3c04dad",
+      "size": 352,
+      "source": "series"
+    },
+    "E/020/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r020.json",
+      "sha256": "fba3399114afb6a6e2caa6e432d56d93afd0fa8cca76564cd002433754f42026",
+      "size": 26891,
+      "source": "series"
+    },
+    "E/020/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r020/science.canonical.json",
+      "sha256": "9e67cabf741a77e1f0b1c5896e772916e9a77775b4c2f2ee2cb573539854e0ef",
+      "size": 6411,
+      "source": "series"
+    },
+    "E/020/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r020/science.canonical.json",
+      "sha256": "70ab5905ea367c8107787d529a3d5349720afa287ea7fecf119da29c542f7de2",
+      "size": 29796,
+      "source": "series"
+    },
+    "E/020/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r020/science.canonical.json",
+      "sha256": "1b63cbd3d32f7297c1162090af9ebce4fd6d1d48a7117253954efe3da66d170a",
+      "size": 352,
+      "source": "series"
+    },
+    "E/021/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r021.json",
+      "sha256": "0e54d57016fef85b15aa380739bc7741a42d3feca88f4b375324df7bd4037071",
+      "size": 26917,
+      "source": "series"
+    },
+    "E/021/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r021/science.canonical.json",
+      "sha256": "bfb2c41ccc611ae98304fc3b6c71a6c8b5a6dd74866a9eef44c530ce4dfb042b",
+      "size": 6416,
+      "source": "series"
+    },
+    "E/021/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r021/science.canonical.json",
+      "sha256": "1be70ff03a49ed0a3a8ffc47e75e10c783032e83a4196f28cee2cfd5fcb07c8c",
+      "size": 29804,
+      "source": "series"
+    },
+    "E/021/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r021/science.canonical.json",
+      "sha256": "289e00a28512aa5b84e03285b95064f3ac10ece773990cef82cbfb0b85a98b79",
+      "size": 352,
+      "source": "series"
+    },
+    "E/022/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r022.json",
+      "sha256": "edcb09bbbed4639c0c5fac99ef9192543c0fc46adce4cec8652a255264c4c95f",
+      "size": 26901,
+      "source": "series"
+    },
+    "E/022/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r022/science.canonical.json",
+      "sha256": "80496f8d48686d264dc56ca8cf74db7937e402158b4c6d38bc77e60e868b7049",
+      "size": 6419,
+      "source": "series"
+    },
+    "E/022/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r022/science.canonical.json",
+      "sha256": "3eb048f978a022daebef03c415e2abf3fa276430f2b8e527ea3ec45acd88a4d3",
+      "size": 29800,
+      "source": "series"
+    },
+    "E/022/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r022/science.canonical.json",
+      "sha256": "c0afc15a6bc04eafdb98f2d19eb7e2494695572f2112db44dc70b81e0bcc736a",
+      "size": 352,
+      "source": "series"
+    },
+    "E/023/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r023.json",
+      "sha256": "9640f23487f024108bc1e87d1a2c9b5328f36653bec08bddcd9e56c7a5b073b9",
+      "size": 26908,
+      "source": "series"
+    },
+    "E/023/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r023/science.canonical.json",
+      "sha256": "bd250716a73ac3901d5fe7968f97418f802bbed6dc470f2d9a0157efeadbbc82",
+      "size": 6413,
+      "source": "series"
+    },
+    "E/023/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r023/science.canonical.json",
+      "sha256": "3d0ba7e09374b7e377a391990d34493e8ab456d29c9edf6a21946fab1f63bf33",
+      "size": 29819,
+      "source": "series"
+    },
+    "E/023/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r023/science.canonical.json",
+      "sha256": "9e529d7e51d5e352028558733b8989ef701db53a2ee55b6bba6aab6984201dd1",
+      "size": 352,
+      "source": "series"
+    },
+    "E/024/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r024.json",
+      "sha256": "92db6fb83dcdb7cc49cdf943e1bbfd73c5082e005f15699c0819d23d5f8b4e2c",
+      "size": 26912,
+      "source": "series"
+    },
+    "E/024/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r024/science.canonical.json",
+      "sha256": "89a51bc9e6a5f8ac76b4d24614d973a49f6b59250529529b2f82f0600517e232",
+      "size": 6423,
+      "source": "series"
+    },
+    "E/024/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r024/science.canonical.json",
+      "sha256": "7432fc0c724cd40ad73ca3328d74f2090b1792504b9ebaa346e81c3175c4f9e4",
+      "size": 29798,
+      "source": "series"
+    },
+    "E/024/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r024/science.canonical.json",
+      "sha256": "b8905bc1f7faafd8e6197ec7c42fd996ee8ec31b16ad5bba5a5b2c94f6c7d1f6",
+      "size": 352,
+      "source": "series"
+    },
+    "E/025/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r025.json",
+      "sha256": "0fb7c8a953c97600096326ccd3dede158fe6f265ffe6c8da3080f45cb1230750",
+      "size": 26901,
+      "source": "series"
+    },
+    "E/025/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r025/science.canonical.json",
+      "sha256": "23ef983576a8707a460706e9904024d47619d8eca313e73c12078835027ed0fa",
+      "size": 6424,
+      "source": "series"
+    },
+    "E/025/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r025/science.canonical.json",
+      "sha256": "f5e30197cc2bd1537cedf43c91a7a16245bbe93510866daea9a484fa67e4dcc2",
+      "size": 29791,
+      "source": "series"
+    },
+    "E/025/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r025/science.canonical.json",
+      "sha256": "5cf8d23d4655272232b0d31d438d55bd67fc1706923e36ba85303c6ade5a6c3f",
+      "size": 352,
+      "source": "series"
+    },
+    "E/026/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r026.json",
+      "sha256": "5d9a5742353eeddff9d00f2ca2fbdb89cdf65e71462ed7eaaeaf47620a74e7c1",
+      "size": 26925,
+      "source": "series"
+    },
+    "E/026/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r026/science.canonical.json",
+      "sha256": "ecf105911e47084d15ed2da95c8ce18ca2b612feb9a2faf8e0314006b2cefaa9",
+      "size": 6428,
+      "source": "series"
+    },
+    "E/026/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r026/science.canonical.json",
+      "sha256": "6aa5cfe13884f9ee338a5d4bf03a0478bbcb7cf7b3b33a3a1df04757ec162c98",
+      "size": 29817,
+      "source": "series"
+    },
+    "E/026/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r026/science.canonical.json",
+      "sha256": "98113e9609f0220ceaf26a16adea1529b5cb9a6e4cc0a96aae5652c6d232af49",
+      "size": 352,
+      "source": "series"
+    },
+    "E/027/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r027.json",
+      "sha256": "b34271ee4bcaaf55ba856eced73df9c40fe557f63aea2860e4808bed7533b27f",
+      "size": 26913,
+      "source": "series"
+    },
+    "E/027/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r027/science.canonical.json",
+      "sha256": "e2c8324c4d2355fd35a54b0669ad6fe4f3a828df3b95952e0c3cf78e93cb2355",
+      "size": 6416,
+      "source": "series"
+    },
+    "E/027/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r027/science.canonical.json",
+      "sha256": "02cd411f6eb851a23c1af4099251f77ec8975d629d48611cce52cac0a1c9dcfa",
+      "size": 29775,
+      "source": "series"
+    },
+    "E/027/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r027/science.canonical.json",
+      "sha256": "f696d73ac1816bd75817a47b030a5f58ecfee1e0751fdccb659b284b7c6099c5",
+      "size": 352,
+      "source": "series"
+    },
+    "E/028/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r028.json",
+      "sha256": "1da5eb6ceeae473f37804b9ed14319a9bcd5d269eeaa8dcb8b95c60021727652",
+      "size": 26932,
+      "source": "series"
+    },
+    "E/028/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r028/science.canonical.json",
+      "sha256": "c640a1333b5b1f6a43bbdbffba16100f48c441372843487012b43d81eac1f390",
+      "size": 6413,
+      "source": "series"
+    },
+    "E/028/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r028/science.canonical.json",
+      "sha256": "bc2f7901be8fb47208721a19ec9fa6847a07a8a9eaed5e99e9a19365f122860f",
+      "size": 29785,
+      "source": "series"
+    },
+    "E/028/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r028/science.canonical.json",
+      "sha256": "625ff7c4d0fc238d8ff5d8ff56af1892b2f92e1c2b8918d667cf6ea9bce0f2d7",
+      "size": 352,
+      "source": "series"
+    },
+    "E/029/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r029.json",
+      "sha256": "e15fe3d77cb07b7d94323b08be3d91a48381966a5e8626537ec069489170803c",
+      "size": 26901,
+      "source": "series"
+    },
+    "E/029/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r029/science.canonical.json",
+      "sha256": "1234300dfd8a2daf2140c91d262dbf7d616031cf0e0daab7287bcd658acbe5ef",
+      "size": 6411,
+      "source": "series"
+    },
+    "E/029/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r029/science.canonical.json",
+      "sha256": "c4a665a1b0c362ae97fafa87c843373ed7f5d0f983ab3257eae234b60dfe5c31",
+      "size": 29808,
+      "source": "series"
+    },
+    "E/029/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r029/science.canonical.json",
+      "sha256": "58c63ee1d859a3f670840665aff9e346535e33a314c0f6d4b15f00601023f4f9",
+      "size": 352,
+      "source": "series"
+    },
+    "E/030/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r030.json",
+      "sha256": "facbd2526089eef34ed917de7e4efd4d7aa1c9b6f7f8c3d7f338be75941511ad",
+      "size": 26900,
+      "source": "series"
+    },
+    "E/030/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r030/science.canonical.json",
+      "sha256": "4ffa428e4b5377f0e5bffd95dec79c25f968f3461f4ddd151deecc660d40f036",
+      "size": 6422,
+      "source": "series"
+    },
+    "E/030/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r030/science.canonical.json",
+      "sha256": "e08bd1ebba6e4530f3bcc234e6926166de5d3cdf6297024839374a3585e674dd",
+      "size": 29777,
+      "source": "series"
+    },
+    "E/030/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r030/science.canonical.json",
+      "sha256": "d9236c8e33c1e4b68fe3fddf82d3380cb2a54d1692afaff7b9dc8a5c1da899e9",
+      "size": 352,
+      "source": "series"
+    },
+    "E/031/boundary": {
+      "path": "r23/artifacts/E-results/matrix.r23.rc2.e.r031.json",
+      "sha256": "86327947eb154c21113dee9ab8c86b2d54055d6a21d26903933424aec7c9702f",
+      "size": 26911,
+      "source": "series"
+    },
+    "E/031/measurement": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.measure.matrix.r23.rc2.e.r031/science.canonical.json",
+      "sha256": "81110a16a41a90f538754435993f39c6cb4e2ac8b12937f024f566e2ec48357a",
+      "size": 6399,
+      "source": "series"
+    },
+    "E/031/seal": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.lower.matrix.r23.rc2.e.r031/science.canonical.json",
+      "sha256": "66fbb549c954e2d217bd5554ba38519c96aa880071d639f6f1ca279b600b3b7a",
+      "size": 29810,
+      "source": "series"
+    },
+    "E/031/selection": {
+      "path": "r23/artifacts/runs/r23.e.run-b62a41e52d3787a9a01f7ab31c26309b/outputs/ap.select.matrix.r23.rc2.e.r031/science.canonical.json",
+      "sha256": "44829c1c453678832263488bb286021865eed09b10806f8a59da86f273f005fb",
+      "size": 352,
+      "source": "series"
+    },
+    "E/report": {
+      "path": "r23/artifacts/E-results/report.canonical.json",
+      "sha256": "a2689ba7bb7959505b73af487264c393976cbd65f4bf6b8ca8ec459543d65cf4",
+      "size": 17196,
+      "source": "series"
+    },
+    "E/source": {
+      "path": "r23/artifacts/E-authoring/source.json",
+      "sha256": "a7fc62039bbe3d714f02e136751a87499c1b917aaa7dae31d16cafeeb22476ee",
+      "size": 4488,
+      "source": "series"
+    },
+    "E/stage": {
+      "path": "r23/artifacts/E-authoring/stage.json",
+      "sha256": "b62a41e52d3787a9a01f7ab31c26309b7d62b83023f06a9fa31af48613acc650",
+      "size": 560964,
+      "source": "series"
+    },
+    "Q/000/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r000.json",
+      "sha256": "f8b39decf07b34214ad1e3c71971f28eef6665139c8b7274f8e0b395b075ab19",
+      "size": 26908,
+      "source": "series"
+    },
+    "Q/000/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r000/science.canonical.json",
+      "sha256": "c3d84ec73895c8bf1ee4fed5c769b34c46d005f955bdea5864ce40ef74e69d9c",
+      "size": 6427,
+      "source": "series"
+    },
+    "Q/000/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r000/science.canonical.json",
+      "sha256": "37e20a2c1a710a601c64b4b8a8f5f22257622189e28acf9c66eb45b4ff6cc948",
+      "size": 29799,
+      "source": "series"
+    },
+    "Q/000/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r000/science.canonical.json",
+      "sha256": "8f08ea9cd7b78960165271027936a087fbaf7f82189124cd4f7753929e120160",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/001/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r001.json",
+      "sha256": "0c2cb154ebd796dd4a6bc7c8d18566cbb2d75c61b87381d1020cbf63b3e8a2b2",
+      "size": 26914,
+      "source": "series"
+    },
+    "Q/001/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r001/science.canonical.json",
+      "sha256": "ab2f074497b58e30364be4019cd5a5b2bf66579fd7da54906880379adbe3745b",
+      "size": 6415,
+      "source": "series"
+    },
+    "Q/001/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r001/science.canonical.json",
+      "sha256": "63c2292ade6a3fedd45cbadf9b8ea0531b9bca6cfc087d0bb2d4c7a58c1b3938",
+      "size": 29817,
+      "source": "series"
+    },
+    "Q/001/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r001/science.canonical.json",
+      "sha256": "8ca0c20a90b3aee09d747f77d817dc1366027ba006be28b4859eeeef92ca0681",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/002/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r002.json",
+      "sha256": "3f1264d25aef7a3e45654639b6c34dc3d2e6b46a0d8aff0629c760ecda43e191",
+      "size": 26905,
+      "source": "series"
+    },
+    "Q/002/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r002/science.canonical.json",
+      "sha256": "431d51fdedf480221cce556d10197543be3c5e82cbaf0398bedde5640816b078",
+      "size": 6414,
+      "source": "series"
+    },
+    "Q/002/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r002/science.canonical.json",
+      "sha256": "7d385e015dc19f80d373fd02b76b2e0310d58611f79985b3466d1e0e8b582289",
+      "size": 29821,
+      "source": "series"
+    },
+    "Q/002/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r002/science.canonical.json",
+      "sha256": "af2b3df963cdcefbe02a5967a46aca556993cc2b1b4aff956578255c6de9f6e6",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/003/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r003.json",
+      "sha256": "a83ad883a9b7f6716df92d433464cf5383f4ed4de38ba10fd540167ee58faab3",
+      "size": 26914,
+      "source": "series"
+    },
+    "Q/003/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r003/science.canonical.json",
+      "sha256": "4746f01614880b1de35524223510a7e4b59128bc28eca21543b4f7be7b559c8e",
+      "size": 6423,
+      "source": "series"
+    },
+    "Q/003/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r003/science.canonical.json",
+      "sha256": "8e5f0d32f767e61d1ac01a5d76b8fa018d373f0491192e65ede8a9291ba751fd",
+      "size": 29842,
+      "source": "series"
+    },
+    "Q/003/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r003/science.canonical.json",
+      "sha256": "a037999a833f36603d9b275f31f9e3b365614afafd2c03183cee7951f8d5bb92",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/004/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r004.json",
+      "sha256": "b0b25d3127786d93255ee634437a6e7928034b4fb681e42073631e3f57095b3e",
+      "size": 26915,
+      "source": "series"
+    },
+    "Q/004/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r004/science.canonical.json",
+      "sha256": "62bf5956c04b4a6ba39818d146b3ede98145f82ca7bea8375c19e51a53b62975",
+      "size": 6406,
+      "source": "series"
+    },
+    "Q/004/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r004/science.canonical.json",
+      "sha256": "d775fd4bbca40fadf7afd917507e2e70b8308881ebf160bbaf03eac5b86a3197",
+      "size": 29811,
+      "source": "series"
+    },
+    "Q/004/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r004/science.canonical.json",
+      "sha256": "dadca558845f476544075bab83cbe9635b2d52c2c46dbc19d4813a11331f734e",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/005/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r005.json",
+      "sha256": "d8b965937364d110b1415125c82a144f00b01f6d9a5fe282108a5dbe93fd2c09",
+      "size": 26914,
+      "source": "series"
+    },
+    "Q/005/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r005/science.canonical.json",
+      "sha256": "cf4cfd1b84159bf0a4076dda69bc004015f3c7c8f31fd085071126b88f06aac3",
+      "size": 6431,
+      "source": "series"
+    },
+    "Q/005/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r005/science.canonical.json",
+      "sha256": "bfec3d7df4731aa7860875dfc858f1ad13d30bcb514a0ea66aaa0d831c3a1f01",
+      "size": 29786,
+      "source": "series"
+    },
+    "Q/005/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r005/science.canonical.json",
+      "sha256": "816bbe67539213c922a67ae2f4ef1f3703feae3168f86e5132796335abef738b",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/006/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r006.json",
+      "sha256": "e2ae50df2cef300363f3bb69854216a806b83ea699d546ea8606e728ffea7000",
+      "size": 26921,
+      "source": "series"
+    },
+    "Q/006/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r006/science.canonical.json",
+      "sha256": "8913ab850a265a58eda1e87df1b7b159e4c3ff0fb677d242f8089340b8e161fb",
+      "size": 6426,
+      "source": "series"
+    },
+    "Q/006/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r006/science.canonical.json",
+      "sha256": "09c4ea2d43683b9b8bbe6089bcfdca311addbb0adfcd0312934c4e3667cb2f1d",
+      "size": 29780,
+      "source": "series"
+    },
+    "Q/006/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r006/science.canonical.json",
+      "sha256": "2e76de2c16ea86d4ad7d1fd734f721217de1663a093cf7edc052c6c21e2155fa",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/007/boundary": {
+      "path": "r23/artifacts/Q-repaired-results/matrix.r23.rc2.repeat.q.r007.json",
+      "sha256": "453e4b5481535f2133ddd2b31d05b2b72413131bee34e82f8dcdb14b11659e01",
+      "size": 26900,
+      "source": "series"
+    },
+    "Q/007/measurement": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.measure.matrix.r23.rc2.repeat.q.r007/science.canonical.json",
+      "sha256": "f9d18f1b8f8a6ab0c9adbf6795390ea57a63e46b2d2a93fe61a7b59c61b210a0",
+      "size": 6425,
+      "source": "series"
+    },
+    "Q/007/seal": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.lower.matrix.r23.rc2.repeat.q.r007/science.canonical.json",
+      "sha256": "8011e78a32b85aef11af3c9272ba2fe22824a06b4cbe3cd4c32e394a2e936fb0",
+      "size": 29794,
+      "source": "series"
+    },
+    "Q/007/selection": {
+      "path": "r23/artifacts/runs/matrix.r23.q2.run-d94f8e47609ea182b990e907a2aa6e7e/outputs/ap.select.matrix.r23.rc2.repeat.q.r007/science.canonical.json",
+      "sha256": "b5901df78f2555f85e6d69940ad0de0840c03bebc1c1d1545d7529bed93c18b7",
+      "size": 359,
+      "source": "series"
+    },
+    "Q/report": {
+      "path": "r23/artifacts/Q-repaired-results/report.canonical.json",
+      "sha256": "efff34f0a8954f035c2246be887fa94c740748f4030aada070bc0c77041d54e5",
+      "size": 5987,
+      "source": "series"
+    },
+    "Q/source": {
+      "path": "r23/artifacts/Q-repair-authoring/source.json",
+      "sha256": "a7fc62039bbe3d714f02e136751a87499c1b917aaa7dae31d16cafeeb22476ee",
+      "size": 4488,
+      "source": "series"
+    },
+    "Q/stage": {
+      "path": "r23/artifacts/Q-repair-authoring/stage.json",
+      "sha256": "d94f8e47609ea182b990e907a2aa6e7e2074ab96737d451f5a46cf8b58f7a3e0",
+      "size": 505587,
+      "source": "series"
+    },
+    "historical/000": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r000.json",
+      "sha256": "f008050fb1fba73d3db9bf0d83d3f5f9fbb322c16ba3ab4dee0c88ff887f2489",
+      "size": 26173,
+      "source": "series"
+    },
+    "historical/001": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r001.json",
+      "sha256": "b8411b4193d8691b7513f348cce7e16e919bc874e727fa48081db0b1034f2686",
+      "size": 26195,
+      "source": "series"
+    },
+    "historical/002": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r002.json",
+      "sha256": "80271e7c984d2b3aee0e9262b064a0e389db94c1726ca09a0f4accb8dc4f5eb3",
+      "size": 26151,
+      "source": "series"
+    },
+    "historical/003": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r003.json",
+      "sha256": "15eea5ea2cf10fd70a933429afbf8e90001db96828e1188955931002837f01b8",
+      "size": 26181,
+      "source": "series"
+    },
+    "historical/004": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r004.json",
+      "sha256": "3bb139bc6ba6ec91ecc626f3fa3859b5ce52d5ca52c171b55697233908d43573",
+      "size": 26175,
+      "source": "series"
+    },
+    "historical/005": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r005.json",
+      "sha256": "9ad760e36574a4ddcc469b4cbe1cce0f200b97914c3957448ee5558787cd1a7b",
+      "size": 26177,
+      "source": "series"
+    },
+    "historical/006": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r006.json",
+      "sha256": "454319b5fe26a28149484a19820bdb22e1b93e2f2aa9688b1a7bf1cbfa8d1da3",
+      "size": 26148,
+      "source": "series"
+    },
+    "historical/007": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r007.json",
+      "sha256": "3d7d0e6c5e630e29c222e98730d3b0bfbb737b969d7e6f280ce6cc6b8839ae05",
+      "size": 26171,
+      "source": "series"
+    },
+    "historical/008": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r008.json",
+      "sha256": "f23d43bfcb32e9bcf4bad48d5f0b783d18b9eb56d0a1fc732346eaf1f43bf5b8",
+      "size": 26174,
+      "source": "series"
+    },
+    "historical/009": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r009.json",
+      "sha256": "31845544a5b922a8db46ccdda6d315406693303b8512caac39dde94e32c2de17",
+      "size": 26152,
+      "source": "series"
+    },
+    "historical/010": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r010.json",
+      "sha256": "967a2c8839355e1503298a1fb9c5da90aee7e4374cb42459bfadcab7d81da190",
+      "size": 26172,
+      "source": "series"
+    },
+    "historical/011": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r011.json",
+      "sha256": "e1af24045b13699f13b417bbe054354ecfd6bf67dde9ccb938361b75022622d9",
+      "size": 26163,
+      "source": "series"
+    },
+    "historical/012": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r012.json",
+      "sha256": "a57460c3add75398f4a78165f32a733b05a73f00c2afb5624de48c323cbbe9ba",
+      "size": 26179,
+      "source": "series"
+    },
+    "historical/013": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r013.json",
+      "sha256": "b7513032962fe0f68b80500886f32326f80056f0b766f63a164cedb81e83be07",
+      "size": 26158,
+      "source": "series"
+    },
+    "historical/014": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r014.json",
+      "sha256": "6bc5b634d400ae4c9d22075a387b866bfc27323ebef6c828af44d4c5248280cb",
+      "size": 26176,
+      "source": "series"
+    },
+    "historical/015": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r015.json",
+      "sha256": "0604eea801a1da4b84e54d985f7750d485c5caa65d383456e1564af00cc9b65a",
+      "size": 26150,
+      "source": "series"
+    },
+    "historical/016": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r016.json",
+      "sha256": "1b9b4c8c755c9fde12334edd3f4be055fd31fdcdeae974555a16035ee2121d6c",
+      "size": 26175,
+      "source": "series"
+    },
+    "historical/017": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r017.json",
+      "sha256": "90025e87065a1a80697bef6a9bb7ea3257b4057f4492a11ec1628ab31b170a6b",
+      "size": 26159,
+      "source": "series"
+    },
+    "historical/018": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r018.json",
+      "sha256": "c4957070f3534496dbb3b88029636a2cd21dbf76a9e4e9e2cd8fdd83c9611916",
+      "size": 26178,
+      "source": "series"
+    },
+    "historical/019": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r019.json",
+      "sha256": "d0e2e31a9694b3f254da49d9bca8927477a86ad8b9cda7cd4e57f1ea3c09d7e3",
+      "size": 26189,
+      "source": "series"
+    },
+    "historical/020": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r020.json",
+      "sha256": "2295a153c0d4b3f39563035efd0993496101c445d1db9a69dd269ee8a0f855c3",
+      "size": 26182,
+      "source": "series"
+    },
+    "historical/021": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r021.json",
+      "sha256": "4baba8a432f1d7230be1343ab19a2b8bc1937583d2e35e151554e1f3a671c02f",
+      "size": 26156,
+      "source": "series"
+    },
+    "historical/022": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r022.json",
+      "sha256": "cf87d4ad70b83f152dd56930b6a0924f01f6a520bafcfb8990d44ef703899cdd",
+      "size": 26180,
+      "source": "series"
+    },
+    "historical/023": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r023.json",
+      "sha256": "680204abc1a60a22c765b8c6381fd19343b05d97dd61590e387a579fa7272035",
+      "size": 26173,
+      "source": "series"
+    },
+    "historical/024": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r024.json",
+      "sha256": "6c8f6ab5c10b3dc61dce688220151dc251c395887488414a947c6d5a0b8b0268",
+      "size": 26167,
+      "source": "series"
+    },
+    "historical/025": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r025.json",
+      "sha256": "67b5b7469e7d4ba5274b020c01b5e74c83b87f5fc5014e404f51423ebed8edff",
+      "size": 26169,
+      "source": "series"
+    },
+    "historical/026": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r026.json",
+      "sha256": "7b83cb1e88256c1ed5e2b2a30d739b78dd41903dd8394c69bfcf07b89a6ca05b",
+      "size": 26164,
+      "source": "series"
+    },
+    "historical/027": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r027.json",
+      "sha256": "1754082fcb6b67355663863ae0279af4f54581a19daea8e91cb3f5db7baeb35e",
+      "size": 26154,
+      "source": "series"
+    },
+    "historical/028": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r028.json",
+      "sha256": "4a7770aaec9737dfef44f7c3610c6034af571fae1d405ffbedefe9d724ade2b8",
+      "size": 26168,
+      "source": "series"
+    },
+    "historical/029": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r029.json",
+      "sha256": "e6f4c7a683fc83f969f6c6cf4e10b469d7623e93dcdb90dc6a83a4a18ebd6fcd",
+      "size": 26181,
+      "source": "series"
+    },
+    "historical/030": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r030.json",
+      "sha256": "4b7e64442909a829c2687c03cf541b20c22f2fe0d72e3981154d126a44f15464",
+      "size": 26149,
+      "source": "series"
+    },
+    "historical/031": {
+      "path": "r23/artifacts/historical-boundary-observations-01/cc1-boundary-production-v1.e.r031.json",
+      "sha256": "1f127ddf8c76494f35b7c7db3a83549c784f28f24791c091d28d773db53aa164",
+      "size": 26180,
+      "source": "series"
+    },
+    "interrupted": {
+      "path": "r23/artifacts/Q-first-attempt-audit.json",
+      "sha256": "ea0aecd468fd7845771a4fffb098775b9e57f15f53fb4b5c6490f61fa22ba1b6",
+      "size": 6339,
+      "source": "series"
+    },
+    "lower": {
+      "path": "r23/artifacts/r23/imports/lower/input.canonical.json",
+      "sha256": "7724cb17eed712c763b572adcb59ce30055d6123597cac5108019890778a26d8",
+      "size": 39771,
+      "source": "series"
+    }
+  },
+  "study": "r23"
+}

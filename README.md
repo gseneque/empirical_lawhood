@@ -10,8 +10,10 @@ The framework prepares and executes the work, retains its evidence and makes ass
 
 [Read the preprint (edition 0.60, PDF)](paper/editions/v0.60-deposit/Empirical_Lawhood_Manuscript_v0.60.pdf) · [Explore the study results by programme](programmes/README.md)
 
-**Version 1.0 is in release-candidate review.**
-Users upgrading from 0.3.0 must update imports from the retired Python packages. [RC1 tag](https://github.com/gseneque/empirical_lawhood/tree/1.0.0-RC1) · [Release notes](docs/release/1.0.0.md) · [Migration guide](docs/v1.0/migration.md)
+**Version 1.0 release candidate 2 is under review.**
+[Release notes](docs/release/1.0.0.md) · [Migration guide](docs/v1.0/migration.md) · [Earlier RC1 tag](https://github.com/gseneque/empirical_lawhood/tree/1.0.0-RC1)
+
+[Joint descriptions (R01–R22)](programmes/shared-records/joint-description-results.md) · [Preparation and reuse (R23–R27)](programmes/foundations/emergent-structure/records/preparation-and-reuse-results.md) · [Foundations synthesis (Studies 1–5)](programmes/foundations/README.md#foundations-synthesis-studies)
 
 ## Run a first investigation
 

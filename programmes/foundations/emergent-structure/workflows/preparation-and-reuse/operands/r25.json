@@ -1,0 +1,55 @@
+{
+  "context": {},
+  "format": 1,
+  "members": {
+    "closeout": {
+      "path": "r25/artifacts/development-closed-panel-01/scientific-result.json",
+      "sha256": "34277329893b0f459783602ca2adaec99b79bb6fdb361a4afe190100ec113957",
+      "size": 103335,
+      "source": "series"
+    },
+    "cohort": {
+      "path": "r25/artifacts/development-closed-panel-01/cohort.canonical.json",
+      "sha256": "bdb5b36a29678a3705e55d498de69fc12b2951c109a2c53d1cb35d2abb171674",
+      "size": 446778,
+      "source": "series"
+    },
+    "ordinary": {
+      "path": "r25/artifacts/ordinary-bath-comparison-01.json",
+      "sha256": "bb149ba4a2e3d0b5513398962d75d01920c6225cd2bda743373b4245483c1798",
+      "size": 14920,
+      "source": "series"
+    },
+    "recursive/exposure.json": {
+      "path": "r25/scratch/development-03-inputs/exposure.json",
+      "sha256": "3621a68240ae9523aad49b89b429fcdb2fd876254423b246e49ba28ebe8cddaf",
+      "size": 1997330,
+      "source": "series"
+    },
+    "recursive/lower.json": {
+      "path": "r25/scratch/development-03-inputs/lower.json",
+      "sha256": "7724cb17eed712c763b572adcb59ce30055d6123597cac5108019890778a26d8",
+      "size": 39771,
+      "source": "series"
+    },
+    "recursive/source-snapshot.json": {
+      "path": "r25/scratch/development-03-inputs/source-snapshot.json",
+      "sha256": "1ecf544d6df7486b305b5dffcbb82384cf5c651f64d0f3b5e8d78e7b4b3983d9",
+      "size": 564531,
+      "source": "series"
+    },
+    "recursive/sources.json": {
+      "path": "r25/scratch/development-03-inputs/sources.json",
+      "sha256": "870c2783f774c9f9ae7c394f81e681a6af3d83ad9a1b4dc0e3e0e8af51690626",
+      "size": 1225,
+      "source": "series"
+    },
+    "recursive/specification.json": {
+      "path": "r25/scratch/development-03-inputs/specification.json",
+      "sha256": "8db743fd17c7ab8d164490311a94fdba12e9488c3165253454c8e8ae3da95c54",
+      "size": 1249,
+      "source": "series"
+    }
+  },
+  "study": "r25"
+}

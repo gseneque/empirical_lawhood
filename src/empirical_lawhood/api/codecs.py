@@ -42,7 +42,7 @@ from empirical_lawhood.design.multi_world_study import ArchiveOutcomeProtectionP
 from empirical_lawhood.design.response_algebra import ResponseAlgebraHypothesisFreeze, ResponseAlgebraConformanceSpec, ResponseAlgebraProtocolSpec
 from empirical_lawhood.design.source_pipelines import SourcePipelineProfile
 from empirical_lawhood.design.approval import ApprovalGateAttestation, DurableAuthorizationRecord, FrozenApprovalProposal, FrozenIssuedStudyApprovalProposal, IssuedStudyApprovalProposal
-from empirical_lawhood.design.study_issue import AccountableHumanIdentity, HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyOperationAuthority
+from empirical_lawhood.design.study_issue import AccountableHumanIdentity, HumanProposerAttestation, RetainedEvaluationProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyOperationAuthority
 from empirical_lawhood.execution.plans import EnvelopeExecutionPlan, ExecutionPlan, ProtocolTemplate, EnvelopeRunPlan, RunPlan
 from empirical_lawhood.execution.profile_compilation import LinkedCampaignExecutableCompilation
 from empirical_lawhood.execution.source_pipelines import SourcePipelineCompilation
@@ -104,6 +104,7 @@ RootRecord = (
     | ExecutableStudyCompilationReport
     | AccountableHumanIdentity
     | HumanProposerAttestation
+    | RetainedEvaluationProposerAttestation
     | ImplementationSourceClosure
     | StudyOperationAuthority
     | IssuedDraftManifest
@@ -188,6 +189,7 @@ ROOT_SCHEMAS: Mapping[str, type[RootRecord]] = types.MappingProxyType(
         RetrospectiveExtensionReport.SCHEMA: RetrospectiveExtensionReport,
         AccountableHumanIdentity.SCHEMA: AccountableHumanIdentity,
         HumanProposerAttestation.SCHEMA: HumanProposerAttestation,
+        RetainedEvaluationProposerAttestation.SCHEMA: RetainedEvaluationProposerAttestation,
         RetrospectiveProposerAttestation.SCHEMA: RetrospectiveProposerAttestation,
         ImplementationSourceClosure.SCHEMA: ImplementationSourceClosure,
         StudyOperationAuthority.SCHEMA: StudyOperationAuthority,

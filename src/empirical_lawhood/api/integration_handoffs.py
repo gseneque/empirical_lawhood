@@ -58,8 +58,15 @@ class IntegrationApplicationHandoff:
             raise TypeError('Integration family differs from its exact typed handoff')
 
 
-def load_integration_handoff(*, directory, root, storage_profile, artifact_writer) -> IntegrationApplicationHandoff:
+def load_integration_handoff(*, directory, root, storage_profile, artifact_writer=None,
+                             artifact_writer_for_family=None) -> IntegrationApplicationHandoff:
     """Load one exact current handoff; never search for a latest result."""
+    if (artifact_writer is None) == (artifact_writer_for_family is None):
+        raise ValueError("Select one artifact writer or a family-specific writer factory")
+
+    def writer(family: IntegrationFamily):
+        return artifact_writer if artifact_writer_for_family is None else artifact_writer_for_family(family)
+
     directory, _ = resolve_authoring_directory(directory, repo_root=root, storage_profile=storage_profile, escape_message='Integration handoff lies outside the explicitly selected guarded external root')
     markers = tuple(name for name in ('issued-inputs.json', 'rerun-input.json', 'selection.json', 'recursive-prospective.json') if (directory / name).is_file())
     if len(markers) != 1:
@@ -71,7 +78,7 @@ def load_integration_handoff(*, directory, root, storage_profile, artifact_write
         # schema read must not impose a second, smaller allocation on that body.
         from empirical_lawhood.api.recursive_prospective_authoring import load_recursive_prospective_handoff
         return IntegrationApplicationHandoff('recursive-inquiry', load_recursive_prospective_handoff(
-            directory=directory, root=root, storage_profile=storage_profile, artifact_writer=artifact_writer))
+            directory=directory, root=root, storage_profile=storage_profile, artifact_writer=writer("recursive-inquiry")))
     document = loads_external_json(read_bounded_bytes(directory / marker, maximum_bytes=16 * 1024**2))
     if not isinstance(document, dict):
         raise ValueError('Integration selector must be a typed object')
@@ -90,7 +97,7 @@ def load_integration_handoff(*, directory, root, storage_profile, artifact_write
         family, loader = 'constructed-preparation-applicability', load_constructed_preparation_applicability_handoff
     else:
         raise ValueError('Unsupported integration selector; user input cannot select arbitrary modules')
-    return IntegrationApplicationHandoff(family, loader(directory=directory, root=root, storage_profile=storage_profile, artifact_writer=artifact_writer))
+    return IntegrationApplicationHandoff(family, loader(directory=directory, root=root, storage_profile=storage_profile, artifact_writer=writer(family)))
 
 
 def integration_api_inputs(handoff: IntegrationApplicationHandoff) -> dict[str, object]:
@@ -112,7 +119,9 @@ def integration_api_inputs(handoff: IntegrationApplicationHandoff) -> dict[str, 
                 'executable_platform_ports': selected.platform_ports}
     if handoff.family not in {'finite-response-law', 'preparation-applicability', 'constructed-preparation-applicability'}:
         raise ValueError('Unsupported integration family')
+    profile_args = {}
     if handoff.family == 'finite-response-law':
+        profile_args['artifact_profile_validators'] = integration_artifact_profile_validators(handoff.family)
         from empirical_lawhood.domains.matrix.response_geometry_prospective.authoring.design import ResponseGeometryAssayCandidateContextProvider
         selected = cast('FiniteResponseLawApplicationHandoff', handoff.selected)
         bundle = selected.bundle
@@ -122,7 +131,7 @@ def integration_api_inputs(handoff: IntegrationApplicationHandoff) -> dict[str, 
         selected = cast('PreparationApplicabilityApplicationHandoff | ConstructedPreparationApplicabilityApplicationHandoff', handoff.selected)
         bundle = selected.bundle
         context = PhaseContextProvider(bundle)
-    return {'candidate_context_provider': context,
+    return {**profile_args, 'candidate_context_provider': context,
             'candidate_capability_catalog': bundle.catalog,
             'study_bundle_registry': bundle.standard_context.base.registry,
             'executable_platform_ports': selected.platform_ports}

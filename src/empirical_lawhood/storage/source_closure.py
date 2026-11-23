@@ -14,7 +14,7 @@ from empirical_lawhood.execution.local.bounded_process import BoundedProcessErro
 from empirical_lawhood.storage.study_issue import GitStudySourceClosureInspector
 from empirical_lawhood.storage.source_origin import require_executing_target_source
 from empirical_lawhood.storage.repository_identity import _descriptor_identity, _open_relative_read_only
-from empirical_lawhood.storage.source_policy import CheckoutSourceAdmission, InstalledSourceAdmission, SourcePolicyError, inspect_checkout_source, is_work_plan_path, require_unchanged_source_admission
+from empirical_lawhood.storage.source_policy import CHECKOUT_GIT_TIMEOUT_SECONDS, CheckoutSourceAdmission, InstalledSourceAdmission, SourcePolicyError, inspect_checkout_source, is_work_plan_path, require_unchanged_source_admission
 from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SelectedSourceManifest, SelectedSourceManifestMember, SourceClosureKind
 
 _SOURCE_ROOTS = ("src/empirical_lawhood", "scripts")
@@ -224,7 +224,7 @@ def _stream_archive_census(tree, source):
 def _git_archive_stream(root, consumer):
     try:
         result = run_bounded_stream_command(("git", "archive", "HEAD"), cwd=root,
-            consume_stdout=consumer, timeout_seconds=60, maximum_stdout_bytes=None,
+            consume_stdout=consumer, timeout_seconds=CHECKOUT_GIT_TIMEOUT_SECONDS, maximum_stdout_bytes=None,
             maximum_stderr_bytes=64 * 1024)
     except BoundedProcessError as error:
         raise PermissionError(f"target source capture failed: {error}") from error
@@ -445,7 +445,7 @@ def _git(root: Path, *arguments: str) -> bytes:
         result = run_bounded_command(
             ("git", *arguments),
             cwd=root,
-            timeout_seconds=60,
+            timeout_seconds=CHECKOUT_GIT_TIMEOUT_SECONDS,
             maximum_stdout_bytes=limits[arguments[0]],
             maximum_stderr_bytes=64 * 1024,
         )

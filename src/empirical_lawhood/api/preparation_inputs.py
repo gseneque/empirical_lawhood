@@ -15,7 +15,7 @@ from empirical_lawhood.science.records.decoding import decode_canonical_bytes
 from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from empirical_lawhood.science.records.serialization import validate_relative_locator, validate_stable_id
 from empirical_lawhood.storage.contracts.artifacts import ArtifactWriteRequest, ArtifactProfile
-from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
+from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access, preparation_output_reader
 from empirical_lawhood.domains.matrix.preparation_applicability.result_access import PREPARATION_PROTECTED_OUTCOMES
 
 
@@ -57,7 +57,7 @@ def _retained_output(*, plane, receipt, kind, result_access,
         raise ValueError("retained task omits its exact single scientific output")
     if outputs[0].outcome_access not in PREPARATION_PROTECTED_OUTCOMES:
         raise PermissionError("retained preparation output changes its protected issued outcome class")
-    access_authenticator(context=result_access,receipt=receipt,logical=outputs[0],writer=plane)
+    plan = access_authenticator(context=result_access,receipt=receipt,logical=outputs[0],writer=plane)
     manifests=[]
     for materialization in receipt.output_materializations:
         path=plane.root.resolve(f"{materialization.relative_path}.manifest.json",for_write=False)
@@ -69,7 +69,7 @@ def _retained_output(*, plane, receipt, kind, result_access,
     manifest=manifests[0]
     if manifest.logical not in receipt.output_logical_artifacts or manifest.materialization not in receipt.output_materializations:
         raise ValueError("retained scientific output substitutes its committed task receipt")
-    plane.verify_manifest(manifest)
+    preparation_output_reader(plane, plan, manifest.logical).verify_manifest(manifest)
     path=plane.root.resolve(manifest.materialization.relative_path,for_write=False)
     record=decode_canonical_bytes(read_bounded_bytes(path,maximum_bytes=128*1024**2),kind,maximum_bytes=128*1024**2)
     if record.fingerprint()!=manifest.materialization.physical_sha256:
@@ -125,12 +125,12 @@ def read_preparation_report(retained,*,artifact_writer):
           PreparationApplicabilityScreenReport.SCHEMA:PreparationApplicabilityScreenReport}.get(retained.manifest.logical.payload_schema)
     if kind is None:
         raise ValueError("retained preparation result has an unsupported current report schema")
-    authenticate_preparation_result_access(context=retained.result_access,receipt=retained.receipt,
+    plan = authenticate_preparation_result_access(context=retained.result_access,receipt=retained.receipt,
         logical=retained.manifest.logical,writer=artifact_writer)
     actual=ExternalTaskReceiptStore(artifact_writer).read_by_receipt_id(retained.receipt.run_id,retained.receipt.task_id,retained.receipt.receipt_id)
     if actual!=retained.receipt:
         raise ValueError("retained preparation report changes its committed task receipt")
-    artifact_writer.verify_manifest(retained.manifest)
+    preparation_output_reader(artifact_writer, plan, retained.manifest.logical).verify_manifest(retained.manifest)
     record=decode_canonical_bytes(retained.record_payload.encode("utf-8"),kind,maximum_bytes=16*1024**2)
     authenticate_preparation_result_access(context=retained.result_access,receipt=retained.receipt,
         logical=retained.manifest.logical,writer=artifact_writer)

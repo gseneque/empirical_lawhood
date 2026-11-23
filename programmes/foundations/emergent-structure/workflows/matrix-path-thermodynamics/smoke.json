@@ -1,0 +1,17 @@
+{
+  "schema": "matrix-path-thermodynamics.definition.v1",
+  "first_root": 133112300,
+  "development_roots": 2,
+  "evaluation_roots": 2,
+  "batch_size": 1,
+  "parameters": {
+    "burn_cycles": 2,
+    "cycle_ticks": 32,
+    "rise_ticks": 8,
+    "timestep": "0.001",
+    "alpha_x": "0.6666666666666666666666666667",
+    "alpha_y": "7.333333333333333333333333334",
+    "jitter": "0.03",
+    "critic_bound": "0.7"
+  }
+}

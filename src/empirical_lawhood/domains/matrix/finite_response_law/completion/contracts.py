@@ -8,9 +8,9 @@ from empirical_lawhood.science.identity.references import ArtifactIdentity
 from empirical_lawhood.science.records.serialization import CanonicalRecord, validate_stable_id
 from empirical_lawhood.storage.contracts.artifacts import CanonicalTaskReceipt
 from empirical_lawhood.domains.matrix.finite_response_law.fresh_contracts import FiniteResponseLawCalibrationConfig
-from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedCalibrationConfig, FiniteResponseLawAssignedEvaluationConfig
 from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retention import FiniteResponseLawEvaluationRetention
-from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedEvaluationViewObservation
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationViewObservation, FiniteResponseLawAssignedEvaluationViewObservation
 from empirical_lawhood.domains.matrix.finite_response_law.control_records import FiniteResponseLawControlConfig
 from empirical_lawhood.domains.matrix.finite_response_law.native_records import FiniteResponseLawCalibrationViewObservation
 from empirical_lawhood.domains.matrix.finite_response_law.science import PROGRAMME
@@ -37,6 +37,7 @@ class FiniteResponseLawRetainedProjection(CanonicalRecord):
             self.report.payload_schema
             not in (
                 FiniteResponseLawCalibrationViewObservation.SCHEMA,
+                FiniteResponseLawAssignedCalibrationViewObservation.SCHEMA,
                 FiniteResponseLawAssignedEvaluationViewObservation.SCHEMA,
             )
             or self.receipt.payload_schema != CanonicalTaskReceipt.SCHEMA
@@ -140,3 +141,31 @@ class FiniteResponseLawAssignedRetainedCompletionConfig(FiniteResponseLawRetaine
             or self.retained_run_id == self.retention.donor_run_id
         ):
             raise ValueError("Independent evaluation completion loses its original source, control or donor")
+
+
+@dataclass(frozen=True, slots=True)
+class FiniteResponseLawAssignedCalibrationRetainedConfig(FiniteResponseLawRetainedCompletionConfig):
+    """Nonacquiring completion of an issued, externally assigned calibration."""
+
+    SCHEMA: ClassVar[str] = 'empirical-lawhood/methods/finite-response-law/completion/assigned-calibration-retained-config'
+    SOURCE_TYPE: ClassVar[type] = FiniteResponseLawAssignedCalibrationConfig
+    VIEW_SCHEMA: ClassVar[str] = FiniteResponseLawAssignedCalibrationViewObservation.SCHEMA
+    PREFIX_ID: ClassVar[str] = f"{PROGRAMME}.calibration.assigned-retained-completion"
+    native_source: FiniteResponseLawAssignedCalibrationConfig
+    retained_study: ObjectIdentity
+    retained_execution: ObjectIdentity
+    retained_reveal: ObjectIdentity
+    retained_terminal: ObjectIdentity
+
+    def __post_init__(self) -> None:
+        from empirical_lawhood.design.study_issue import StudyOperationAuthority
+        from empirical_lawhood.execution.study_issue import IssuedExecutableStudyManifest
+        from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent
+
+        FiniteResponseLawRetainedCompletionConfig.__post_init__(self)
+        if (self.retained_study.object_schema != IssuedExecutableStudyManifest.SCHEMA
+                or self.retained_terminal.object_schema != RunRecoveryTerminalEvent.SCHEMA
+                or self.retained_execution.object_schema != StudyOperationAuthority.SCHEMA
+                or self.retained_reveal.object_schema != StudyOperationAuthority.SCHEMA
+                or self.retained_execution == self.retained_reveal):
+            raise ValueError("Assigned calibration completion requires its original issue, grants and terminal")

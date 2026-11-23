@@ -18,6 +18,8 @@ from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_retent
 from empirical_lawhood.adapters.simulators.finite_response_law.source_outputs import FiniteResponseLawAssignedEvaluationTaskResult
 from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
 
+from empirical_lawhood.adapters.simulators.finite_response_law.locked_evaluation import CONTROL_RESULTS, FiniteResponseLawLockedEvaluationRetention
+
 NAMESPACE = "finite-response-law.evaluation-continuation"
 SOURCE_CAPABILITY = replace(
     ORIGINAL_SOURCE,
@@ -65,6 +67,22 @@ IMPORT_CAPABILITY = replace(
         if p is not CapabilityPermission.READ_SEALED_OUTCOMES
     ),
 )
+_locked_outputs = (*IMPORT_CAPABILITY.output_schema_ids, *(cls.SCHEMA for cls in CONTROL_RESULTS.values()))
+LOCKED_IMPORT_CAPABILITY = manifest(
+    "locked-parent-import", FiniteResponseLawLockedEvaluationRetention, CapabilityKind.TRANSFORM,
+    (FiniteResponseLawLockedEvaluationRetention.SCHEMA, CanonicalTaskReceipt.SCHEMA, *_locked_outputs),
+    _locked_outputs, EvidenceCeiling.MEASUREMENT, OutcomeAccess.OUTCOME_BLIND, 60,
+    namespace=NAMESPACE, resources=ResourceBudget(1, 2 * 1024**3, 0, 60, 128 * 1024**2, 16 * 1024**2),
+    implementation_id="original-locked-choices-and-acquired-native-parents",
+    conformance_ids=("no-native-acquisition", "original-receipt-and-complete-members", "prepared-choice-continuity"),
+    read_permission=CapabilityPermission.READ_SEALED_OUTCOMES,
+)
+LOCKED_IMPORT_CAPABILITY = replace(LOCKED_IMPORT_CAPABILITY, permissions=tuple(
+    perm for perm in LOCKED_IMPORT_CAPABILITY.permissions if perm is not CapabilityPermission.READ_SEALED_OUTCOMES))
+_locked, LOCKED_IMPORT_COMPONENTS = bundle(
+    "locked-parent-import", ExtensionContributionKind.METHOD, LOCKED_IMPORT_CAPABILITY,
+    (FiniteResponseLawLockedEvaluationRetention,), NATIVE_PAIR_SCHEMA, namespace=NAMESPACE)
+
 _source, SOURCE_COMPONENTS = bundle(
     "source",
     ExtensionContributionKind.SOURCE,
@@ -106,7 +124,7 @@ EXTENSION_BUNDLE_CONTRIBUTION = replace(
     contribution_id=f"extension-contribution.{NAMESPACE}",
     capability_manifests=tuple(
         sorted(
-            (*_source.capability_manifests, *_import.capability_manifests),
+            (*_source.capability_manifests, *_import.capability_manifests, *_locked.capability_manifests),
             key=lambda v: v.registry_id,
         )
     ),
@@ -114,29 +132,29 @@ EXTENSION_BUNDLE_CONTRIBUTION = replace(
         sorted(
             (
                 *_source.candidate_capability_registrations,
-                *_import.candidate_capability_registrations,
+                *_import.candidate_capability_registrations, *_locked.candidate_capability_registrations,
             ),
             key=lambda v: v.registration_id,
         )
     ),
     profile_registrations=tuple(
         sorted(
-            (*_source.profile_registrations, *_import.profile_registrations),
+            (*_source.profile_registrations, *_import.profile_registrations, *_locked.profile_registrations),
             key=lambda v: v.registration_id,
         )
     ),
     config_decoders=tuple(
         sorted(
-            {v.object_id: v for p in (_source, _import) for v in p.config_decoders}.values(),
+            {v.object_id: v for p in (_source, _import, _locked) for v in p.config_decoders}.values(),
             key=lambda v: v.object_id,
         )
     ),
     runtime_providers=tuple(
-        sorted((*_source.runtime_providers, *_import.runtime_providers), key=lambda v: v.object_id)
+        sorted((*_source.runtime_providers, *_import.runtime_providers, *_locked.runtime_providers), key=lambda v: v.object_id)
     ),
     artifact_validators=tuple(
         sorted(
-            (*_source.artifact_validators, *_import.artifact_validators), key=lambda v: v.object_id
+            (*_source.artifact_validators, *_import.artifact_validators, *_locked.artifact_validators), key=lambda v: v.object_id
         )
     ),
 )

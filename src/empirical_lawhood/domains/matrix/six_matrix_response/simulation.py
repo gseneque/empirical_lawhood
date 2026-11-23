@@ -487,6 +487,7 @@ def baoab_step_with_hermitian_noise(
     next_alpha_tilde_y: float,
     standardized_noise: ComplexArray,
     gradient_cache: BAOABGradientCache | None = None,
+    recorder=None,
 ) -> SixMatrixState:
     """Advance one ordered BAOAB step with one supplied HS-standard innovation.
 
@@ -510,9 +511,13 @@ def baoab_step_with_hermitian_noise(
     gradient = _gradient(state.positions, _parameters(state, member), gradient_cache)
     momentum = hermitian_part(state.momenta - 0.5 * dt * gradient)
     position = hermitian_part(state.positions + 0.5 * dt * momentum)
+    if recorder is not None:
+        p_minus, midpoint = momentum, position
     decay = float(np.exp(-friction * dt))
     noise_scale = float(np.sqrt(temperature * (1.0 - decay**2)))
     momentum = hermitian_part(decay * momentum + noise_scale * noise)
+    if recorder is not None:
+        p_plus = momentum
     position = hermitian_part(position + 0.5 * dt * momentum)
     next_parameters = SixMatrixParameters(
         q=state.q,
@@ -524,7 +529,7 @@ def baoab_step_with_hermitian_noise(
     )
     next_gradient = _gradient(position, next_parameters, gradient_cache)
     momentum = hermitian_part(momentum - 0.5 * dt * next_gradient)
-    return SixMatrixState(
+    result = SixMatrixState(
         q=state.q,
         positions=position,
         momenta=momentum,
@@ -532,6 +537,10 @@ def baoab_step_with_hermitian_noise(
         alpha_tilde_x=next_alpha_tilde_x,
         alpha_tilde_y=next_alpha_tilde_y,
     )
+    if recorder is not None:
+        from .substeps import BAOABSubsteps
+        recorder(BAOABSubsteps.capture(state, result, midpoint, p_minus, p_plus, gradient, next_gradient))
+    return result
 
 
 def baoab_step_and_capture_hermitian_noise(

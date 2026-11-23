@@ -581,6 +581,11 @@ def _member_preflight_scopes(plane, *, before_member=None, member_preflights=Non
             in_parallel_verification.reset(token)
 
 
+_DEFAULT_SEMANTIC_VALIDATIONS = ArtifactSemanticValidationRegistry(
+    registry_id="unregistered-artifact-semantics", registrations=(),
+)
+
+
 class ExternalArtifactPlane:
     def __init__(
         self,
@@ -601,12 +606,14 @@ class ExternalArtifactPlane:
         self.root = root
         self.custody_limits = custody_limits or ArtifactCustodyLimits()
         self.validators = validators or ArtifactProfileValidatorRegistry()
-        self.semantic_validations = semantic_validations or ArtifactSemanticValidationRegistry(
-            registry_id="unregistered-artifact-semantics",
-            registrations=(),
-        )
+        self.semantic_validations = semantic_validations if semantic_validations is not None else _DEFAULT_SEMANTIC_VALIDATIONS
         if self.custody_limits.exceeds("semantic_validation_registrations", len(self.semantic_validations.registrations)):
             raise ArtifactIdentityConflict("semantic validation registry exceeds its selected allowance")
+
+    def accepts_issued_output_semantics(self) -> bool:
+        """Only a stock reader with no caller-selected registry can bind a run's output contracts."""
+        return (self.semantic_validations is _DEFAULT_SEMANTIC_VALIDATIONS
+                and _has_stock_manifest_reads(self) and _has_stock_artifact_plane_state(self))
 
     def with_semantic_validation_registry(
         self,

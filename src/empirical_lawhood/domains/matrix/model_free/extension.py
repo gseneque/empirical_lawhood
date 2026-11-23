@@ -34,6 +34,7 @@ _WORKFLOW = WorkflowDeclaration(Workflow(workflow_id="model-free-matrix-programm
         role, schema) for name, role, schema in (
         ("smoke.json", "small native software control", "model-free-matrix-definition.v1"),
         ("pilot.json", "bounded formation/response and memory pilot", "model-free-matrix-definition.v1"),
+        ("handoff-entry-pilot.json", "paired handoff-entry pilot", "model-free-matrix-definition.v1"),
         ("matched-exposure.json", "separate development recipes with equal integrated coupling exposure", "model-free-matrix-definition.v1"),
         ("transfer.json", "nominal and destination response development", "model-free-matrix-definition.v1"),
         ("population-reveal-all.json", "complete native reveal-all benchmark before sparse deployment", "model-free-matrix-definition.v1"),

@@ -39,7 +39,8 @@ from empirical_lawhood.execution.candidate_compiler import CandidateCompilationC
 from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog, CandidateContextResolution, StandardCandidateContextResolution
 from empirical_lawhood.execution.capabilities import CapabilityConfigRef, CapabilityManifest, CapabilityRegistry
 from empirical_lawhood.execution.evidence_profiles import EvidenceProfileRegistryResolver, ProfileFeasibilityDisposition, resolve_candidate_profile_feasibility
-from empirical_lawhood.execution.parameterised_candidate_context import compose_parameterised_candidate_context_for_template
+from empirical_lawhood.execution.parameterised_candidate_context import compose_parameterised_candidate_context_for_template, compose_parameterised_candidate_context
+from empirical_lawhood.execution.executable_bindings import ExecutableCapabilityProviderFactoryRegistry
 from empirical_lawhood.execution.response_experiment_ports import NativeActionContract, NativeClockContract, NativeInteractionKind, NativeReceiverContract, ResponseSubstrateBinding
 from empirical_lawhood.execution.plans import BarrierKind, OutputTemplate, ProtocolStepTemplate, ProtocolTemplate, ScientificStage
 from empirical_lawhood.execution.study_issue import StudyExtensionDecoderRegistration
@@ -1011,3 +1012,18 @@ class ResponseGeometryAssayCandidateContextProvider:
             (),
             CandidateSourceResolution(self.bundle.standard_context.base.qualifications, (), ()),
         )
+
+    def resolve_materialized_base(
+        self, package: StudyDefinition, *, factories: ExecutableCapabilityProviderFactoryRegistry,
+    ) -> StandardCandidateContextResolution:
+        """Apply the selected bundle's native roster during standalone base issue."""
+        resolution = self.resolve_standard(package)
+        context = compose_parameterised_candidate_context(
+            package=self.bundle.authoring,
+            context=resolution.context,
+            records=self.bundle.payloads,
+            factories=factories,
+        )
+        if not isinstance(context, StandardCandidateCompilationContext):
+            raise TypeError("materialized base requires a standard candidate context")
+        return replace(resolution, context=context)

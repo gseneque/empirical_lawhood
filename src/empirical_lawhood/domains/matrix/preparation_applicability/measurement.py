@@ -42,6 +42,20 @@ def response_arrays(phase: NativePhaseOperand) -> NativeResponseArrays:
     )
 
 
+def matched_word_response(frame, parent_sha256, hold, phase):
+    if (
+        phase.incoming_sha256 != parent_sha256
+        or hold.incoming_sha256 != parent_sha256
+        or phase.streams != hold.streams
+        or phase.innovation_sha256 != hold.innovation_sha256
+    ):
+        raise ValueError("signed branch substitutes handoff or same-purpose HOLD innovations")
+    return reduce_native_response_arrays(
+        frame=frame, word=WORDS[phase.word_index], handoff_tick=HANDOFF_TICK,
+        readouts=(RESPONSE_TICKS,), future=response_arrays(phase), paired_hold=response_arrays(hold),
+    )
+
+
 def reduce_panel(
     prefix: PrefixOperand, panel: PanelOperand
 ) -> tuple[Array, Array, Array] | None:
@@ -81,6 +95,7 @@ def reduce_panel(
             parent = phases[s, v, "parent", None, None]
             if parent.incoming_sha256 != prefix.phases[v - 1].fingerprint():
                 raise ValueError("measurement substitutes preparation predecessor")
+            parent_sha256 = parent.fingerprint()
             work[s, v - 1] = float(parent.parent_work)
             z[s, :, v - 1] = preparation_policy_compact_interface(
                 frame=frame,
@@ -93,23 +108,7 @@ def reduce_panel(
                 rows = []
                 for w in range(1, 9):
                     phase = phases[s, v, "future", f, w]
-                    if (
-                        phase.incoming_sha256 != parent.fingerprint()
-                        or hold.incoming_sha256 != parent.fingerprint()
-                        or phase.streams != hold.streams
-                        or phase.innovation_sha256 != hold.innovation_sha256
-                    ):
-                        raise ValueError(
-                            "signed branch substitutes handoff or same-purpose HOLD innovations"
-                        )
-                    observed, known = reduce_native_response_arrays(
-                        frame=frame,
-                        word=WORDS[w],
-                        handoff_tick=HANDOFF_TICK,
-                        readouts=(RESPONSE_TICKS,),
-                        future=response_arrays(phase),
-                        paired_hold=response_arrays(hold),
-                    )
+                    observed, known = matched_word_response(frame, parent_sha256, hold, phase)
                     if not known[0, :5].all():
                         return None
                     rows.append(observed[0, :5])

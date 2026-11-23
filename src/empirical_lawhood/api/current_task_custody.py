@@ -417,24 +417,14 @@ class CurrentIssuedTaskCustody:
     def _admit_run_control_metadata(self, writer):
         """Exact already-admitted runtime records, before their first body hash."""
         from empirical_lawhood.api.execution import CampaignExecutionService
-        from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, lineage_parent_sort_key
+        from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile
         if self._prepared_run_records is None:
             return
         package, source, plan, reconstruction = self._prepared_run_records
         self.require_original_input_access()
         self._require_current_issued_identity(package)
-        parents = CampaignExecutionService._package_lineage_parents(package)
-        visibility = VisibilityCeiling.most_restrictive(*(value.visibility_ceiling for value in parents))
-        access = CampaignExecutionService._most_restrictive_access(parents)
-        package_parent = ArtifactLineageParent(ObjectIdentity.from_record(package.package_id, package), visibility, access)
-        source_parent = ArtifactLineageParent(ObjectIdentity.from_record(self._current_run_id, source), visibility, access)
-        rows = [("campaign-package", package, parents), ("run-plan", source, (package_parent,)),
-            ("execution-plan", plan, tuple(sorted((package_parent, source_parent), key=lineage_parent_sort_key)))]
-        if reconstruction is not None:
-            replay = ArtifactLineageParent(reconstruction.payload_replay_set,
-                VisibilityCeiling.PROSPECTIVE, OutcomeAccess.OUTCOME_BLIND)
-            rows.append(("provider-reconstruction", reconstruction,
-                tuple(sorted((package_parent, replay), key=lineage_parent_sort_key))))
+        rows = CampaignExecutionService._plan_control_records(package, source, plan,
+            provider_reconstruction=reconstruction)
         for name, record, lineage in rows:
             relative = "runs/" + self._current_run_id + "/plans/" + name + ".json"
             manifest = writer.read_manifest(relative)

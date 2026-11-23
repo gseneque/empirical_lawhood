@@ -105,7 +105,8 @@ def target_state(c, row):
                              alpha_tilde_y=float(c['target_y']), constitution='11')
 
 
-def formation(c, row, recipe, seed, policy, *, yoked_tick=None, reviewed=False):
+def formation(c, row, recipe, seed, policy, *, yoked_tick=None, reviewed=False,
+              retain_incoming_state=False):
     """Observe a causal persistence landmark and a common fixed-time landmark.
 
     Persistence is explicitly on the declared observation grid; no assertion
@@ -122,6 +123,7 @@ def formation(c, row, recipe, seed, policy, *, yoked_tick=None, reviewed=False):
     work = protocol_work_account()
     streak_start, first, previous, reentries = None, None, False, 0
     completed_ticks, failure = 0, None
+    incoming_state = None
     try:
         for tick in range(end + 1):
             if tick % policy['observation_stride'] == 0 or tick in (end, policy['fixed_tick'], yoked_tick):
@@ -156,6 +158,8 @@ def formation(c, row, recipe, seed, policy, *, yoked_tick=None, reviewed=False):
                         handoff['preparation_force_calls'] = cache.completed_evaluations
                         handoff['coupling_exposure_prefix'] = exposure.tolist()
                         handoff['identifiable'] = all(measured[k]['raw_admitted'] is not None for k in policy['required_sectors'])
+                        if retain_incoming_state:
+                            handoff['incoming_state'] = None if incoming_state is None else checkpoint(incoming_state)
             if tick < end:
                 if matched:
                     fraction = min(tick + 1, c['ramp_ticks']) / c['ramp_ticks']
@@ -166,6 +170,8 @@ def formation(c, row, recipe, seed, policy, *, yoked_tick=None, reviewed=False):
                 else:
                     target = coord.couplings(min(tick + 1, coord.total_ticks))
                 exposure += np.asarray(target) * float(c['timestep'])
+                if retain_incoming_state:
+                    incoming_state = state
                 state = step(state, coord, hermitian_noise(rng=stream, q=2), cache=cache, couplings=target, protocol_work=work)
                 completed_ticks += 1
                 guard(state, c)

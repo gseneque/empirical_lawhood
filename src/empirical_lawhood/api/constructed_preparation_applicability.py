@@ -13,7 +13,7 @@ from empirical_lawhood.api.authoring_handoff import create_authoring_api, write_
 from empirical_lawhood.api.authoring_output import report_incomplete_output
 from empirical_lawhood.api.results import CompileCandidateRequest
 from empirical_lawhood.domains.matrix.preparation_applicability.config import preparation_run_id
-from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
+from empirical_lawhood.api.preparation_result_access import authenticate_preparation_input
 from empirical_lawhood.api.preparation_applicability import preflight_preparation_authoring_output
 from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedExternalRoot
 from empirical_lawhood.storage.bounded_io import read_bounded_bytes
@@ -50,8 +50,9 @@ def _bundle(selection, root, closure):
 
 
 def _authenticate(selection, writer, plane):
+    receipts = ExternalTaskReceiptStore(plane)
     for value in selection.upstream_records:
-        value.authenticate(writer, ExternalTaskReceiptStore(plane), result_access_authenticator=authenticate_preparation_result_access)
+        authenticate_preparation_input(value, writer, receipts)
         value.require_stage(selection.stage)
 
 

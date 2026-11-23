@@ -632,7 +632,9 @@ class ExternalTaskReceiptStore:
 
     @staticmethod
     def _relative_path(run_id: str, task_id: str, attempt_id: str) -> str:
-        return f"runs/{run_id}/receipts/{task_id}/{attempt_id}.json"
+        from empirical_lawhood.execution.recovery import task_receipt_relative_path
+
+        return task_receipt_relative_path(run_id, task_id, attempt_id)
 
     def commit(
         self,

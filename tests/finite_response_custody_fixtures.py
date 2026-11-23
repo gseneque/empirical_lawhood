@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Synthetic complete calibration data; no source integration or real authority.
+"""Synthetic complete calibration and prospective observations for custody tests.
 
 The real reducers and sole qualification service calculate these fictional
 responses. Published contexts and grants belong only to disposable test stores.
@@ -16,7 +16,9 @@ import numpy as np
 from tests.test_finite_response_assigned_method_records import _source
 from empirical_lawhood.domains.matrix.finite_response_law import method_records as mr
 from empirical_lawhood.domains.matrix.finite_response_law.native_records import native_method_types
-from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationInterface
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedEvaluationConfig
+from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationInterface, FiniteResponseLawAssignedEvaluationInterface
+from empirical_lawhood.domains.matrix.finite_response_law.control_delivery import observation_words
 from empirical_lawhood.domains.matrix.finite_response_law.calibration_operands import calibration_operands
 from empirical_lawhood.domains.matrix.finite_response_law.terminal import qualify_calibration
 from empirical_lawhood.domains.matrix.finite_response_law.extension import METHOD_CAPABILITY
@@ -24,8 +26,8 @@ from empirical_lawhood.domains.matrix.finite_response_law.authoring.design impor
 from empirical_lawhood.domains.matrix.finite_response_law.contracts import native_invocations
 from empirical_lawhood.adapters.simulators.finite_response_law.provider import native_result_type
 from empirical_lawhood.domains.matrix.finite_response_law.instruments import REFERENCE_INSTRUMENT
-from empirical_lawhood.domains.matrix.finite_response_law.source import FiniteResponseLawAssignedCalibrationCheckpoint
 from empirical_lawhood.domains.matrix.prepared_response.contracts import PreparedForceWord
+from empirical_lawhood.science.response.action_contracts import ObservedActionOccurrence
 from empirical_lawhood.storage.candidate_payloads import ExternalCandidatePayloadPlane
 from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
 from empirical_lawhood.science.identity.provenance import ObjectIdentity
@@ -124,6 +126,8 @@ def synthetic_native(source=None):
     projection = projection_type(source)
     projection_id = ObjectIdentity.from_record(projection.config_id, projection)
     result_type = native_result_type(source)
+    evaluation = type(source) is FiniteResponseLawAssignedEvaluationConfig
+    interface_type = FiniteResponseLawAssignedEvaluationInterface if evaluation else FiniteResponseLawAssignedCalibrationInterface
 
     def identity(name, kind):
         return ObjectIdentity(name, kind.SCHEMA, kind.VERSION, "0" * 64)
@@ -157,15 +161,25 @@ def synthetic_native(source=None):
             for phase, cutoff in (("prefix", 4096), ("parent", 4368)):
                 task = next(t for t in local if t.phase == phase)
                 interfaces.append(
-                    FiniteResponseLawAssignedCalibrationInterface(
+                    interface_type(
                         identity(
                             f"{task.task_id}.r{refinement}.checkpoint",
-                            FiniteResponseLawAssignedCalibrationCheckpoint,
+                            interface_type.CHECKPOINT_TYPE,
                         ),
                         REFERENCE_INSTRUMENT.identity,
                         cutoff,
                         (D(0),) * 24,
                     )
+                )
+            delivery = {}
+            if evaluation:
+                occurrences = sorted((word.occurrences[0] for word in observation_words(root.root_id)),
+                                     key=lambda occurrence: occurrence.occurrence_id)
+                delivery["delivery_observations"] = tuple(
+                    ObservedActionOccurrence(
+                        f"{occurrence.occurrence_id}.synthetic.r{refinement}", occurrence.occurrence_id,
+                        occurrence.requested, occurrence.accepted, occurrence.applied, occurrence.realized, (),
+                    ) for occurrence in occurrences
                 )
             views.append(
                 view_type(
@@ -184,6 +198,7 @@ def synthetic_native(source=None):
                     tuple(words),
                     *interfaces,
                     D(0),
+                    **delivery,
                 )
             )
     return completion_type(evaluation_type(projection), tuple(views))

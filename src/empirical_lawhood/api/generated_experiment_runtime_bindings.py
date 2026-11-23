@@ -3,53 +3,59 @@
 from empirical_lawhood.api.domain_composition.classical_series.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_000
 from empirical_lawhood.api.domain_composition.isolated_native_starter.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_001
 from empirical_lawhood.api.domain_composition.joint_description.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_002
-from empirical_lawhood.api.domain_composition.mass_balance_revision.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_003
-from empirical_lawhood.api.domain_composition.mass_balance_starter.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_004
-from empirical_lawhood.api.domain_composition.matrix_compact_factor_confirmation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_005
-from empirical_lawhood.api.domain_composition.matrix_configured_protected_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_006
-from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_007
-from empirical_lawhood.api.domain_composition.matrix_continued_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_008
-from empirical_lawhood.api.domain_composition.matrix_curve_amended_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_009
-from empirical_lawhood.api.domain_composition.matrix_curve_amendment.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_010
-from empirical_lawhood.api.domain_composition.matrix_e3_cal_closeout.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_011
-from empirical_lawhood.api.domain_composition.matrix_finite_dt_retained_e3_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_012
-from empirical_lawhood.api.domain_composition.matrix_finite_dt_source.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_013
-from empirical_lawhood.api.domain_composition.matrix_finite_dt_source_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_014
-from empirical_lawhood.api.domain_composition.matrix_full_factor_development.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_015
-from empirical_lawhood.api.domain_composition.matrix_full_factor_protected.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_016
-from empirical_lawhood.api.domain_composition.matrix_history_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_017
-from empirical_lawhood.api.domain_composition.matrix_native_training.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_018
-from empirical_lawhood.api.domain_composition.matrix_native_training_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_019
-from empirical_lawhood.api.domain_composition.matrix_native_utility.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_020
-from empirical_lawhood.api.domain_composition.matrix_preparation_initialization.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_021
-from empirical_lawhood.api.domain_composition.matrix_prepared_retained_e3_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_022
-from empirical_lawhood.api.domain_composition.matrix_prepared_source.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_023
-from empirical_lawhood.api.domain_composition.matrix_prepared_source_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_024
-from empirical_lawhood.api.domain_composition.matrix_programme_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_025
-from empirical_lawhood.api.domain_composition.matrix_programme_e1.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_026
-from empirical_lawhood.api.domain_composition.matrix_programme_e1_allocation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_027
-from empirical_lawhood.api.domain_composition.matrix_programme_e2.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_028
-from empirical_lawhood.api.domain_composition.matrix_programme_inputs.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_029
-from empirical_lawhood.api.domain_composition.matrix_programme_output_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_030
-from empirical_lawhood.api.domain_composition.matrix_protected_factorial.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_031
-from empirical_lawhood.api.domain_composition.matrix_protected_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_032
-from empirical_lawhood.api.domain_composition.matrix_researcher_programme_v2.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_033
-from empirical_lawhood.api.domain_composition.matrix_retained_e3_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_034
-from empirical_lawhood.api.domain_composition.matrix_retained_training_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_035
-from empirical_lawhood.api.domain_composition.matrix_sci02.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_036
-from empirical_lawhood.api.domain_composition.matrix_sci02b.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_037
-from empirical_lawhood.api.domain_composition.matrix_sci02c.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_038
-from empirical_lawhood.api.domain_composition.matrix_sci02d.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_039
-from empirical_lawhood.api.domain_composition.matrix_selected_declarative.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_040
-from empirical_lawhood.api.domain_composition.matrix_selected_declarative_development.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_041
-from empirical_lawhood.api.domain_composition.matrix_selected_e3_e4.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_042
-from empirical_lawhood.api.domain_composition.matrix_selected_e4_component.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_043
-from empirical_lawhood.api.domain_composition.matrix_selected_e4_declarative.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_044
-from empirical_lawhood.api.domain_composition.matrix_selected_e4_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_045
-from empirical_lawhood.api.domain_composition.matrix_selected_e4_revision.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_046
-from empirical_lawhood.api.domain_composition.matrix_selected_e4_revision_acquisition.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_047
-from empirical_lawhood.api.domain_composition.model_free_matrix.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_048
-from empirical_lawhood.api.domain_composition.rubisco_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_049
+from empirical_lawhood.api.domain_composition.marked_event_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_003
+from empirical_lawhood.api.domain_composition.mass_balance_revision.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_004
+from empirical_lawhood.api.domain_composition.mass_balance_starter.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_005
+from empirical_lawhood.api.domain_composition.matrix_compact_factor_confirmation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_006
+from empirical_lawhood.api.domain_composition.matrix_configured_protected_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_007
+from empirical_lawhood.api.domain_composition.matrix_configured_protected_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_008
+from empirical_lawhood.api.domain_composition.matrix_continued_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_009
+from empirical_lawhood.api.domain_composition.matrix_curve_amended_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_010
+from empirical_lawhood.api.domain_composition.matrix_curve_amendment.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_011
+from empirical_lawhood.api.domain_composition.matrix_e3_cal_closeout.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_012
+from empirical_lawhood.api.domain_composition.matrix_finite_dt_retained_e3_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_013
+from empirical_lawhood.api.domain_composition.matrix_finite_dt_source.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_014
+from empirical_lawhood.api.domain_composition.matrix_finite_dt_source_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_015
+from empirical_lawhood.api.domain_composition.matrix_full_factor_development.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_016
+from empirical_lawhood.api.domain_composition.matrix_full_factor_protected.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_017
+from empirical_lawhood.api.domain_composition.matrix_history_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_018
+from empirical_lawhood.api.domain_composition.matrix_native_training.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_019
+from empirical_lawhood.api.domain_composition.matrix_native_training_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_020
+from empirical_lawhood.api.domain_composition.matrix_native_utility.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_021
+from empirical_lawhood.api.domain_composition.matrix_preparation_initialization.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_022
+from empirical_lawhood.api.domain_composition.matrix_prepared_retained_e3_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_023
+from empirical_lawhood.api.domain_composition.matrix_prepared_source.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_024
+from empirical_lawhood.api.domain_composition.matrix_prepared_source_assembly.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_025
+from empirical_lawhood.api.domain_composition.matrix_programme_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_026
+from empirical_lawhood.api.domain_composition.matrix_programme_e1.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_027
+from empirical_lawhood.api.domain_composition.matrix_programme_e1_allocation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_028
+from empirical_lawhood.api.domain_composition.matrix_programme_e2.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_029
+from empirical_lawhood.api.domain_composition.matrix_programme_inputs.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_030
+from empirical_lawhood.api.domain_composition.matrix_programme_output_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_031
+from empirical_lawhood.api.domain_composition.matrix_protected_factorial.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_032
+from empirical_lawhood.api.domain_composition.matrix_protected_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_033
+from empirical_lawhood.api.domain_composition.matrix_researcher_programme_v2.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_034
+from empirical_lawhood.api.domain_composition.matrix_retained_e3_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_035
+from empirical_lawhood.api.domain_composition.matrix_retained_training_continuation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_036
+from empirical_lawhood.api.domain_composition.matrix_sci02.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_037
+from empirical_lawhood.api.domain_composition.matrix_sci02b.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_038
+from empirical_lawhood.api.domain_composition.matrix_sci02c.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_039
+from empirical_lawhood.api.domain_composition.matrix_sci02d.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_040
+from empirical_lawhood.api.domain_composition.matrix_selected_declarative.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_041
+from empirical_lawhood.api.domain_composition.matrix_selected_declarative_development.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_042
+from empirical_lawhood.api.domain_composition.matrix_selected_e3_e4.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_043
+from empirical_lawhood.api.domain_composition.matrix_selected_e4_component.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_044
+from empirical_lawhood.api.domain_composition.matrix_selected_e4_declarative.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_045
+from empirical_lawhood.api.domain_composition.matrix_selected_e4_programme.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_046
+from empirical_lawhood.api.domain_composition.matrix_selected_e4_revision.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_047
+from empirical_lawhood.api.domain_composition.matrix_selected_e4_revision_acquisition.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_048
+from empirical_lawhood.api.domain_composition.model_free_matrix.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_049
+from empirical_lawhood.api.domain_composition.orientation_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_050
+from empirical_lawhood.api.domain_composition.path_thermodynamics.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_051
+from empirical_lawhood.api.domain_composition.projected_memory.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_052
+from empirical_lawhood.api.domain_composition.rubisco_response.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_053
+from empirical_lawhood.api.domain_composition.thermal_rc.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_054
+from empirical_lawhood.api.domain_composition.waveform_preparation.experiment_binding import EXPERIMENT_RUNTIME_BINDING as _runtime_binding_055
 
 EXPERIMENT_RUNTIME_BINDINGS = (
     _runtime_binding_000,
@@ -102,16 +108,27 @@ EXPERIMENT_RUNTIME_BINDINGS = (
     _runtime_binding_047,
     _runtime_binding_048,
     _runtime_binding_049,
+    _runtime_binding_050,
+    _runtime_binding_051,
+    _runtime_binding_052,
+    _runtime_binding_053,
+    _runtime_binding_054,
+    _runtime_binding_055,
 )
 
 EXPERIMENT_SPECIFICATION_PROTOCOLS = (
     ('empirical-lawhood/battery-diagnostic-obstruction/experiment-specification', '1.0.0', 'battery.diagnostic-obstruction.retained-reassessment'),
     ('empirical-lawhood/isolated-native-starter/specification', '1.0.0', 'isolated-native-starter.development'),
     ('empirical-lawhood/joint-description/specification', '1.0.0', 'joint-description.development'),
+    ('empirical-lawhood/marked-event-response/specification', '1.0.0', 'marked-event-response.numerical'),
     ('empirical-lawhood/mass-balance/specification', '1.0.0', 'mass-balance.development'),
     ('empirical-lawhood/mass-balance/forecast-upgrade-specification', '1.0.0', 'mass-balance.forecast-upgrade'),
     ('empirical-lawhood/matrix-classical-series/specification', '1.0.0', 'matrix-classical-series.development'),
     ('empirical-lawhood/matrix-model-free/specification', '1.0.0', 'matrix-model-free.development'),
+    ('empirical-lawhood/matrix-orientation-response/specification', '1.0.0', 'matrix-orientation-response.numerical'),
+    ('empirical-lawhood/matrix-path-thermodynamics/specification', '1.0.0', 'matrix-path-thermodynamics.numerical'),
+    ('empirical-lawhood/matrix-projected-memory/specification', '1.0.0', 'matrix-projected-memory.numerical'),
+    ('empirical-lawhood/waveform-preparation/specification', '1.0.0', 'matrix-waveform-preparation.population'),
     ('empirical-lawhood/matrix-sci02c/specification', '1.0.0', 'matrix.consumer-directed-prediction.h64'),
     ('empirical-lawhood/matrix-scheduled-programme/revision-experiment-specification', '1.0.0', 'matrix.e4.exposed-declared-revision'),
     ('empirical-lawhood/matrix-scheduled-programme/factorial-specification', '1.0.0', 'matrix.e4.exposed-factorial'),
@@ -164,4 +181,5 @@ EXPERIMENT_SPECIFICATION_PROTOCOLS = (
     ('empirical-lawhood/rubisco-response/initial-root-experiment-specification', '1.0.0', 'rubisco-initial-root-experiment-v1'),
     ('empirical-lawhood/rubisco-response/experiment-specification', '1.0.0', 'rubisco-response-experiment-v1'),
     ('empirical-lawhood/rubisco-kinetic-experiment/specification', '1.0.0', 'rubisco.kinetic-join.exposed'),
+    ('empirical-lawhood/thermal-rc/specification', '1.0.0', 'thermal-rc.numerical'),
 )

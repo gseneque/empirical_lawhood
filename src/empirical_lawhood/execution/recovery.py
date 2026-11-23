@@ -547,6 +547,11 @@ def build_run_recovery_index(
     )
 
 
+def task_receipt_relative_path(run_id: str, task_id: str, attempt_id: str) -> str:
+    """Physical receipt path shared by planning, recovery and storage."""
+    return f"runs/{run_id}/receipts/{task_id}/{attempt_id}.json"
+
+
 def _task_binding(
     task: ProtocolExecutionTask,
     *,
@@ -560,9 +565,8 @@ def _task_binding(
         RecoveryAttemptCandidate(
             attempt_id=f"{run_id}.{task.task_id}.attempt-{ordinal:03d}",
             ordinal=ordinal,
-            receipt_relative_path=(
-                f"runs/{run_id}/receipts/{task.task_id}/"
-                f"{run_id}.{task.task_id}.attempt-{ordinal:03d}.json"
+            receipt_relative_path=task_receipt_relative_path(
+                run_id, task.task_id, f"{run_id}.{task.task_id}.attempt-{ordinal:03d}"
             ),
             event_relative_path=(
                 f"{recovery_root}/events/{task.task_id}/attempt-{ordinal:03d}.json"

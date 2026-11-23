@@ -27,6 +27,10 @@ The re-authored studies have twenty original CPU results and two physical input 
 
 ## Shared interfaces and present limits
 
+The registered [orientation pilot](../../programmes/foundations/emergent-structure/workflows/matrix-orientation-response/guide.md), [matrix memory experiment](../../programmes/foundations/emergent-structure/workflows/matrix-projected-memory/guide.md) and [marked-event reference](../../programmes/foundations/measurement-and-response/workflows/marked-event-response/guide.md) share the recursive path-ensemble lifecycle. Each evaluation issues a forecast from a released observation before acquiring its reference futures. The matrix and quantum source owners define the physical preparations and receivers. The reusable statistics, linear-memory and marked-process methods implement the estimators.
+
+The path investigations share recursive preparation, acquisition, frozen development decisions, held-out assessment and an original-receipt reader. The circuit owns exact OU transitions and physical Gaussian reversal. The matrix instrument records native BAOAB substeps and measures the heat, boundary density, protocol work and direction evidence on their declared clocks. [Thermal circuit findings](../../programmes/foundations/measurement-and-response/records/thermal-rc-dissipation.md) · [Matrix instrument and cycle findings](../../programmes/foundations/emergent-structure/records/matrix-path-thermodynamics.md)
+
 | Responsibility | Current owner | Interpretation |
 | --- | --- | --- |
 | Scientific inputs and preparation | [Experiment preparation](../../src/empirical_lawhood/api/experiment_preparation.py), closed adapter declarations and typed configuration consumers | Select scientific records before effects. Discovery and preparation establish neither source availability nor scientific standing. |

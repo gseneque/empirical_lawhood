@@ -18,7 +18,7 @@ from empirical_lawhood.science.models.time import parse_utc_timestamp
 from empirical_lawhood.design.study_authoring import MaterializationQualificationReceipt, StudyDraft, SourceAccessDisposition
 from empirical_lawhood.design.approval import IssuedStudyApprovalProposal
 from empirical_lawhood.design.experiment_entry import ExperimentEntryPackage, StudyDefinition, ProposedStudyExtension, ProposedStudyExtensionSet, validate_experiment_entry
-from empirical_lawhood.design.study_issue import HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority, require_study_authority
+from empirical_lawhood.design.study_issue import HumanProposerAttestation, RetainedEvaluationProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority, require_study_authority
 
 from empirical_lawhood.storage.contracts.artifacts import ArtifactMaterialization, ArtifactProfile, ArtifactPublicationBinding, LogicalArtifactIdentity
 from empirical_lawhood.execution.candidate_compiler import CandidateAxisState, CandidateCompilationDisposition, CandidateCompilationReport, DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StudyCandidate, ExecutableStudyCandidate
@@ -85,7 +85,7 @@ class IssuedDraftManifest(CanonicalRecord):
     raw_draft: ObjectIdentity
     canonical_draft: ObjectIdentity
     source_closure: ImplementationSourceClosure
-    proposer_attestation: HumanProposerAttestation
+    proposer_attestation: HumanProposerAttestation | RetainedEvaluationProposerAttestation
     custody_authority: ObjectIdentity
     registry: CapabilityRegistry
     materialization_qualifications: tuple[MaterializationQualificationReceipt, ...]
@@ -345,7 +345,7 @@ class IssuedStudyManifest(CanonicalRecord):
     raw_authoring_package: ObjectIdentity
     canonical_authoring_package: ObjectIdentity
     source_closure: ImplementationSourceClosure
-    proposer_attestation: HumanProposerAttestation
+    proposer_attestation: HumanProposerAttestation | RetainedEvaluationProposerAttestation
     custody_authority: ObjectIdentity
     registry: CapabilityRegistry
     materialization_qualifications: tuple[MaterializationQualificationReceipt, ...]
@@ -358,7 +358,7 @@ class IssuedStudyManifest(CanonicalRecord):
 
     def __post_init__(self) -> None:
         if not isinstance(self, RetrospectiveIssuedBase):
-            if type(self.proposer_attestation) is not HumanProposerAttestation:
+            if type(self.proposer_attestation) not in (HumanProposerAttestation, RetainedEvaluationProposerAttestation):
                 raise ValueError("prospective issue requires its original attestation")
             if type(self.candidate) is not StudyCandidate:
                 raise ValueError(
@@ -577,12 +577,12 @@ class IssuedExecutableStudyManifest(CanonicalRecord):
     candidate: ExecutableStudyCandidate
     issued_extensions: IssuedExtensionSet
     extension_validation: StudyExtensionValidationReceipt
-    extension_proposer_attestation: HumanProposerAttestation
+    extension_proposer_attestation: HumanProposerAttestation | RetainedEvaluationProposerAttestation
     extension_custody_authority: ObjectIdentity
 
     def __post_init__(self) -> None:
         if not isinstance(self, RetrospectiveIssuedStudy):
-            if type(self.extension_proposer_attestation) is not HumanProposerAttestation:
+            if type(self.extension_proposer_attestation) not in (HumanProposerAttestation, RetainedEvaluationProposerAttestation):
                 raise ValueError("prospective issue requires its original attestation")
             if type(self.base) is not IssuedStudyManifest:
                 raise ValueError(
@@ -1216,7 +1216,7 @@ def prepare_draft_candidate_issue(
         (
             "proposer-attestation",
             f"{prefix}/proposer-attestation.json",
-            HumanProposerAttestation.SCHEMA,
+            proposer_attestation.SCHEMA,
             ArtifactProfile.CANONICAL_JSON,
             proposer_attestation.canonical_bytes(),
             proposer_attestation.fingerprint(),

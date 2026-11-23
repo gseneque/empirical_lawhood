@@ -24,6 +24,29 @@ from empirical_lawhood.execution.providers import CapabilityOutputSemanticContra
 from empirical_lawhood.storage.contracts.record_codecs import resolve_operation_output_codec
 from empirical_lawhood.execution.scientific_graph_preservation import _validate_execution_plan, _validate_run_plan
 
+def _retained_output_contract(manifest, output, output_codecs):
+    if output.profile is not ArtifactProfile.CANONICAL_JSON:
+        return CapabilityOutputSemanticContract.from_manifest(manifest,
+            payload_schema=output.payload_schema, profile=output.profile)
+    from empirical_lawhood.design.study_authoring import CapabilitySelection
+    record_type = resolve_operation_output_codec(output_codecs,
+        CapabilitySelection(manifest.capability_key, manifest.capability_version, manifest.implementation_sha256),
+        output.payload_schema, allow_unbound_unique=True)
+    return CapabilityOutputSemanticContract.from_manifest(manifest,
+        payload_schema=output.payload_schema, profile=output.profile, top_level_keys=('schema', 'value', 'version'),
+        value_keys=tuple(sorted(field.name for field in fields(record_type))), record_version=record_type.VERSION)
+
+
+def retained_task_output_registrations(package, task, output_codecs):
+    """Bind the complete sibling set of an authenticated task to the original producer."""
+    manifest = package.registry.resolve(task.capability.capability_key, task.capability.capability_version)
+    if manifest.implementation_sha256 != task.capability_implementation_sha256:
+        raise PermissionError('retained output capability differs from its issued implementation')
+    return tuple(_retained_output_contract(manifest, output, output_codecs).artifact_validation_registration(
+        logical_artifact_id=output.logical_artifact_id, task_id=task.task_id, output_id=output.output_id)
+        for output in task.outputs)
+
+
 def retained_output_artifact_plane(package, plan, writer, output_codecs):
     """Bind installed record shapes to the original stored output ownership.
 
@@ -35,18 +58,7 @@ def retained_output_artifact_plane(package, plan, writer, output_codecs):
     for task in plan.tasks:
         manifest = package.registry.resolve(task.capability.capability_key, task.capability.capability_version)
         for output in task.outputs:
-            if output.profile is not ArtifactProfile.CANONICAL_JSON:
-                contract = CapabilityOutputSemanticContract.from_manifest(manifest,
-                    payload_schema=output.payload_schema, profile=output.profile)
-            else:
-                from empirical_lawhood.design.study_authoring import CapabilitySelection
-                record_type = resolve_operation_output_codec(output_codecs,
-                    CapabilitySelection(manifest.capability_key, manifest.capability_version, manifest.implementation_sha256),
-                    output.payload_schema, allow_unbound_unique=True)
-                contract = CapabilityOutputSemanticContract.from_manifest(manifest,
-                    payload_schema=output.payload_schema, profile=output.profile,
-                    top_level_keys=('schema', 'value', 'version'),
-                    value_keys=tuple(sorted(field.name for field in fields(record_type))), record_version=record_type.VERSION)
+            contract = _retained_output_contract(manifest, output, output_codecs)
             if contracts.setdefault(contract.key, contract) != contract:
                 raise PermissionError('retained outputs disagree on one immutable semantic contract')
     return writer.with_semantic_validation_registry(capability_semantic_validation_registry(

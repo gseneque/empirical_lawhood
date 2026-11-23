@@ -60,13 +60,18 @@ def test_installation_roles_are_closed_unique_and_bounded():
 
 
 def test_every_workflow_has_a_standard_manifest_and_brian2_keeps_separate_numpy():
-    from empirical_lawhood.api.workflows import list_workflows
+    from empirical_lawhood.api.workflows import RetainedManifestInput, list_workflows
 
     for workflow in list_workflows():
         manifest = owner.workflow_installation(workflow.workflow_id)
         assert manifest["profile"]["declaration"]["workflow_id"] == workflow.workflow_id
-        assert manifest["profile"]["source_inputs"] == json.loads(json.dumps([
-            {"path": row.path, "role": row.role, "schema_id": row.schema_id} for row in workflow.inputs]))
+        expected_inputs = []
+        for row in workflow.inputs:
+            source = {"path": row.path, "role": row.role, "schema_id": row.schema_id}
+            if isinstance(row, RetainedManifestInput):
+                source.update(format_version=row.format_version, content_sha256=row.content_sha256)
+            expected_inputs.append(source)
+        assert manifest["profile"]["source_inputs"] == expected_inputs
     brian = owner.workflow_installation("neuron-current-response")
     assert brian["profile"]["declaration"]["workers"] == [
         {"role_id": "brian2", "environment_id": "brian2-worker", "selection": "explicit"}]

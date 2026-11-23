@@ -996,7 +996,9 @@ def create_cli_api(
         )
         handoff = load_integration_handoff(
             directory=authoring_dir, root=root, storage_profile=operator_storage_profile,
-            artifact_writer=ExternalArtifactPlane(GuardedExternalRoot(contract), integration_artifact_profile_validators(), artifact_verification=artifact_verification),
+            artifact_writer_for_family=lambda family: ExternalArtifactPlane(
+                GuardedExternalRoot(contract), integration_artifact_profile_validators(family),
+                artifact_verification=artifact_verification),
         )
         native_kwargs = integration_api_inputs(handoff)
     if dataset_projection_trust_path is None:

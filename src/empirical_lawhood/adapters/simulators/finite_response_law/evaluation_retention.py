@@ -24,6 +24,7 @@ class FiniteResponseLawEvaluationRetention(CanonicalRecord):
     SCHEMA: ClassVar[str] = (
         'empirical-lawhood/simulators/finite-response-law/finite-response-law-evaluation-retention'
     )
+    CLOSEOUT_SCHEMA: ClassVar[str] = "empirical-lawhood/document/json"
     source: FiniteResponseLawEvaluationConfig | FiniteResponseLawAssignedEvaluationConfig
     donor_run_id: str
     donor_closeout: ArtifactIdentity
@@ -36,7 +37,7 @@ class FiniteResponseLawEvaluationRetention(CanonicalRecord):
             FiniteResponseLawEvaluationConfig,
             FiniteResponseLawAssignedEvaluationConfig,
         ) or (
-            self.donor_closeout.payload_schema != 'empirical-lawhood/document/json'
+            self.donor_closeout.payload_schema != self.CLOSEOUT_SCHEMA
             or self.donor_closeout.media_type != "application/json"
             or self.donor_closeout.size_bytes <= 0
         ):
@@ -76,6 +77,10 @@ class FiniteResponseLawEvaluationRetention(CanonicalRecord):
     @property
     def config_id(self) -> str:
         return f"{self.source.spec_id}.retained-prefixes"
+
+    @property
+    def native_origins(self):
+        return self.prefixes
 
     def authenticate(
         self,

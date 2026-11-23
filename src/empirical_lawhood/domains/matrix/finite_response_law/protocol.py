@@ -13,7 +13,7 @@ from empirical_lawhood.execution.source_qualification import PredecessorBoundSou
 from empirical_lawhood.execution.protocol_helpers import capability_config_ref as _config_ref, protocol_outputs as _outputs
 from empirical_lawhood.domains.matrix.finite_response_law.extension import PROJECTION_CAPABILITY, EVALUATION_CAPABILITY
 from empirical_lawhood.domains.matrix.finite_response_law.native_records import FiniteResponseLawProjectionConfig, FiniteResponseLawNativeEvaluationConfig
-from empirical_lawhood.domains.matrix.finite_response_law.native_provider import EVALUATOR_TASK_ID
+from empirical_lawhood.domains.matrix.finite_response_law.native_provider import EVALUATOR_TASK_ID, NATIVE_ADJUDICATION_TASK_ID
 from empirical_lawhood.domains.matrix.finite_response_law.contracts import FiniteResponseLawNativeConfig, native_invocations
 from empirical_lawhood.adapters.simulators.finite_response_law.discovery import SOURCE_CAPABILITY
 from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
@@ -222,8 +222,26 @@ def native_protocol_steps(
                 else (f"custody.{stage.task_id}",),
             )
         )
+    if type(config) is FiniteResponseLawAssignedCalibrationConfig:
+        # The protected measurement and the formal verdict have different access
+        # classes. Each task publishes and receipts one homogeneous output set.
+        measurement_index = next(i for i, step in enumerate(steps) if step.step_id == EVALUATOR_TASK_ID)
+        original = steps[measurement_index]
+        outputs = _outputs((("evaluation", evaluation_type.SCHEMA), ("stage-envelope", LinkedCampaignStageEnvelope.SCHEMA)))
+        # Preserve the original combined 8 MiB envelope. The verdict binds a
+        # single receipt and its three input ports, without carrying any views.
+        verdict_bytes = 64 * 1024
+        measurement_bytes = original.resource_budget.output_bytes - verdict_bytes
+        steps[measurement_index] = replace(original, outputs=outputs,
+            resource_budget=replace(original.resource_budget, output_bytes=measurement_bytes),
+            obligation_ids=(f"finite-response-law.{config.stage}.measurement-census",))
+        steps.append(replace(original, step_id=NATIVE_ADJUDICATION_TASK_ID,
+            dependency_step_ids=(EVALUATOR_TASK_ID,),
+            outputs=_outputs((("evaluation", ScientificAdjudicationRecord.SCHEMA),)),
+            resource_budget=replace(original.resource_budget,
+                source_scan_bytes=len(evaluation.canonical_bytes()) + measurement_bytes, output_bytes=verdict_bytes)))
     if len(steps) != (
-        705
+        706
         if type(config) is FiniteResponseLawAssignedCalibrationConfig
         else 23
         if config.stage == "native-canary"

@@ -135,6 +135,25 @@ def test_operational_run_identity_retains_exact_packet_commitment(tmp_path):
     assert edited.config_id == packet.config_id
     assert application._packet_run_id(edited) != application._packet_run_id(packet)
 
+    from empirical_lawhood.science.records.serialization import MAX_RELATIVE_LOCATOR_SEGMENT_BYTES, validate_relative_locator
+    from empirical_lawhood.storage.task_receipts import ExternalTaskReceiptStore
+
+    named, compact, digest_only = application._packet_run_names(packet)
+    length = MAX_RELATIVE_LOCATOR_SEGMENT_BYTES - len(f"{named}..attempt-001.json.manifest.json")
+    step = SimpleNamespace(step_id="t" * length, maximum_attempts=1)
+    assert application._packet_run_id(packet, (step,)) == named
+    step.step_id += "x"
+    assert application._packet_run_id(packet, (step,)) == compact
+    validate_relative_locator(ExternalTaskReceiptStore._relative_path(compact, step.step_id,
+        f"{compact}.{step.step_id}.attempt-001") + ".manifest.json")
+    step.step_id = "t" * (MAX_RELATIVE_LOCATOR_SEGMENT_BYTES - len(f"{digest_only}..attempt-001.json.manifest.json"))
+    assert application._packet_run_id(packet, (step,)) == digest_only == packet.fingerprint()[:32]
+    validate_relative_locator(ExternalTaskReceiptStore._relative_path(digest_only, step.step_id,
+        f"{digest_only}.{step.step_id}.attempt-001") + ".manifest.json")
+    step.step_id += "x"
+    with pytest.raises(ValueError, match="task receipt exceeds"):
+        application._packet_run_id(packet, (step,))
+
 
 def test_changed_actual_source_refuses_before_parent_or_reconstruction(tmp_path, monkeypatch):
     from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind

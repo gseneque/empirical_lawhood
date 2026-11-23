@@ -19,7 +19,7 @@ from empirical_lawhood.storage.artifacts import ExternalArtifactPlane, GuardedEx
 from empirical_lawhood.design.study_issue import ImplementationSourceClosure, SourceClosureKind
 from empirical_lawhood.storage.contracts.artifacts import ExternalRootContract
 from empirical_lawhood.execution.operator_profile import OperatorStorageProfile, OperatorStorageAccessMode
-from empirical_lawhood.api.results import CompileCampaignRequest
+from empirical_lawhood.api.results import CompileCampaignRequest, CompileStudyRequest
 from tests.finite_response_rerun_fixtures import (
     publish_current_issue, publish_native_parent, publish_current_step_output,
     nominated_synthetic_native, qualify_nominated_fixture,
@@ -46,6 +46,32 @@ def finite_plane(tmp_path):
     )))
 
 
+def test_candidate_worker_reopens_registered_storage(finite_plane):
+    from multiprocessing.reduction import ForkingPickler
+    from empirical_lawhood.api.integration_artifact_profiles import integration_artifact_profile_validators
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent
+
+    validators = integration_artifact_profile_validators("finite-response-law")
+    plane = ExternalArtifactPlane(finite_plane.root, validators, maximum_parallel_verifications=2)
+    plane.root.verify(for_write=False)
+    receipt = ObjectIdentity.from_record("worker-software-allocation", _allocation("calibration", 202610080032))
+    lineage = ArtifactLineageParent(receipt, VisibilityCeiling.PROSPECTIVE, OutcomeAccess.OUTCOME_BLIND)
+    port = application._CurrentCandidatePort(plane, "worker-software-run", lineage, VisibilityCeiling.PROSPECTIVE)
+    restored = ForkingPickler.loads(ForkingPickler.dumps(port))
+    assert (restored.run_id, restored.parent, restored.visibility) == (port.run_id, port.parent, port.visibility)
+    assert restored.plane.root.contract == plane.root.contract
+    assert restored.plane.root.inspector is not plane.root.inspector
+    assert restored.plane._verification_preflight_lock is not plane._verification_preflight_lock
+    assert restored.plane.validators._hdf5_contracts == validators._hdf5_contracts
+    assert restored.plane.validators._implementation_hashes == validators._implementation_hashes
+    assert restored.plane.maximum_parallel_verifications == 2
+    assert restored.plane.custody_limits == plane.custody_limits
+    assert restored.plane.artifact_verification == plane.artifact_verification
+    with plane.verification_scope() as scoped, pytest.raises(TypeError, match="read scope"):
+        ForkingPickler.dumps(replace(port, plane=scoped))
+
+
 @pytest.fixture
 def nomination(tmp_path):
     directory = tmp_path / "authentic-pinned-nomination"
@@ -63,22 +89,26 @@ def _allocation(stage, master_seed):
 
 def test_published_control_authenticates_exact_bytes_and_enforces_selected_limits(finite_plane, monkeypatch):
     from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
-    from empirical_lawhood.storage.contracts.artifacts import ArtifactProfile, ArtifactWriteRequest
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, ArtifactWriteRequest
 
     record = _allocation("calibration", 202610080032)
     payload = record.canonical_bytes()
-    for run_id, visibility in (("software-control", VisibilityCeiling.PROSPECTIVE),
-                              ("software-development", VisibilityCeiling.DEVELOPMENT_ONLY)):
+    for run_id, visibility, access in (
+            ("software-control", VisibilityCeiling.PROSPECTIVE, OutcomeAccess.OUTCOME_BLIND),
+            ("software-visible", VisibilityCeiling.OUTCOME_VISIBLE, OutcomeAccess.EVALUATION_REVEALED),
+            ("software-development", VisibilityCeiling.DEVELOPMENT_ONLY, OutcomeAccess.DEVELOPMENT_VISIBLE)):
+        parent = ArtifactLineageParent(ObjectIdentity.from_record("issued.control.source", record), visibility, access)
         directory = f"runs/{run_id}/plans"
         finite_plane.write(ArtifactWriteRequest(f"allocation.{run_id}", f"{directory}/allocation.json", record.SCHEMA,
             ArtifactProfile.CANONICAL_JSON, "application/json", f"campaign-plans.{run_id}",
-            directory, payload, visibility, (), OutcomeAccess.OUTCOME_BLIND, minimum_free_bytes=1))
+            directory, payload, visibility, (visibility,), access, lineage_parents=(parent,), minimum_free_bytes=1))
 
     def read(limit, run_id="software-control", plane=finite_plane):
-        return application._published_current_control(plane, run_id, "allocation", type(record), limit)
+        value, _ = application._published_current_control(plane, run_id, "allocation", type(record), limit)
+        return value
 
     relative = "runs/software-control/plans/allocation.json"
-    assert read(None) == read(len(payload)) == record
+    assert read(None) == read(len(payload)) == read(None, "software-visible") == record
     with monkeypatch.context() as guarded:
         guarded.setattr(application, "read_verified_canonical_record",
             lambda *_args, **_kwargs: pytest.fail("a rejected control reached payload verification"))
@@ -167,8 +197,55 @@ def test_current_calibration32_neutral_public_handoff_without_issued_execution(n
     assert all(cell.maximum_attempts == 1 and cell.jit_cell_id is None for cell in handoff.resources.task_cells)
     assert not proof['scientific_execution_performed'] and not proof['runtime_authority_bound']
     parameters = integration_handoffs.integration_api_inputs(public)
+    from empirical_lawhood.adapters.simulators.finite_response_law.native_artifact import NATIVE_PAIR_SCHEMA
+
+    assert len(parameters['artifact_profile_validators'].hdf5_contract(NATIVE_PAIR_SCHEMA).objects) == 19
     assert parameters['executable_platform_ports'] == handoff.platform_ports
     assert parameters['study_bundle_registry'] == handoff.bundle.standard_context.base.registry
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+    from empirical_lawhood.api.current_result_custody import retained_task_output_registrations
+    from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+    from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnvelope
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry, capability_semantic_validation_registry
+    from types import SimpleNamespace
+
+    registry = parameters['study_bundle_registry']
+    provider = LayeredCampaignRuntimeProviderResolver(precomposed=CampaignRuntimeProviderRegistry(()),
+        factories=EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY).resolve(registry,
+        decoded_records=tuple(sorted(handoff.bundle.payloads, key=lambda value: value.SCHEMA)), platform_ports=handoff.platform_ports)
+    original = capability_semantic_validation_registry(registry_id='synthetic.original-output-contracts',
+        plan=handoff.projection, contracts=provider.output_semantic_contracts(registry, handoff.projection))
+    from empirical_lawhood.domains.matrix.finite_response_law.native_provider import EVALUATOR_TASK_ID, NATIVE_ADJUDICATION_TASK_ID
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.science.evidence.evidence import OutcomeAccess, VisibilityCeiling
+
+    tasks = {t.task_id: t for t in handoff.projection.tasks}
+    measurement, verdict = tasks[EVALUATOR_TASK_ID], tasks[NATIVE_ADJUDICATION_TASK_ID]
+    assert len(tasks) == 706 and sum(c.native_simulator_launch for c in handoff.resources.task_cells) == 640
+    assert verdict.dependency_task_ids == (measurement.task_id,)
+    assert {o.payload_schema for o in measurement.outputs} == {
+        application._current_result_types()['calibration-native'].SCHEMA, LinkedCampaignStageEnvelope.SCHEMA}
+    assert [o.payload_schema for o in verdict.outputs] == [ScientificAdjudicationRecord.SCHEMA]
+    assert {(o.visibility_ceiling, o.outcome_access) for o in measurement.outputs} == {
+        (VisibilityCeiling.PROSPECTIVE, OutcomeAccess.EVALUATOR_REVEAL)}
+    assert {(o.visibility_ceiling, o.outcome_access) for o in verdict.outputs} == {
+        (VisibilityCeiling.OUTCOME_VISIBLE, OutcomeAccess.EVALUATION_REVEALED)}
+    assert provider.scientific_adjudication_contract(registry, handoff.projection).output_id == verdict.outputs[0].output_id
+    codecs = {kind.SCHEMA: kind for kind in (*application._current_result_types().values(), LinkedCampaignStageEnvelope)}
+    recovered = tuple(r for task in (measurement, verdict)
+        for r in retained_task_output_registrations(SimpleNamespace(registry=registry), task, codecs))
+    declared = {o.logical_artifact_id for task in (measurement, verdict) for o in task.outputs}
+    assert {r.logical_artifact_id for r in recovered} == declared
+    assert set(recovered) == {r for r in original.registrations if r.logical_artifact_id in declared}
+    from empirical_lawhood.api.authoring_handoff import create_authoring_api
+
+    base_api = create_authoring_api(
+        repo_root=ROOT, candidate_context_provider=parameters["candidate_context_provider"],
+        candidate_capability_catalog=parameters["candidate_capability_catalog"],
+    )
+    standalone = base_api.compile_study(CompileStudyRequest(output / "base-authoring.json"))
+    assert standalone.succeeded, standalone.errors
+    assert standalone.payload.report.candidate.canonical_bytes() == (output / "base-candidate.json").read_bytes()
 
 
 def test_full_calibration_public_authoring_and_installed_provider_resource_proof(nomination, finite_plane, tmp_path, monkeypatch, capsys):

@@ -12,6 +12,7 @@ from pathlib import Path, PurePosixPath
 import stat
 
 
+CHECKOUT_GIT_TIMEOUT_SECONDS = 60
 LOCAL_PLAN_NAME = "WTF.md"
 # Operational instructions and implementation/audit ledgers are local data,
 # never supported researcher inputs. Keep this inventory explicit so a newly

@@ -89,6 +89,10 @@ class FiniteResponseLawCurrentExposure(CanonicalRecord):
     excluded_unit_ids: tuple[str, ...]
     excluded_seed_ids: tuple[str, ...]
 
+    @property
+    def identity(self) -> ObjectIdentity:
+        return ObjectIdentity.from_record(self.census_id, self)
+
     def __post_init__(self) -> None:
         validate_stable_id(self.census_id)
         for name in ('excluded_unit_ids', 'excluded_seed_ids'):

@@ -3641,65 +3641,9 @@ class CampaignExecutionService:
         for completed, plan in enumerate((source_plan, execution_plan), start=1):
             report_progress(phase="execution.plan-validation", done=completed, total=2)
         run_id = execution_plan.source_plan.object_id
-        package_parents = self._package_lineage_parents(package)
-        package_visibility = VisibilityCeiling.most_restrictive(
-            *(parent.visibility_ceiling for parent in package_parents)
-        )
-        package_access = self._most_restrictive_access(package_parents)
-        package_identity = ObjectIdentity.from_record(package.package_id, package)
-        package_parent = ArtifactLineageParent(
-            identity=package_identity,
-            visibility_ceiling=package_visibility,
-            outcome_access=package_access,
-        )
-        source_identity = ObjectIdentity.from_record(run_id, source_plan)
-        source_parent = ArtifactLineageParent(
-            identity=source_identity,
-            visibility_ceiling=package_visibility,
-            outcome_access=package_access,
-        )
-        provider_reconstruction_parents = (
-            tuple(
-                sorted(
-                    (
-                        package_parent,
-                        ArtifactLineageParent(
-                            identity=provider_reconstruction.payload_replay_set,
-                            visibility_ceiling=VisibilityCeiling.PROSPECTIVE,
-                            outcome_access=OutcomeAccess.OUTCOME_BLIND,
-                        ),
-                    ),
-                    key=lineage_parent_sort_key,
-                )
-            )
-            if provider_reconstruction is not None
-            else ()
-        )
-        values = (
-            (package_name, package, package_parents),
-            (source_plan_name, source_plan, (package_parent,)),
-            (
-                "execution-plan",
-                execution_plan,
-                tuple(
-                    sorted(
-                        (package_parent, source_parent),
-                        key=lineage_parent_sort_key,
-                    )
-                ),
-            ),
-            *(
-                (
-                    (
-                        "provider-reconstruction",
-                        provider_reconstruction,
-                        provider_reconstruction_parents,
-                    ),
-                )
-                if provider_reconstruction is not None
-                else ()
-            ),
-        )
+        values = self._plan_control_records(package, source_plan, execution_plan,
+            package_name=package_name, source_plan_name=source_plan_name,
+            provider_reconstruction=provider_reconstruction)
         report_progress(phase="execution.plan-publication", done=0, total=len(values))
         for completed, (name, value, parents) in enumerate(values, start=1):
             require_original()
@@ -3737,6 +3681,71 @@ class CampaignExecutionService:
             )
             require_original()
             report_progress(phase="execution.plan-publication", done=completed, total=len(values))
+
+    @classmethod
+    def _plan_control_records(cls, package, source_plan, execution_plan, *,
+            package_name="campaign-package", source_plan_name="run-plan", provider_reconstruction=None):
+        """Return each persisted control with the exact lineage used by the publisher."""
+        run_id = execution_plan.source_plan.object_id
+        package_parents = cls._package_lineage_parents(package)
+        package_visibility = VisibilityCeiling.most_restrictive(
+            *(parent.visibility_ceiling for parent in package_parents)
+        )
+        package_access = cls._most_restrictive_access(package_parents)
+        package_identity = ObjectIdentity.from_record(package.package_id, package)
+        package_parent = ArtifactLineageParent(
+            identity=package_identity,
+            visibility_ceiling=package_visibility,
+            outcome_access=package_access,
+        )
+        source_identity = ObjectIdentity.from_record(run_id, source_plan)
+        source_parent = ArtifactLineageParent(
+            identity=source_identity,
+            visibility_ceiling=package_visibility,
+            outcome_access=package_access,
+        )
+        provider_reconstruction_parents = (
+            tuple(
+                sorted(
+                    (
+                        package_parent,
+                        ArtifactLineageParent(
+                            identity=provider_reconstruction.payload_replay_set,
+                            visibility_ceiling=VisibilityCeiling.PROSPECTIVE,
+                            outcome_access=OutcomeAccess.OUTCOME_BLIND,
+                        ),
+                    ),
+                    key=lineage_parent_sort_key,
+                )
+            )
+            if provider_reconstruction is not None
+            else ()
+        )
+        return (
+            (package_name, package, package_parents),
+            (source_plan_name, source_plan, (package_parent,)),
+            (
+                "execution-plan",
+                execution_plan,
+                tuple(
+                    sorted(
+                        (package_parent, source_parent),
+                        key=lineage_parent_sort_key,
+                    )
+                ),
+            ),
+            *(
+                (
+                    (
+                        "provider-reconstruction",
+                        provider_reconstruction,
+                        provider_reconstruction_parents,
+                    ),
+                )
+                if provider_reconstruction is not None
+                else ()
+            ),
+        )
 
     @staticmethod
     def _record_id(value: CanonicalRecord) -> str:

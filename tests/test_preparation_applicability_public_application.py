@@ -124,6 +124,22 @@ def _author_load_prove(application,selection,plane,constructed):
     public_proof=prove_integration_handoff(public)
     assert prove_integration_handoff(public)==public_proof
     assert public.selected.projection==handoff.projection
+    from empirical_lawhood.execution.providers import capability_semantic_validation_registry
+    from empirical_lawhood.adapters.composition.generated_executable_bindings import EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY
+    from empirical_lawhood.execution.executable_bindings import LayeredCampaignRuntimeProviderResolver
+    from empirical_lawhood.execution.providers import CampaignRuntimeProviderRegistry
+
+    registry = handoff.bundle.standard_context.base.registry
+    provider = LayeredCampaignRuntimeProviderResolver(
+        precomposed=CampaignRuntimeProviderRegistry(()), factories=EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY,
+    ).resolve(registry, decoded_records=tuple(sorted(handoff.bundle.payloads, key=lambda item: item.SCHEMA)),
+              platform_ports=handoff.platform_ports)
+    expected_semantics = capability_semantic_validation_registry(
+        registry_id=f"execution-semantics.{handoff.projection.execution_plan_id}",
+        plan=handoff.projection, contracts=provider.output_semantic_contracts(registry),
+    )
+    custody = next(port.port for port in handoff.platform_ports if port.port_key.endswith("-method-custody"))
+    assert custody.semantics == expected_semantics
     assert public_proof["task_count"]==proof["task_count"]
     assert public_proof["scientific_execution_performed"] is False
     public_inputs=integration_api_inputs(public)

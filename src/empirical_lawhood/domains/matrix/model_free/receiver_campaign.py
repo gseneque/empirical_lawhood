@@ -73,7 +73,8 @@ def normalise_receiver_study(value, base):
         implementation = owner(module)
         defaults = implementation.DEFAULTS[module]
         choices = value.get(module, {})
-        if type(choices) is not dict or set(choices) - set(defaults):
+        optional = {"handoff_clocks"} if module == "M7" else set()
+        if type(choices) is not dict or set(choices) - set(defaults) - optional:
             raise ValueError(f"Unknown {module} receiver-study selection")
         selection = deepcopy(defaults)
         selection.update(deepcopy(choices))

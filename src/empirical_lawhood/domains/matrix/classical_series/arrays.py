@@ -5,6 +5,7 @@ JSON retains scientific names and small scalar metadata. Numerical list values
 are retained as exact binary arrays in bounded NPZ leaves within one streamed
 container. Root population size is not a transport limit.
 """
+import base64
 from dataclasses import replace
 from hashlib import sha256
 from math import prod
@@ -22,17 +23,27 @@ _ARRAY = "__classical_matrix_array__"
 _LEAF_ELEMENTS = 500_000  # Buffer policy; every complete array is split, never truncated.
 
 
-def encode_acquisition(product, *, artifact_id, allow_empty=False):
+def encode_acquisition(product, *, artifact_id, allow_empty=False, base64_float_fields=()):
     """Separate array bytes without changing any native numeric value or shape."""
     if product.array_manifest is not None:
         raise ValueError("acquisition arrays have already been encoded")
     values = {}
 
-    def visit(value):
+    def visit(value, field=None):
+        if field in base64_float_fields and isinstance(value, str) and value:
+            raw = base64.b64decode(value, validate=True)
+            if len(raw) % 8 or base64.b64encode(raw).decode("ascii") != value:
+                raise ValueError("Native float field must use canonical little-endian array bytes")
+            array = np.frombuffer(raw, dtype="<f8")
+            if not np.isfinite(array).all():
+                raise ValueError("Nonfinite native array field")
+            name = "array." + str(len(values)).zfill(8)
+            values[name] = array
+            return {_ARRAY: name, "shape": [len(array)], "dtype": "<f8", "encoding": "base64"}
         if isinstance(value, dict):
             if _ARRAY in value:
                 raise ValueError("native metadata uses a reserved physical array marker")
-            return {key: visit(item) for key, item in value.items()}
+            return {key: visit(item, key) for key, item in value.items()}
         if isinstance(value, list):
             try:
                 array = np.asarray(value)
@@ -95,7 +106,9 @@ def decode_acquisition(product, reader):
     def visit(value):
         if isinstance(value, dict):
             if _ARRAY in value:
-                if set(value) != {_ARRAY, "shape", "dtype"}:
+                base64_encoded = value.get("encoding") == "base64"
+                fields = {_ARRAY, "shape", "dtype"}
+                if set(value) != (fields | {"encoding"} if base64_encoded else fields):
                     raise ValueError("native array layout adds undeclared interpretation")
                 name = value[_ARRAY]
                 if name not in values or name in seen:
@@ -106,6 +119,10 @@ def decode_acquisition(product, reader):
                 if (not isinstance(shape, list) or any(type(n) is not int or n < 0 for n in shape)
                         or prod(shape) != array.size or value["dtype"] != array.dtype.str):
                     raise ValueError("native array metadata changes shape or exact numerical dtype")
+                if base64_encoded:
+                    if shape != [array.size] or array.dtype.str != "<f8":
+                        raise ValueError("Native base64 array changed its original byte representation")
+                    return base64.b64encode(array.tobytes(order="C")).decode("ascii")
                 return array.reshape(tuple(shape)).tolist()
             return {key: visit(item) for key, item in value.items()}
         if isinstance(value, list):

@@ -5,7 +5,12 @@ SPDX-License-Identifier: MPL-2.0
 
 from __future__ import annotations
 
-from empirical_lawhood.execution.workflow_descriptors import Workflow as Workflow, WorkflowInput as WorkflowInput, WorkflowOperation as WorkflowOperation
+from empirical_lawhood.execution.workflow_descriptors import (
+    RetainedManifestInput as RetainedManifestInput,
+    Workflow as Workflow,
+    WorkflowInput as WorkflowInput,
+    WorkflowOperation as WorkflowOperation,
+)
 from empirical_lawhood.adapters.composition.generated_workflows import WORKFLOW_DECLARATIONS
 
 

@@ -68,7 +68,7 @@ Use a disjoint proposed allocation to check full-size authoring and proof.
 Keep every existing exclusion in the exposure census.
 
 The proof reconstructs installed factories, output contracts, the graph and resource bounds with zero scientific task execution.
-Select the same directory through global `--authoring-dir` for later lifecycle operations.
+Select the same directory through global `--authoring-dir` for later lifecycle operations. Standalone compilation and issue of the base use the handoff’s expanded native task roster and reproduce the saved base candidate. Calibration and evaluation use the registered paired HDF5 layout for both numerical views, including bounded checkpoints and interval traces. If a receipt filename would exceed the filesystem limit, preparation chooses a shorter run name bound to the same packet digest. Use the run ID returned by preparation.
 See [the shared lifecycle](../../../../../docs/using/paper-study-workflows.md) and [CLI reference](../../../../../docs/reference/cli.md).
 
 Allow time for full-size authoring and proof even though they execute no native task.
@@ -96,9 +96,35 @@ for the complete suite and its retained timing logs.
 
 After actual issue, `campaign finite-response-bind-runtime --authoring-dir DIR --context FILE` binds an operator-selected current runtime context. The context references actual current execution/reveal authorities and creates neither. Missing authority refuses before task execution. Current source identities must match the selected committed checkout.
 
+### Continue an issued evaluation after all parent joins failed
+
+Use the original issued evaluation packet and calibration parent. Include its assigned roots and seeds in the current exposure census. EL derives a distinct continuation run name and preserves the original design-exposure ledger. Run `campaign finite-response-author` with the current parent and `--retained-evaluation-ids RUN ISSUE EXECUTION REVEAL`. Supply the four IDs from the failed original publication.
+
+EL checks the terminal dispositions for the complete assignment. Each of the 64 roots must have its successful prefix, forecast, request, choice lock and measured parent. Each parent join must have failed before any child assay acquired data. The new issue imports the 320 successful publications. Its parent joins use the original parent receipt and six original durable policy commitments. Only the 1,152 future assays consume native acquisition tokens.
+
+The retained-evaluation proposer declaration binds the original issue, original blind assignment, failed terminal and retained input selection. It records the current exposure of these roots and the absence of observed child outcomes. Complete the usual integration proof, issue, execute and read the current native, cohort and adjudication results. Count the original parent work once across the two issues.
+
 ## Current results, parent joins and recovery
 
-`campaign finite-response-result` takes the actual current run, issued-study, execution/reveal authority, task and exact receipt IDs, a closed `--result-kind`, and a new output path. It authenticates the complete sibling publication before reading the selected scientific outcome. Kinds include native calibration, qualification, sealed closeout, authorized root reveal/readout, cohort and terminal adjudication. The bounded CLI readout preserves the complete assigned-root census, numerical/decline/cancellation dispositions and relevant q/statistical fields, with the exact custody path, hash, size and receipt of the full scientific payload. The new output file retains its authenticated selector; the complete payload stays in guarded custody. An optional development attempt retains the bounded readout without copying multi-megabyte native arrays into its report.
+An assigned 32-root calibration has 640 native acquisitions and 64 root/view projections. One evaluator publishes the protected measurement and its stage envelope. A second evaluator reads that receipt and publishes the scientific adjudication. The standard run has 706 tasks, 2,051 outputs and 640 native execution tokens.
+
+The earlier 705-task workflow could finish every acquisition and projection, then refuse to publish its combined measurement and adjudication. To complete such a run, select its original calibration configuration, frozen nomination and a current exposure census that includes the acquired roots and seeds. Use the four IDs from the issued run and its grants.
+
+```bash
+uv run --no-sync empirical-lawhood --project-root "$PROJECT_ROOT" \
+  --operator-profile "$OPERATOR_PROFILE" campaign finite-response-author \
+  --config "$CALIBRATION_CONFIG" --exposure "$CURRENT_EXPOSURE" \
+  --nomination-directory "$NOMINATION_DIRECTORY" --output-dir "$NEW_COMPLETION_DIRECTORY" \
+  --retained-calibration-ids "$RUN_ID" "$ISSUED_STUDY_ID" "$EXECUTION_AUTHORITY_ID" "$REVEAL_AUTHORITY_ID"
+```
+
+The command checks the original terminal, 704 successful receipts and both members of each projection. It writes a new three-task candidate that freezes, aggregates and adjudicates those measurements. Issue it under its own run and grants. The original failed terminal retains its identity and cost. A completed calibration supplies measurements to the separate qualification step. [Issued integration workflow](../../../../../docs/reference/workflows.md)
+
+`campaign finite-response-result` takes the actual current run, issued-study, execution/reveal authority, task and exact receipt IDs, a closed `--result-kind`, and a new output path. It authenticates the complete sibling publication before reading the selected scientific outcome. Select `calibration-native` for the 32 calibration roots or `evaluation-native` for the assigned 64-root comparison. Other kinds cover qualification, sealed closeout, authorized root reveal and readout, cohort and terminal adjudication. The bounded CLI readout preserves the complete assigned-root census, numerical, decline and cancellation dispositions and relevant q and statistical fields, with the exact custody path, hash, size and receipt of the full scientific payload. The new output file retains its authenticated selector. The complete payload stays in guarded custody.
+
+After reveal, select the evaluation-native result, a root's sealed closeout and root reveal, and the qualification result that its forecast names. Read their typed records with `read_finite_response_current_result`. The calibration-method handoff supplies the candidate-payload port for the published lower law. Pass that lower payload, the qualification, the two ordered native views for the root, and the paired closeout and reveal to `revealed_handoff_errors`. Each of its 128 rows reports the sealed prediction, the prediction at the observed handoff, the native measurement, and the available signed differences. Keep the root as the independent unit. [Handoff-error readout](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/handoff_error.py)
+
+The forecast also retains the requested word, qualification view, mean, calibrated half-width and numerical allowance for every table entry. For a committed choice, match its word to the two entries and pass each result to `finite_bound_operands` with the original response coordinates. Its bounds record the limits used by the certificate and expose `expanded_interval`. Keep the native unit, the preservation coordinate's physical lower limit of zero, and the actual measurements for both futures when reporting coverage. [Finite admission operands](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/consumer.py)
 
 `campaign finite-response-parent` joins the selected authenticated native result, and where required the qualification result, into the exact current next-stage parent. Use that parent to prepare calibration-method or evaluation packets. Native and qualification runs can have separate current issued publications; both grants and receipts must authenticate. Exposed-development parents cannot authorize new prospective evaluation.
 
@@ -434,6 +460,12 @@ while keeping absent terminal adjudication absent. Authenticate the exact source
 receipts, revealed operands and analysis authority before entry. Any continuation
 repair, retry census and cumulative elapsed accounting require their own runtime
 proofs. These arithmetic functions do not perform those acts.
+
+After authorized reveal, the [handoff-error readout](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/handoff_error.py)
+compares the sealed composed point prediction, the same qualified F at the observed primary handoff
+at tick 4368, and the native signed or preservation endpoint at tick 4560. It returns the two signed
+contributions and their total in each output's original units for every word pair, future and view.
+The original masks preserve missing handoffs, incomplete signed delivery and missing HOLD controls.
 
 The [retained feature assembler](../../../../../src/empirical_lawhood/domains/matrix/finite_response_law/retained_features.py)
 keeps the original 16 retained prepared and 32 information-response roots, each with five parent payloads and two

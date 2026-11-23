@@ -1,0 +1,49 @@
+{
+  "schema": "matrix-projected-memory.definition.v1",
+  "first_root": 532611230,
+  "development_roots": 112,
+  "evaluation_roots": 128,
+  "batch_size": 8,
+  "parameters": {
+    "burn_cycles": 4,
+    "cycle_ticks": 512,
+    "rise_ticks": 128,
+    "timestep": "0.001",
+    "alpha_x": "0.6666666666666666666666666667",
+    "alpha_y": "7.333333333333333333333333334",
+    "jitter": "0.03",
+    "amplitude": "1",
+    "tapes": 4,
+    "oracle_tapes": 16,
+    "margin": "0.01",
+    "ridge": [
+      "0.1",
+      "1",
+      "10"
+    ],
+    "level_margin": "0.05",
+    "joint_margin": "0.05",
+    "coverage_floor": "0.80",
+    "predictive_draws": 16,
+    "lags": [
+      0,
+      1,
+      4,
+      8,
+      16
+    ],
+    "kernel_lengths": [
+      1,
+      4,
+      8,
+      16,
+      128
+    ],
+    "splits": {
+      "development": 16,
+      "train": 64,
+      "select": 16,
+      "calibrate": 16
+    }
+  }
+}

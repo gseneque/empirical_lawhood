@@ -223,7 +223,7 @@ def register_integration_commands(campaign_app: typer.Typer) -> None:
         reveal_authority_id: Annotated[str, typer.Option('--reveal-authority-id')],
         task_id: Annotated[str, typer.Option('--task-id')],
         receipt_id: Annotated[str, typer.Option('--receipt-id')],
-        result_kind: Annotated[str, typer.Option('--result-kind', help='calibration-native, qualification, closeout, root-reveal, root-inference, cohort or terminal')],
+        result_kind: Annotated[str, typer.Option('--result-kind', help='calibration-native, evaluation-native, qualification, closeout, root-reveal, root-inference, cohort or terminal')],
         config_id: Annotated[str, typer.Option('--config-id')],
         output: Annotated[Path, typer.Option('--output', help='New authenticated current result input.')],
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
@@ -420,18 +420,35 @@ def register_integration_commands(campaign_app: typer.Typer) -> None:
         nomination_directory: Annotated[Path, typer.Option('--nomination-directory', exists=True, file_okay=False)],
         output_dir: Annotated[Path, typer.Option('--output-dir')],
         parent: Annotated[Path | None, typer.Option('--parent', help='Exact current parent publications, receipts and reveal authority.')] = None,
+        retained_calibration: Annotated[Path | None, typer.Option('--retained-calibration', exists=True, dir_okay=False,
+            help='Original issued calibration publication for nonacquiring completion of all retained views.')] = None,
+        retained_calibration_ids: Annotated[tuple[str, str, str, str] | None, typer.Option('--retained-calibration-ids',
+            metavar='RUN ISSUE EXECUTION REVEAL', help='Select the original calibration by its run, issued study and both grant IDs.')] = None,
+        retained_evaluation_ids: Annotated[tuple[str, str, str, str] | None, typer.Option('--retained-evaluation-ids',
+            metavar='RUN ISSUE EXECUTION REVEAL', help='Retain every original sealed choice and measured parent from a terminal evaluation.')] = None,
         attempt_dir: Annotated[Path | None, ATTEMPT_DIRECTORY_OPTION] = None,
     ) -> None:
         """Compile one current calibration, qualification or prospective evaluation act."""
-        from empirical_lawhood.api.finite_rerun_authoring import author_finite_response_rerun
+        from empirical_lawhood.api.finite_rerun_authoring import author_finite_response_rerun, current_publication_from_ids
+        from empirical_lawhood.api.codecs import load_registered_authoring
+        from empirical_lawhood.domains.matrix.finite_response_law.authoring.rerun_input import FiniteResponseLawCurrentPublication
         try:
             root, _, plane = _storage()
             packet = _configuration(config, 'finite-rerun')
             census = _configuration(exposure, 'finite-current-exposure')
             current_parent = None if parent is None else _configuration(parent, 'finite-current-parent')
+            if retained_calibration is not None and retained_calibration_ids:
+                raise ValueError('Select the original calibration once, by its publication or its four identifiers')
+            original = None if retained_calibration is None else load_registered_authoring(
+                _selected_input(retained_calibration, maximum_bytes=16384),
+                root_schemas={FiniteResponseLawCurrentPublication.SCHEMA: FiniteResponseLawCurrentPublication})
+            if retained_calibration_ids:
+                original = current_publication_from_ids(*retained_calibration_ids, artifact_writer=plane)
             destination = _destination(output_dir, plane)
             attempt_stage('current_candidate_compilation', native_contact='none')
-            report = author_finite_response_rerun(root=root, packet=packet, exposure=census, nomination_directory=nomination_directory, output_dir=destination, artifact_writer=plane, parent=current_parent)
+            report = author_finite_response_rerun(root=root, packet=packet, exposure=census, nomination_directory=nomination_directory,
+                output_dir=destination, artifact_writer=plane, parent=current_parent, retained_calibration=original,
+                retained_evaluation=current_publication_from_ids(*retained_evaluation_ids, artifact_writer=plane) if retained_evaluation_ids else None)
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             _error(error)
         _report(report)

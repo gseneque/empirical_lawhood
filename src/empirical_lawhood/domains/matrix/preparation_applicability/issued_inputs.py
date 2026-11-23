@@ -92,15 +92,17 @@ class PreparationApplicabilityPublishedInput(CanonicalRecord):
               or self.receipt_manifest.materialization.size_bytes != len(self.receipt.canonical_bytes())):
             raise ValueError("imported original F/exposure needs its separate committed import receipt")
 
-    def authenticate(self, writer: ArtifactWriter, receipt_store, *, result_access_authenticator=None) -> None:
+    def authenticate(self, writer: ArtifactWriter, receipt_store, *, result_access_authenticator=None, result_writer=None) -> None:
         if self.key == "qualification":
             if result_access_authenticator is None:
                 raise PermissionError("current Q publication requires actual issued run and reveal validation")
-            result_access_authenticator(context=self.result_access, receipt=self.receipt,
+            plan = result_access_authenticator(context=self.result_access, receipt=self.receipt,
                 logical=self.manifest.logical, writer=writer)
             retained = receipt_store.read_by_receipt_id(self.receipt.run_id, self.receipt.task_id, self.receipt.receipt_id)
             if retained != self.receipt:
                 raise ValueError("current Q receipt is absent or differs from committed custody")
+            if result_writer is not None:
+                writer = result_writer(writer, plan, self.manifest.logical)
         else:
             writer.verify_manifest(self.receipt_manifest)
         writer.verify_manifest(self.manifest)

@@ -64,9 +64,9 @@ from empirical_lawhood.design.prospective import NominationObligations, Prospect
 from empirical_lawhood.design.study_authoring import StudyDraft
 from empirical_lawhood.design.study_bundles import StudyBundleSpec
 from empirical_lawhood.design.multi_world_study import ArchiveOutcomeProtectionPlan, ArchiveToSimulatorPartialMorphismSpec, MultiWorldJointAdjudicationPlan, MultiWorldOutcomeBarrierPlan, MultiWorldStudyChildScientificBinding
-from empirical_lawhood.design.study_issue import HumanProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority
+from empirical_lawhood.design.study_issue import HumanProposerAttestation, RetainedEvaluationProposerAttestation, RetrospectiveProposerAttestation, ImplementationSourceClosure, StudyAuthorityKind, StudyOperationAuthority
 from empirical_lawhood.execution.candidate_compiler import AuthoringMaterializationIdentity, CandidateCompilationContext, CandidateCompilationDisposition, CandidateDiagnostic, CandidateDiagnosticClass, CandidateDiagnosticCode, CandidateScientificGraph, ContentIdentityPolicy, DraftStudyCandidate, StudyCompilationReport, ExecutableStudyCompilationReport, StandardCandidateCompilationContext, StudyCandidate, ExecutableStudyCandidate, bind_standard_candidate_compilation_report, compile_study_candidate
-from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog, CandidateContextProvider
+from empirical_lawhood.execution.candidate_composition import CandidateCapabilityCatalog, CandidateContextProvider, StandardCandidateContextResolution
 from empirical_lawhood.execution.extension_bundles import GeneratedExtensionBundleAggregate
 from empirical_lawhood.execution.capabilities import CapabilityKind, CapabilityRegistry
 from empirical_lawhood.execution.study_bundle_compiler import StudyBundleCandidate, StudyBundleCompilationDisposition, StudyBundleCompilationInput, StudyBundleCompilationReport, compile_study_bundle
@@ -2322,6 +2322,17 @@ class EmpiricalLawhoodApi:
             parent_record=parent_record,
         )
 
+    def _standalone_study_resolution(
+        self, provider: CandidateContextProvider, package: StudyDefinition,
+    ) -> StandardCandidateContextResolution:
+        """Resolve the reviewed protocol when its base is supplied on its own."""
+        resolve = getattr(provider, "resolve_materialized_base", None)
+        if resolve is not None:
+            factories = self._executable_factory_registry
+            if factories is not None:
+                return resolve(package, factories=factories)
+        return provider.resolve_standard(package)
+
     def compile_study(
         self,
         request: CompileStudyRequest,
@@ -2349,7 +2360,7 @@ class EmpiricalLawhoodApi:
             if not isinstance(loaded.record, StudyDefinition):
                 raise AuthoringCodecError("candidate compile requires a ProgrammeAuthoringPackage")
             readiness_diagnostics: tuple[CandidateDiagnostic, ...] = ()
-            resolution = provider.resolve_standard(loaded.record)
+            resolution = self._standalone_study_resolution(provider, loaded.record)
             context = resolution.context
             readiness_diagnostics = resolution.diagnostics
             report = compile_study_candidate(
@@ -3200,6 +3211,7 @@ class EmpiricalLawhoodApi:
                 request.proposer_attestation_path,
                 root_schemas={
                     HumanProposerAttestation.SCHEMA: HumanProposerAttestation,
+                    RetainedEvaluationProposerAttestation.SCHEMA: RetainedEvaluationProposerAttestation,
                     RetrospectiveProposerAttestation.SCHEMA: RetrospectiveProposerAttestation,
                 },
             )
@@ -3215,6 +3227,9 @@ class EmpiricalLawhoodApi:
                     StudyOperationAuthority.SCHEMA: StudyOperationAuthority,
                 },
             )
+            if isinstance(expected_candidate, StudyCandidate):
+                from empirical_lawhood.api.finite_evaluation_continuation import require_evaluation_attestation
+                require_evaluation_attestation(expected_candidate, attestation, publisher)
             if not isinstance(attestation, HumanProposerAttestation):
                 raise AuthoringCodecError("programme issue requires a HumanProposerAttestation")
             if not isinstance(expected_candidate, StudyCandidate):
@@ -3226,7 +3241,7 @@ class EmpiricalLawhoodApi:
             if not isinstance(custody_authority, StudyOperationAuthority):
                 raise AuthoringCodecError("programme issue requires a ProgrammeOperationAuthority")
             readiness_diagnostics: tuple[CandidateDiagnostic, ...] = ()
-            resolution = provider.resolve_standard(loaded.record)
+            resolution = self._standalone_study_resolution(provider, loaded.record)
             context = resolution.context
             readiness_diagnostics = (*resolution.diagnostics, *resolution.issue_diagnostics)
             report = compile_study_candidate(
@@ -3428,6 +3443,7 @@ class EmpiricalLawhoodApi:
                 request.extension_proposer_attestation_path,
                 root_schemas={
                     HumanProposerAttestation.SCHEMA: HumanProposerAttestation,
+                    RetainedEvaluationProposerAttestation.SCHEMA: RetainedEvaluationProposerAttestation,
                     RetrospectiveProposerAttestation.SCHEMA: RetrospectiveProposerAttestation,
                 },
             )
@@ -3450,6 +3466,8 @@ class EmpiricalLawhoodApi:
                     decoder_registration_paths=request.decoder_registration_paths,
                 )
             )
+            from empirical_lawhood.api.finite_evaluation_continuation import require_evaluation_attestation
+            require_evaluation_attestation(expected_candidate, attestation, publisher, records=extension_records)
             resolution = provider.resolve_standard(package.base)
             context = self._parameterised_candidate_context(
                 package=package,
@@ -4355,7 +4373,7 @@ class EmpiricalLawhoodApi:
             )
             return (), (binding,)
         authoring_package = standard_package.issued_study.authoring_package
-        context_resolution = provider.resolve_standard(authoring_package)
+        context_resolution = self._standalone_study_resolution(provider, authoring_package)
         parent_compilation = compile_study_candidate(
             authoring_package=authoring_package,
             authoring_materialization=issued_candidate.base_candidate.authoring_materialization,

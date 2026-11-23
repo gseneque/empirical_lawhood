@@ -153,7 +153,16 @@ def test_complete_current_q8_e32_issue_receipts_diagnostics_recovery_and_prebyte
     q = _selection("Q", True, publications)
     q_handoff = _author_load_prove(boundary, q, plane, True)
     q_issue = publish_current_issue(plane, q_handoff, label="diagnostics-q8")
-    q_phase, q_report, q_receipts, _ = _publish_phase(q, q_handoff, plane, q_issue)
+    from empirical_lawhood.adapters.composition.preparation_applicability.ports import preparation_output_semantics
+    producer = plane.with_semantic_validation_registry(preparation_output_semantics(q_issue.execution_plan, constructed=True))
+    q_phase, q_report, q_receipts, _ = _publish_phase(q, q_handoff, producer, q_issue)
+    assert q_receipts["ap.report"].output_logical_artifacts[0].semantic_validation is not None
+    from empirical_lawhood.storage.artifacts import ArtifactIdentityConflict
+    from empirical_lawhood.storage.contracts.artifacts import ArtifactSemanticValidationRegistry
+    explicit = plane.with_semantic_validation_registry(ArtifactSemanticValidationRegistry("synthetic.explicit-empty", ()))
+    with pytest.raises(ArtifactIdentityConflict, match="registered semantic validator"):
+        bind_constructed_preparation_q(run_id=q_issue.publication.run_id, receipt_id=q_receipts["ap.report"].receipt_id,
+            artifact_writer=explicit, result_access=q_phase.result_access)
     assert q_report.constructor_qualified and len(q_report.root_ids) == 8
     qualified = bind_constructed_preparation_q(run_id=q_issue.publication.run_id,
         receipt_id=q_receipts["ap.report"].receipt_id, artifact_writer=plane, result_access=q_phase.result_access)
@@ -196,5 +205,9 @@ def test_complete_current_q8_e32_issue_receipts_diagnostics_recovery_and_prebyte
     assert not protected
     with pytest.raises(PermissionError):
         api.read_preparation_diagnostics(denied, artifact_writer=fresh, relative_root="software/diagnostics")
+    assert not protected
+    from empirical_lawhood.api.preparation_boundary_readout import read_preparation_boundary_observations
+    with pytest.raises(PermissionError):
+        read_preparation_boundary_observations(denied.evaluation, artifact_writer=fresh)
     assert not protected
     assert ExternalStudyOperationAuthorityStore(fresh).load(e_phase.result_access.reveal_authority.object_id) is not None

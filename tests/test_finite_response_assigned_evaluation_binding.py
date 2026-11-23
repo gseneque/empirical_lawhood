@@ -465,3 +465,121 @@ def test_assigned_prospective_evaluation_continuation_reuses_all_original_roots_
     )
     assert len(owners) == 1
     assert owners[0]["native_tasks_planned"] == 0
+
+
+def test_retained_assigned_calibration_separates_measurement_and_adjudication():
+    from dataclasses import replace
+    from empirical_lawhood.adapters.simulators.finite_response_law.calibration.discovery import SOURCE_CAPABILITY
+    from empirical_lawhood.design.study_issue import StudyOperationAuthority
+    from empirical_lawhood.domains.matrix.finite_response_law.assigned_contracts import FiniteResponseLawAssignedCalibrationConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.assigned_native_records import FiniteResponseLawAssignedCalibrationViewObservation
+    from empirical_lawhood.domains.matrix.finite_response_law.completion.contracts import FiniteResponseLawAssignedCalibrationRetainedConfig
+    from empirical_lawhood.domains.matrix.finite_response_law.completion.extension import CALIBRATION_BINDING
+    from empirical_lawhood.execution.adjudication import ScientificAdjudicationRecord
+    from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent
+    from empirical_lawhood.execution.study_issue import IssuedExecutableStudyManifest
+
+    namespace = "empirical-lawhood.finite-response-law.calibration.development"
+    science = FiniteResponseLawScienceSpec()
+    assignment = FiniteResponseLawCohortAssignment("calibration", namespace, science.plan_sha256, 32,
+        "EXPOSED_DEVELOPMENT_NONPROMOTABLE", scientific_seeds=ASSIGNED_SEEDS[namespace])
+    source = FiniteResponseLawAssignedCalibrationConfig("calibration", science,
+        ObjectIdentity.from_record(SOURCE_CAPABILITY.capability_key, SOURCE_CAPABILITY),
+        None, (), namespace, assignment.fingerprint(), assignment.scientific_seeds)
+    rows = []
+    for root in source.roots:
+        for view in (1, 2):
+            task = f"{root.root_id}.flh-project.r{view}"
+            rows.append(FiniteResponseLawRetainedProjection(task,
+                _artifact(task + ".view", FiniteResponseLawAssignedCalibrationViewObservation.SCHEMA),
+                _artifact(task + ".receipt", CanonicalTaskReceipt.SCHEMA),
+                _identity(task + ".receipt", CanonicalTaskReceipt.SCHEMA)))
+    cls = FiniteResponseLawAssignedCalibrationRetainedConfig
+    config = cls(cls.PREFIX_ID + ".config", source, "synthetic.original-calibration", "0" * 40, tuple(rows),
+        _identity("synthetic.original-issue", IssuedExecutableStudyManifest.SCHEMA),
+        _identity("synthetic.execution", StudyOperationAuthority.SCHEMA),
+        _identity("synthetic.reveal", StudyOperationAuthority.SCHEMA),
+        _identity("synthetic.terminal", RunRecoveryTerminalEvent.SCHEMA))
+    assert decode_canonical_bytes(config.canonical_bytes(), cls, maximum_bytes=512 * 1024) == config
+    with pytest.raises(ValueError, match="root/view custody"):
+        replace(config, projections=config.projections[:-1])
+    with pytest.raises(ValueError, match="original issue, grants and terminal"):
+        replace(config, retained_reveal=config.retained_execution)
+    exposure = ObjectIdentity.from_record("synthetic.original-assignment", assignment)
+    bundle = build_completion_authoring(config=config, implementation_sha256="0" * 64,
+        exposure=exposure, exposed_unit_ids=("synthetic.prior-root",), exposed_seed_ids=("synthetic.prior-seed",))
+    steps = {step.step_id: step for step in bundle.standard_context.base.templates[0].protocol.steps}
+    assert set(steps) == {config.freeze_task_id, config.aggregate_task_id, config.adjudicate_task_id}
+    assert {o.payload_schema for o in steps[config.aggregate_task_id].outputs} == {
+        FiniteResponseLawAssignedCalibrationNativeEvaluation.SCHEMA, LinkedCampaignStageEnvelope.SCHEMA}
+    assert [o.payload_schema for o in steps[config.adjudicate_task_id].outputs] == [ScientificAdjudicationRecord.SCHEMA]
+    registry = bundle.standard_context.base.registry
+    provider = EXECUTABLE_CAPABILITY_PROVIDER_FACTORY_REGISTRY.factory(CALIBRATION_BINDING.binding_id).build_provider(
+        registry=registry, records=(config,), platform_ports=(ExecutablePlatformPort(CALIBRATION_BINDING.required_platform_port_keys[0], object()),))
+    assert provider.scientific_adjudication_contract(registry).output_id == config.adjudicate_task_id + ".report"
+
+
+def test_locked_parent_continuation_preserves_two_acquired_segments_and_all_choices():
+    from dataclasses import replace
+    from empirical_lawhood.adapters.simulators.finite_response_law.locked_evaluation import (
+        CONTROL_RESULTS, FiniteResponseLawLockedEvaluationRetention, FiniteResponseLawRetainedChoice,
+    )
+    from empirical_lawhood.design.source_qualification import ProspectiveRetainedContinuation
+    from empirical_lawhood.design.study_issue import StudyOperationAuthority
+    from empirical_lawhood.execution.recovery import RunRecoveryTerminalEvent
+    from empirical_lawhood.execution.study_issue import IssuedExecutableStudyManifest
+
+    assignment, source, control = _assigned_prospective_evaluation()
+    prefixes, parents, choices = [], [], []
+    for inv in native_invocations(source):
+        if inv.phase not in ("prefix", "parent"):
+            continue
+        artifacts = tuple(sorted((
+            _artifact(f"{inv.task_id}.result", FiniteResponseLawAssignedEvaluationTaskResult.SCHEMA),
+            _artifact(f"{inv.task_id}.stage", LinkedCampaignStageEnvelope.SCHEMA),
+            ArtifactIdentity(f"{inv.task_id}.bytes", "synthetic-development", NATIVE_PAIR_SCHEMA, "0"*64, "application/x-hdf5", 1),
+        ), key=lambda a:a.artifact_id))
+        receipt = ArtifactIdentity(f"{inv.task_id}.receipt", "synthetic-development", CanonicalTaskReceipt.SCHEMA, "0"*64, "application/json", 1)
+        common = (inv.task_id, inv.root.physical_unit_id, Q_CLOCK, Decimal(inv.clocks[1]),
+            tuple(f"{inv.root.root_id}.flh-project.r{v}" for v in (1, 2)), artifacts, receipt,
+            OutcomeAccess.OUTCOME_BLIND, VisibilityCeiling.PROSPECTIVE)
+        if inv.phase == "prefix":
+            prefixes.append(ProspectiveRetainedPredecessor(*common))
+            for op, cls in CONTROL_RESULTS.items():
+                key = f"{inv.root.stage_unit}.{op}"
+                choices.append(FiniteResponseLawRetainedChoice(key, _artifact(key + ".product", cls.SCHEMA),
+                    replace(receipt, artifact_id=key + ".receipt")))
+        else:
+            parents.append(ProspectiveRetainedContinuation(*common, inv.predecessor_segment_id, Decimal(inv.clocks[0])))
+    terminal = _identity("original-failure", RunRecoveryTerminalEvent.SCHEMA)
+    selection = FiniteResponseLawLockedEvaluationRetention(
+        source, "original-test-run", ArtifactIdentity("original-failure", "original-terminal", terminal.object_schema, terminal.object_fingerprint, "application/json", 1),
+        tuple(prefixes), tuple(parents), tuple(sorted(choices, key=lambda c:c.task_id)),
+        _identity("original-issue", IssuedExecutableStudyManifest.SCHEMA),
+        _identity("original-execution", StudyOperationAuthority.SCHEMA), _identity("original-reveal", StudyOperationAuthority.SCHEMA), terminal,
+    )
+    assert len(selection.native_origins) == 128 and len(selection.import_inputs) == 320
+    assert decode_canonical_bytes(selection.canonical_bytes(), type(selection), maximum_bytes=2*1024**2) == selection
+    with pytest.raises(ValueError, match="all original"):
+        replace(selection, choices=selection.choices[:-1])
+    with pytest.raises(ValueError, match="original unit"):
+        replace(selection, parents=(replace(parents[0], predecessor_segment_id=prefixes[1].segment_id), *parents[1:]))
+    historical = (("earlier-pilot",), ("earlier-seed",))
+    arguments = dict(source=source, control=control, retention=selection, implementation_sha256="0"*64,
+        exposure=ObjectIdentity.from_record("population", assignment), new_seed_ids=(),
+        exposed_unit_ids=tuple(sorted((*historical[0], *(r.physical_unit_id for r in source.roots)))),
+        exposed_seed_ids=tuple(sorted((*historical[1], *native_seed_ids(source)))))
+    with pytest.raises(ValueError, match="original issued design"):
+        build_native_authoring(**arguments)
+    bundle = build_native_authoring(**arguments, original_design_exposure=historical)
+    draft = bundle.authoring.base.draft
+    assert (draft.development_unit_ids, draft.development_seed_ids) == historical
+    assert set(draft.evaluation_unit_ids) == {r.physical_unit_id for r in source.roots}
+    assert draft.evaluation_seed_ids == native_seed_ids(source)
+    steps = bundle.standard_context.base.templates[0].protocol.steps
+    assert len(steps) == 1796
+    assert sum(s.stage.value == "PREPARE" for s in steps) == 1152
+    for step in steps:
+        if step.step_id in selection.import_inputs:
+            assert step.dependency_step_ids == selection.import_dependencies[step.step_id] and step.stage.value == "FREEZE"
+            assert step.resource_budget.output_bytes == sum(a.size_bytes for a in selection.import_inputs[step.step_id][:-1])

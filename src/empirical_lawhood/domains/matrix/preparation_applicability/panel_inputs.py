@@ -49,9 +49,12 @@ class PreparationApplicabilityPanelPublication(CanonicalRecord):
         if len({receipt.run_id for receipt in self.receipts})!=1 or self.result_access.run_id != self.receipts[0].run_id:
             raise ValueError("ordinary panel mixes run custody")
 
-    def authenticate(self,writer,receipt_store,*,result_access_authenticator):
+    def authenticate(self,writer,receipt_store,*,result_access_authenticator,result_writer=None):
+        output_writer = writer
         for receipt,manifest in zip(self.receipts,self.manifests,strict=True):
-            result_access_authenticator(context=self.result_access,receipt=receipt,logical=manifest.logical,writer=writer)
+            plan = result_access_authenticator(context=self.result_access,receipt=receipt,logical=manifest.logical,writer=writer)
+            if result_writer is not None and output_writer is writer:
+                output_writer = result_writer(writer, plan, manifest.logical)
             if receipt_store.read_by_receipt_id(receipt.run_id,receipt.task_id,receipt.receipt_id)!=receipt:
                 raise ValueError("ordinary panel task receipt differs from committed custody")
-        writer.verify_manifests(self.manifests)
+        output_writer.verify_manifests(self.manifests)

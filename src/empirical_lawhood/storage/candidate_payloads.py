@@ -152,3 +152,36 @@ class ExternalCandidatePayloadPlane:
 
 
 __all__ = ["ExternalCandidatePayloadPlane"]
+
+
+def candidate_worker_plane_factory(plane):
+    """Transfer immutable custody settings to a spawned candidate-payload worker.
+
+    Process locks, open read contexts and cached mount checks stay with their
+    owner. Reconstruct the registered codecs and verify their implementation
+    stamps in the receiving process before opening candidate storage.
+    """
+    from functools import partial
+    from empirical_lawhood.storage.artifacts import GuardedExternalRoot, LocalFilesystemInspector, supports_closed_batch_writes, _has_stock_manifest_reads
+    from empirical_lawhood.storage.artifact_validation import ArtifactProfileValidatorRegistry
+
+    if not supports_closed_batch_writes(plane) or not _has_stock_manifest_reads(plane):
+        raise TypeError("A live artifact read scope or custom plane cannot be sent to a candidate worker")
+    validators = plane.validators
+    configuration = partial(ArtifactProfileValidatorRegistry, binary_codecs=validators.binary_codecs,
+        arrow_contracts=tuple(validators._arrow_contracts.values()), parquet_contracts=tuple(validators._parquet_contracts.values()),
+        hdf5_contracts=tuple(validators._hdf5_contracts.values()), numpy_contracts=tuple(validators._numpy_contracts.values()))
+    root = plane.root
+    if type(root) is GuardedExternalRoot and type(root.inspector) is LocalFilesystemInspector and set(vars(root.inspector)) == {"_bound"}:
+        root = GuardedExternalRoot(root.contract)
+    return partial(_open_candidate_worker_plane, root, configuration, dict(validators._implementation_hashes),
+        dict(validators._binary_implementations), plane.semantic_validations, plane.custody_limits,
+        plane.maximum_parallel_verifications, plane.artifact_verification)
+
+
+def _open_candidate_worker_plane(root, make_validators, structural_stamps, binary_stamps, semantics, limits, parallelism, verification):
+    validators = make_validators()
+    if validators._implementation_hashes != structural_stamps or validators._binary_implementations != binary_stamps:
+        raise ValueError("Candidate worker validator implementation differs from the issuing process")
+    return ExternalArtifactPlane(root, validators, semantics, custody_limits=limits,
+        maximum_parallel_verifications=parallelism, artifact_verification=verification)

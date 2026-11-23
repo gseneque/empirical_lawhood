@@ -32,10 +32,10 @@ from empirical_lawhood.adapters.simulators.finite_response_law.evaluation_contin
 class _ContinuationTask:
     manifest = SOURCE_CAPABILITY
 
-    def __init__(self, source: FiniteResponseLawAssignedEvaluationConfig, runtime: FiniteResponseLawControlRuntimePort):
+    def __init__(self, source: FiniteResponseLawAssignedEvaluationConfig, runtime: FiniteResponseLawControlRuntimePort, native_ids: frozenset[str]):
         self.source = source
         self.delegate = FiniteResponseLawEvaluationSourceTask(ORIGINAL_SOURCE, source, runtime.prepared_store)
-        self.native_ids = {t.task_id for t in native_invocations(source) if t.phase != "prefix"}
+        self.native_ids = native_ids
 
     def execute(self, context: TaskContext) -> RunnerResult:
         if context.task_id not in self.native_ids:
@@ -76,9 +76,8 @@ class FiniteResponseLawContinuationSourceProvider(FiniteResponseLawEvaluationSou
             None,
         )
         self.registry_sha256, self.capability_count = registry.fingerprint(), 1
-        self.invocations = {
-            t.task_id: t for t in native_invocations(source) if t.phase != "prefix"
-        }
+        declared = {segment.segment_id for segment in carrier.segments}
+        self.invocations = {task.task_id:task for task in native_invocations(source) if task.task_id in declared}
         self.source, self.runtime = source, runtime
 
     def runners(
@@ -86,7 +85,7 @@ class FiniteResponseLawContinuationSourceProvider(FiniteResponseLawEvaluationSou
     ) -> tuple[TaskRunner, ...]:
         if registry != self.registry or source_records:
             raise ValueError("Finite response-law evaluation continuation runner binding differs")
-        return (cast(TaskRunner, _ContinuationTask(self.source, self.runtime)),)
+        return (cast(TaskRunner, _ContinuationTask(self.source, self.runtime, frozenset(self.invocations))),)
 
 
 class _PrefixImportTask:
@@ -188,33 +187,41 @@ class FiniteResponseLawPrefixImportProvider(CampaignRuntimeProvider):
             raise ValueError("Finite response-law evaluation import runner registry differs")
         return (cast(TaskRunner, _PrefixImportTask(self.config)),)
 
+    def import_dependencies(self, task_id):
+        return ()
+
+    def import_inputs(self):
+        return {p.segment_id: (*p.artifacts, p.task_receipt) for p in self.config.prefixes}
+
     def external_inputs(
         self, plan: ProtocolExecutionPlan, source_records: tuple[CanonicalRecord, ...] = ()
     ) -> tuple[ExternalInputPayload, ...]:
         if plan.registry_sha256 != self.registry_sha256 or source_records:
             raise ValueError("Finite response-law evaluation import plan registry differs")
+        inputs = self.import_inputs()
+        config_sha256 = self.config.fingerprint()
         values = list(
             config_payloads(
                 plan,
                 self.manifest,
                 self.config,
                 self.config.config_id,
-                {p.segment_id for p in self.config.prefixes},
+                set(inputs),
             )
         )
         tasks = {t.task_id: t for t in plan.tasks}
-        for prior in self.config.prefixes:
-            task = tasks[prior.segment_id]
+        for task_id, artifacts in inputs.items():
+            task = tasks[task_id]
             expected = {
                 a.artifact_id: (a.payload_schema, a.sha256)
-                for a in (*prior.artifacts, prior.task_receipt)
+                for a in artifacts
             }
             expected[f"config-artifact.{self.config.config_id}"] = (
                 self.config.SCHEMA,
-                self.config.fingerprint(),
+                config_sha256,
             )
             if (
-                task.dependency_task_ids
+                task.dependency_task_ids != self.import_dependencies(task_id)
                 or task.maximum_attempts != 1
                 or len(task.external_inputs) != len(expected)
                 or {
@@ -224,7 +231,7 @@ class FiniteResponseLawPrefixImportProvider(CampaignRuntimeProvider):
                 != expected
             ):
                 raise ValueError("Finite response-law evaluation prefix import adds or drops a retained input")
-            for artifact in (*prior.artifacts, prior.task_receipt):
+            for artifact in artifacts:
                 requirement = ContentAddressedInputRequirement(
                     f"input.{artifact.artifact_id}",
                     ContentAddressedInputKind.SOURCE_MATERIALIZATION,
@@ -237,7 +244,7 @@ class FiniteResponseLawPrefixImportProvider(CampaignRuntimeProvider):
                     VisibilityCeiling.PROSPECTIVE,
                 )
                 lineage = ArtifactLineageParent(
-                    ObjectIdentity.from_record(self.config.config_id, self.config),
+                    ObjectIdentity(self.config.config_id, self.config.SCHEMA, self.config.VERSION, config_sha256),
                     VisibilityCeiling.PROSPECTIVE,
                     OutcomeAccess.OUTCOME_BLIND,
                 )

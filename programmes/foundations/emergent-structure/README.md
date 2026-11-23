@@ -6,6 +6,8 @@ This overview identifies the programme's question, evidence and available operat
 It keeps scientific findings separate from software availability.
 Choose a study below before selecting a run guide.
 
+Recompute the five published preparation and reuse experiments with the [R23–R27 reproduction workflow](workflows/preparation-and-reuse/guide.md).
+
 ## Scientific question
 
 When does an organised structure support useful response prediction, and can preparation extend that use?
@@ -25,12 +27,19 @@ identify the completed report scope and its availability.
 
 ## Studies and evidence
 
+The six-matrix recorder reproduced the preparation rates to their declared tolerance. The 128-family driven cycle absorbed heat and its matched reverse comparison left positive path dissipation unresolved. [Six-matrix thermodynamics results](records/matrix-path-thermodynamics.md)
+
+Discarding global orientation kept the signed pulse forecast within tolerance at tick 64. In the memory study, the drive-only average met the signed tolerance on both pulse recipes, and all 14 field models missed at least one requirement for the complete trajectory. [Orientation pilot](records/matrix-orientation-receiver.md) · [Pulse and trajectory forecasts](records/matrix-projected-memory.md)
+
 A study design, also called a protocol, specifies the observations, analysis and outcome rules.
 Read its date and revision before selecting inputs.
 The [scientific record index](records/README.md) provides the retained document census.
 
 | Study | Design | Result | Supported operation | Evidence availability |
 |---|---|---|---|---|
+| Matrix dissipation and physical reversal | [Scientific definition](workflows/matrix-path-thermodynamics/experiment.json) | [Preparation and cycle decisions](records/matrix-path-thermodynamics.md) | [Run guide](workflows/matrix-path-thermodynamics/guide.md) | Analytic preparation controls and held-out source-bound numerical measurements. |
+| Matrix orientation and signed laboratory response | [Scientific definition](workflows/matrix-orientation-response/experiment.json) | [Receiver-only pilot](records/matrix-orientation-receiver.md) | [Run guide](workflows/matrix-orientation-response/guide.md) | Independent two-lift families, signed pulse forecasts and paired reference panels. |
+| Matrix memory and composed pulse response | [Scientific definition](workflows/matrix-projected-memory/experiment.json) | [Single and blind two-pulse forecasts](records/matrix-projected-memory.md) | [Run guide](workflows/matrix-projected-memory/guide.md) | Independent matrix preparations with same-root comparisons across 14 field candidates and native shooting. |
 | Consolidated v1.0 classical matrix series | [Scientific definition](workflows/classical-series/science.md) | Completed 290 production and 81 retained reanalysis operations. The 880 root/stage comparisons agreed. Qualification remains `NOT_ESTABLISHED`. | [Execution and read guide](../../../docs/v1.0/classical-matrix-series.md) | The 17 November 2026 assessment is retained with the original production and reanalysis. The [historical crosswalk](workflows/classical-series/history.md) identifies the earlier populations. |
 | Earlier geometry and response studies | [Study design](../../../paper/SOURCES.md#paper-studies-and-current-software) | [Findings](../../../paper/revision-and-evidence-notes.md) | [Run guide](workflows/matrix-geometry/guide.md) | Public documentary account; historical primary records remain external. |
 | Matrix E1–E6 | [Study design](records/matrix-programme.md) | [Findings](records/release-results.md) | [Run guide](workflows/matrix-programme/guide.md) | Original completed reports and nonentry records remain in external custody. |
@@ -40,6 +49,11 @@ The [scientific record index](records/README.md) provides the retained document 
 | SCI02-D paired equilibrium estimator bridge | [Protocol](workflows/matrix-equilibrium-bridge/protocol-v1.md) | [Completed result](records/matrix-sci02d-result.md) | [Run guide](workflows/matrix-equilibrium-bridge/guide.md) | Sixteen training, 64 confirmation and eight references; full production retained, no demonstrated 20% complete-cost saving or molecular qualification. |
 | History and passive prediction | [Study design](records/matrix-history-analysis-v1.md) | [Findings](records/matrix-deanneal-numerical-assay.md) | [Run guide](workflows/matrix-history-analysis/guide.md) | Retained selected-history findings do not establish a fresh population result. |
 | Forecast and preparation applicability | [Study design](records/empirical-lawhood.constructed-preparation-applicability.md) | [Findings](../../../paper/revision-and-evidence-notes.md) | [Run guide](workflows/preparation-applicability/guide.md) | Original paper evidence and new execution have separate producing identities. |
+| Fixed preparation on the D016 bath | [Boundary design](records/empirical-lawhood.constructed-preparation-applicability.md) | [R23 paired results](records/preparation-and-reuse-results.md#r23--does-a-fixed-preparation-restore-applicability) | [Preparation workflow](workflows/preparation-applicability/guide.md) | Independent qualification and evaluation use the original lower law F. |
+| Forecasting the handoff to a fixed response law | [Finite response-law design](../../../src/empirical_lawhood/domains/matrix/finite_response_law/specification.md) | [R24 calibration and evaluation](records/preparation-and-reuse-results.md#r24--can-a-forecast-supply-the-handoff-to-a-fixed-response-law) | [Forecast workflow](workflows/finite-response-law/guide.md) | The forecast served both consumers on 62/64 continued roots and 58/64 disjoint roots. Each cohort had zero false-admission roots. Signed-response loss fell 33.79% and 32.60% against cached reuse. The paired service comparisons remained unresolved. |
+| Fixed preparation across new bath waveforms | [Waveform population and execution](records/matrix-waveform-preparation.md) | [R25 paired results](records/preparation-and-reuse-results.md#r25--does-the-fixed-preparation-travel-across-bath-waveforms) | [Recursive workflow](../../../docs/v1.0/compose-investigation.md) | All 32 development waveforms were assessed. The observed covered-service headroom closed confirmation. |
+| Structural delivery and physical commitment at handoff | [Clock and entry design](records/matrix-handoff-entry.md) | [R26 paired results](records/preparation-and-reuse-results.md#r26--what-does-a-causal-handoff-deliver-and-where-does-the-system-go-next) | [Model-free workflow](../../../docs/v1.0/model-free-matrix-programme.md) | All 128 paired roots were assessed. Causal timing increased observed structural delivery at T=2. The primary commitment effect remains unresolved. |
+| Choosing a preparation from the observed prefix | [Tier 2 design](../../../src/empirical_lawhood/domains/matrix/finite_response_law/specification.md#6-conditional-400-preparation-screen) | [R27 paired results](records/preparation-and-reuse-results.md#r27--does-choosing-the-preparation-improve-service) | [Forecast and preparation workflow](workflows/finite-response-law/guide.md) | All 24 designated development roots were assessed. The three entry thresholds kept calibration and confirmation closed. |
 
 ## Available workflows
 

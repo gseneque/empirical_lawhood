@@ -14,7 +14,7 @@ import sys
 
 from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 from empirical_lawhood.execution.local.bounded_process import run_bounded_command
-from empirical_lawhood.storage.source_policy import NESTED_WORK_PLAN_PATHS
+from empirical_lawhood.storage.source_policy import CHECKOUT_GIT_TIMEOUT_SECONDS, NESTED_WORK_PLAN_PATHS
 from empirical_lawhood.science.identity.numerical_provenance import NumericalProducingProvenance
 from empirical_lawhood.science.records.serialization import canonical_json_bytes
 from empirical_lawhood.execution.prepared_native_invocation import PreparedWorkerEnvironment
@@ -239,7 +239,7 @@ def _admitted_implementation_source(project_root, source):
     clean = False
     if type(source.final_source_admission) is CheckoutSourceAdmission:
         observed = run_bounded_command(("git", "status", "--porcelain"), cwd=root,
-            timeout_seconds=5, maximum_stdout_bytes=1024**2, maximum_stderr_bytes=4096)
+            timeout_seconds=CHECKOUT_GIT_TIMEOUT_SECONDS, maximum_stdout_bytes=1024**2, maximum_stderr_bytes=4096)
         if observed.returncode:
             raise ValueError("Numerical producing checkout Git observation failed")
         clean = not bool(observed.stdout.strip())
@@ -268,7 +268,7 @@ def observe_implementation_source(project_root=None, *, _admitted_source=None):
                 raise ValueError("Numerical provenance loaded module differs from selected checkout")
 
     def git(*args):
-        result = run_bounded_command(("git", *args), cwd=root, timeout_seconds=5,
+        result = run_bounded_command(("git", *args), cwd=root, timeout_seconds=CHECKOUT_GIT_TIMEOUT_SECONDS,
                                      maximum_stdout_bytes=1024**2, maximum_stderr_bytes=4096)
         if result.returncode:
             raise ValueError("Numerical producing checkout Git observation failed")

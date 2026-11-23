@@ -20,7 +20,7 @@ from empirical_lawhood.domains.matrix.preparation_applicability.result_access im
 from empirical_lawhood.domains.matrix.constructed_preparation_applicability.phase_records import ConstructedPreparationPrefix, ConstructedPreparationParents, ConstructedPreparationPanel
 from empirical_lawhood.api.current_result_custody import require_current_result_receipt_outputs
 from empirical_lawhood.api.preparation_inputs import _retained_output
-from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access
+from empirical_lawhood.api.preparation_result_access import authenticate_preparation_result_access, preparation_output_reader
 from empirical_lawhood.storage.artifacts import ExternalArtifactPlane
 from empirical_lawhood.storage.bounded_io import read_bounded_bytes
 from empirical_lawhood.storage.recovery import ExternalRunRecoveryStore
@@ -160,6 +160,7 @@ def _phase_read(phase, *, artifact_writer, bootstrap_seed, common_request, authe
     execution, receipts, package = _phase_metadata(phase, artifact_writer=artifact_writer,
         authenticated_access=authenticated_access)
     stage = phase.selection.stage
+    output_writer = preparation_output_reader(artifact_writer, execution, receipts["ap.report"].output_logical_artifacts[0])
     manifests = []
 
     def checked_access(*, receipt, logical, **kwargs):
@@ -169,7 +170,7 @@ def _phase_read(phase, *, artifact_writer, bootstrap_seed, common_request, authe
             raise PermissionError("diagnostic substitutes its scoped stored receipt")
 
     def read(task, kind):
-        value, manifest = _retained_output(plane=artifact_writer, receipt=receipts[task], kind=kind,
+        value, manifest = _retained_output(plane=output_writer, receipt=receipts[task], kind=kind,
             result_access=phase.result_access, access_authenticator=checked_access)
         manifests.append(manifest)
         return value

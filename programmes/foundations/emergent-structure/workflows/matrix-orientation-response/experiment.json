@@ -1,0 +1,31 @@
+{
+  "schema": "matrix-orientation-response.definition.v1",
+  "first_root": 522611230,
+  "development_roots": 112,
+  "evaluation_roots": 24,
+  "batch_size": 4,
+  "parameters": {
+    "burn_cycles": 4,
+    "cycle_ticks": 512,
+    "rise_ticks": 128,
+    "timestep": "0.001",
+    "alpha_x": "0.6666666666666666666666666667",
+    "alpha_y": "7.333333333333333333333333334",
+    "jitter": "0.03",
+    "amplitude": "1",
+    "tapes": 4,
+    "oracle_tapes": 4,
+    "margin": "0.01",
+    "ridge": [
+      "0.1",
+      "1",
+      "10"
+    ],
+    "splits": {
+      "development": 16,
+      "train": 64,
+      "select": 0,
+      "calibrate": 32
+    }
+  }
+}

@@ -27,6 +27,13 @@ def measure_root(prefix: Any, panel: Any, lower: Any, phase: str, scientific_see
     operands = None if prefix.frame_base64 is None else reduce_panel(prefix, panel)
     if operands is None:
         return ConstructedPreparationMeasuredRoot(*identity, False, (), (), (), (), (), (), (), (), ())
+    return measure_sealed_observations(identity, operands, lower, phase, scientific_seed, sealed)
+
+
+def measure_sealed_observations(identity, operands, lower, phase, scientific_seed, sealed):
+    """Score the retained arrays and the actual pre-assay seal under the original lower."""
+    if sealed.root_id != identity[0] or sealed.lower_sha256 != identity[3] or identity[3] != lower.fingerprint():
+        raise ValueError("Sealed observation changes the assigned root or lower operand")
     z, y, work = operands
     maxima, conjuncts, margins, mean, width, support = validity(lower, z, y, work)
     if (

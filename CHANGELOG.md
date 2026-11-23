@@ -16,6 +16,7 @@ The [v1.0 release notes](docs/release/1.0.0.md) describe contributor interfaces,
 - Implemented 22 new preprint-inspired joint-description experiments with editable recipes, six shared causal operations and nine assessed supplier requirements.
 - Added calibration-root crossfit, sealed forecast/action choice, complete paired outcome accounting, explicit interface/memory/forecast-work economics, and per-root native custody/recovery.
 - Added physical-cohort input validation and native CPU and JAX/TORAX GPU selection. Twenty families have verified primary CPU results. R14 and R16 await physical inputs, and R17 and R22 await separate GPU qualification. [Study findings](programmes/shared-records/joint-description-results.md)
+- Added five foundations synthesis studies with editable definitions, public run guides and numerical results on entropy production, predictive memory and response to intervention. [Findings and evidence by study](programmes/foundations/README.md#foundations-synthesis-studies)
 
 The delivery's exact source and verification packet determine software acceptance.
 A version number does not establish a hosted publication or new scientific qualification.

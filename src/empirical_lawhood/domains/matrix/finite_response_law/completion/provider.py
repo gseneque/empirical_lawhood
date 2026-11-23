@@ -8,7 +8,6 @@ from empirical_lawhood.science.evidence.evidence import OutcomeAccess, Visibilit
 from empirical_lawhood.science.identity.provenance import ObjectIdentity
 from empirical_lawhood.science.records.serialization import CanonicalRecord
 from empirical_lawhood.science.records.status import OperationalStatus
-from empirical_lawhood.design.linked_campaign import LinkedCampaignStageRole
 from empirical_lawhood.execution.adjudication import ScientificAdjudicationOutputContract, ScientificAdjudicationRecord
 from empirical_lawhood.storage.contracts.artifacts import ArtifactLineageParent, ArtifactProfile, CanonicalTaskReceipt
 from empirical_lawhood.execution.capabilities import CapabilityManifest, CapabilityRegistry
@@ -17,10 +16,10 @@ from empirical_lawhood.execution.linked_campaigns import LinkedCampaignStageEnve
 from empirical_lawhood.execution.plans import ProtocolExecutionPlan
 from empirical_lawhood.execution.providers import CampaignRuntimeProvider, CapabilityOutputSemanticContract, ExternalInputPayload, MAX_EXTERNAL_INPUT_CHUNK_BYTES
 from empirical_lawhood.execution.source_resolution import ContentAddressedInputRequirement, ContentAddressedInputKind, ContentAddressedInputResolver
-from empirical_lawhood.adapters.simulators.response_geometry_prospective.provider import config_payloads, decode_port, read_port, output_result, semantic_contracts, envelope
+from empirical_lawhood.adapters.simulators.response_geometry_prospective.provider import config_payloads, decode_port, read_port, output_result, semantic_contracts
 from empirical_lawhood.domains.matrix.prepared_response.qualification_provider import _group
 from empirical_lawhood.domains.matrix.finite_response_law.method_provider import _ResolvedInputSource
-from empirical_lawhood.domains.matrix.finite_response_law.native_provider import native_adjudication, projection_stage
+from empirical_lawhood.domains.matrix.finite_response_law.native_provider import native_adjudication, native_measurement_stage, projection_stage, read_native_measurement
 from empirical_lawhood.domains.matrix.finite_response_law.native_records import FiniteResponseLawNativeEvaluation, native_method_types
 from empirical_lawhood.domains.matrix.finite_response_law.completion.contracts import FiniteResponseLawRetainedCompletionConfig, MAX_INPUT_BYTES
 
@@ -97,14 +96,7 @@ def aggregate_retained(
 def completion_stage(
     config: FiniteResponseLawRetainedCompletionConfig, result: FiniteResponseLawNativeEvaluation
 ) -> LinkedCampaignStageEnvelope:
-    return envelope(
-        config.aggregate_task_id,
-        result,
-        result.evaluation_id,
-        LinkedCampaignStageRole.METHOD_IDENTIFICATION,
-        not result.reasons,
-        result.reasons,
-    )
+    return native_measurement_stage(config.aggregate_task_id, result)
 
 
 class FiniteResponseLawRetainedCompletionTask:
@@ -172,26 +164,9 @@ class FiniteResponseLawRetainedCompletionTask:
                     stage.SCHEMA: stage.canonical_bytes(),
                 }
             elif context.task_id == adjudicate:
-                if (
-                    len(context.dependency_receipts) != 1
-                    or context.dependency_receipts[0].task_id != aggregate
-                    or len(context.input_ports) != 3
-                ):
-                    raise ValueError("Native adjudication lacks its completed aggregate dependency")
-                dependency = context.dependency_receipts[0]
                 *_, completion_type = native_method_types(config.native_source)
-                group = _group(
-                    context,
-                    aggregate,
-                    dependency.output_materialization_ids,
-                    (completion_type.SCHEMA, LinkedCampaignStageEnvelope.SCHEMA),
-                )
-                result = decode_port(
-                    group[completion_type.SCHEMA], completion_type
-                )
-                if result.config.projection.native_spec != config.native_source or decode_port(
-                    group[LinkedCampaignStageEnvelope.SCHEMA], LinkedCampaignStageEnvelope
-                ) != completion_stage(config, result):
+                result = read_native_measurement(context, aggregate, completion_type, self.manifest.resource_ceiling.output_bytes)
+                if result.config.projection.native_spec != config.native_source:
                     raise ValueError("Native adjudication changes its retained aggregate")
                 adjudication = native_adjudication(context, result)
                 values = {adjudication.SCHEMA: adjudication.canonical_bytes()}

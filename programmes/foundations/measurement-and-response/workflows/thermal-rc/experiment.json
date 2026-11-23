@@ -1,0 +1,10 @@
+{
+  "schema": "thermal-rc.definition.v1",
+  "first_root": 423112300,
+  "development_roots": 4096,
+  "evaluation_roots": 65536,
+  "batch_size": 1024,
+  "parameters": {
+    "hidden_rate": "4"
+  }
+}

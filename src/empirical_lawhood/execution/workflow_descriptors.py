@@ -2,8 +2,10 @@
 """Inward, nonexecuting workflow facts for adapter-owned public discovery."""
 
 from dataclasses import dataclass
+from hashlib import sha256
+import json
 from pathlib import PurePosixPath
-from empirical_lawhood.science.records.serialization import validate_stable_id
+from empirical_lawhood.science.records.serialization import validate_sha256, validate_stable_id
 
 
 @dataclass(frozen=True, slots=True)
@@ -11,6 +13,30 @@ class WorkflowInput:
     path: str
     role: str
     schema_id: str
+
+    def matches_source(self, payload: bytes) -> bool:
+        document = json.loads(payload)
+        return isinstance(document, dict) and "schema" in document and document["schema"] == self.schema_id
+
+
+@dataclass(frozen=True, slots=True)
+class RetainedManifestInput(WorkflowInput):
+    """A released JSON manifest identified by its original bytes and format version."""
+
+    format_version: int
+    content_sha256: str
+
+    def __post_init__(self):
+        validate_sha256(self.content_sha256)
+        if type(self.format_version) is not int or self.format_version < 1:
+            raise ValueError("Retained manifest format must be a positive integer")
+
+    def matches_source(self, payload: bytes) -> bool:
+        if sha256(payload).hexdigest() != self.content_sha256:
+            return False
+        document = json.loads(payload)
+        version = document.get("format") if isinstance(document, dict) else None
+        return type(version) is int and version == self.format_version
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,7 +96,8 @@ class WorkflowDeclaration:
         if (type(self.operations_available) is not bool or type(w.operations) is not tuple
                 or bool(w.operations) != self.operations_available
                 or any(type(v) is not WorkflowOperation for v in w.operations)
-                or type(w.inputs) is not tuple or any(type(v) is not WorkflowInput for v in w.inputs)
+                or type(w.inputs) is not tuple
+                or any(type(v) not in (WorkflowInput, RetainedManifestInput) for v in w.inputs)
                 or len({v.command for v in w.operations}) != len(w.operations)
                 or len({v.path for v in w.inputs}) != len(w.inputs)):
             raise ValueError("workflow descriptor repeats or substitutes a public operation/input")

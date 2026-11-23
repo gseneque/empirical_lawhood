@@ -237,3 +237,7 @@ Versioned retained scientific formats keep their original identity and supported
 A source change has a changed implementation identity.
 It does not transfer qualification or permit unfinished native work to switch implementations silently.
 The [migration record](migration.md) and [source/format policy](../development/compatibility.md) state those boundaries.
+
+## Reproduce published preparation and reuse results
+
+`api.preparation_reuse_reproduction.reproduce_preparation_reuse(study=..., operand_directory=...)` replays one complete released study from its measured operands. R24 accepts `from_seals=True` and a positive `workers` count to reconstruct each original control and reveal. The checkout also provides native replication and the guarded R25/R26 closed-panel assessment. [R23–R27 workflow](../../programmes/foundations/emergent-structure/workflows/preparation-and-reuse/guide.md)

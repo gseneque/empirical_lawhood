@@ -120,6 +120,24 @@ class HumanProposerAttestation(CanonicalRecord):
 
 
 @dataclass(frozen=True, slots=True)
+class RetainedEvaluationProposerAttestation(HumanProposerAttestation):
+    """Original blind assignment and currently exposed preparation of that same assignment."""
+
+    SCHEMA: ClassVar[str] = "empirical-lawhood/planning/retained-evaluation-proposer-attestation"
+    original_issue: ObjectIdentity
+    original_attestation: ObjectIdentity
+    retained_inputs: ObjectIdentity
+    original_terminal: ObjectIdentity
+
+    def _validate_evaluation_exposure(self) -> None:
+        if (self.evaluation_units_and_seeds_unexposed
+                or self.original_attestation.object_schema != HumanProposerAttestation.SCHEMA
+                or self.original_issue.object_schema != "empirical-lawhood/runtime/issued-executable-study-manifest"
+                or self.original_terminal.object_schema != "empirical-lawhood/runtime/run-recovery-terminal-event"):
+            raise ValueError("Retained evaluation requires its original prospective issue, blind assignment and terminal")
+
+
+@dataclass(frozen=True, slots=True)
 class RetrospectiveProposerAttestation(HumanProposerAttestation):
     """Owner adoption of exposed historical evidence; no fresh evaluation attested."""
 

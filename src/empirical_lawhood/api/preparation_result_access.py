@@ -25,6 +25,22 @@ def authenticate_preparation_result_access(*, context, receipt, logical, writer,
     return (plan, package) if include_package else plan
 
 
+def preparation_output_reader(writer, plan, logical):
+    """Select code-owned validators after the original authority and task/receipt join."""
+    if (plan is None or logical.semantic_validation is None
+            or not writer.accepts_issued_output_semantics()):
+        return writer
+    from empirical_lawhood.adapters.composition.preparation_applicability.ports import preparation_output_semantics
+    constructed = plan.tasks[0].capability.capability_key.startswith("constructed-preparation-applicability.")
+    return writer.with_semantic_validation_registry(preparation_output_semantics(plan, constructed=constructed))
+
+
+def authenticate_preparation_input(value, writer, receipt_store):
+    """Authenticate a current publication and verify its bytes with its issued output contract."""
+    value.authenticate(writer, receipt_store, result_access_authenticator=authenticate_preparation_result_access,
+                       result_writer=preparation_output_reader)
+
+
 def preparation_result_access(*, run_id, issued_study_id, execution_authority_id, reveal_authority_id, writer):
     """Resolve selected IDs from the actual publication and authority stores."""
     from empirical_lawhood.domains.matrix.preparation_applicability.result_access import PreparationApplicabilityResultAccess

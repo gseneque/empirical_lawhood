@@ -1,0 +1,186 @@
+{
+  "context": {
+    "original_receipt_count": 4129,
+    "qualified_lower": "ab880c96a5e4d4e5070e4e2268331ea542f5cc0bedf18da43cded949d2462b1b",
+    "source_commit": "a63e872c85ccd5c0a20d192bccf0811acbd4df6f",
+    "terminal": "838a69b78e7cb34d265ac856065f60f067cadffc6a89372140a6e5a645ab0640"
+  },
+  "format": 1,
+  "members": {
+    "original-fit-audit": {
+      "path": "r27/artifacts/original-tier2-screen-01/analytic-operands.json",
+      "sha256": "0de9cc0732162da2e1488be6a8a33f80f075b812802d106b6ce227ff2a97fa49",
+      "size": 3443576,
+      "source": "series"
+    },
+    "panel/000": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r000.project/root-panel.canonical.json",
+      "sha256": "3b60e9d3331d17dd8b0a88af1979b736c88e4362fd77ed2c0838ae33c72b6bca",
+      "size": 370893,
+      "source": "tier2"
+    },
+    "panel/001": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r001.project/root-panel.canonical.json",
+      "sha256": "a173210b4519bedf6dd62bedeeb4654d47d47f8a48366d0fb67ee537521f10ad",
+      "size": 371142,
+      "source": "tier2"
+    },
+    "panel/002": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r002.project/root-panel.canonical.json",
+      "sha256": "310fd886d1a887e54fa28647c0767badfba40e6a97a1aa2f3306d9d8e5a83194",
+      "size": 371034,
+      "source": "tier2"
+    },
+    "panel/003": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r003.project/root-panel.canonical.json",
+      "sha256": "27ef551bd3dcdb2684eeaab5489c16c7dd50ad2f8f011781bebdf72a671d9ff4",
+      "size": 371123,
+      "source": "tier2"
+    },
+    "panel/004": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r004.project/root-panel.canonical.json",
+      "sha256": "224e959468e59b147526ed047bc83e808dcb8a091f92db9172de6a21d91651ff",
+      "size": 370955,
+      "source": "tier2"
+    },
+    "panel/005": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r005.project/root-panel.canonical.json",
+      "sha256": "66fc193560b00aefbda62fea2c845d67390e00aceca25cfc7d1f4f6d58f1752a",
+      "size": 370668,
+      "source": "tier2"
+    },
+    "panel/006": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r006.project/root-panel.canonical.json",
+      "sha256": "5aed9888ab71b4726610da713db53e4036f1b6f2ecf52d8f1e642a87885336b5",
+      "size": 371027,
+      "source": "tier2"
+    },
+    "panel/007": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r007.project/root-panel.canonical.json",
+      "sha256": "ffeee69087661c48198d2353550a91ed98c4cea2fec69ac78004d3bf318b10b3",
+      "size": 370971,
+      "source": "tier2"
+    },
+    "panel/008": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r008.project/root-panel.canonical.json",
+      "sha256": "bd2d8d339d626ff7a52dbb470c39069e0d822f5db26e89f4a45311c78c85680a",
+      "size": 371130,
+      "source": "tier2"
+    },
+    "panel/009": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r009.project/root-panel.canonical.json",
+      "sha256": "06c143e236ed0d63e8a3a4db09819ece6041855f7847f1eefd65a94be3a05468",
+      "size": 370870,
+      "source": "tier2"
+    },
+    "panel/010": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r010.project/root-panel.canonical.json",
+      "sha256": "b579d476b8326060cef072405f1ec83c6a7dbb43234b9b36b6b039ecb447920a",
+      "size": 371095,
+      "source": "tier2"
+    },
+    "panel/011": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r011.project/root-panel.canonical.json",
+      "sha256": "a53d9af1932a6830331717ba49ef6c1fcb42f6237fd2baab6ec69ef4d336168c",
+      "size": 371071,
+      "source": "tier2"
+    },
+    "panel/012": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r012.project/root-panel.canonical.json",
+      "sha256": "d50c541635c90a1099d0698dc8f409cdbd2e1eea32c8870fb77d7ebf67eb71b0",
+      "size": 371000,
+      "source": "tier2"
+    },
+    "panel/013": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r013.project/root-panel.canonical.json",
+      "sha256": "34174ca64268793cf883a7134094460823017770bb46552587e8e397a238ffe2",
+      "size": 370912,
+      "source": "tier2"
+    },
+    "panel/014": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r014.project/root-panel.canonical.json",
+      "sha256": "5cf50dd09988763e94bcc7346896bb17fd81810d188b053723a167e8bbb9e343",
+      "size": 371036,
+      "source": "tier2"
+    },
+    "panel/015": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r015.project/root-panel.canonical.json",
+      "sha256": "f92e353b7079207eaec576b8030eba03a0b5d1bb8dcbfe8c86fff64dfb59f2a3",
+      "size": 370999,
+      "source": "tier2"
+    },
+    "panel/016": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r016.project/root-panel.canonical.json",
+      "sha256": "ad7c44d2a3ba09576e6db2d5f98445cfb753da946607ba9355cf04697203484b",
+      "size": 371031,
+      "source": "tier2"
+    },
+    "panel/017": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r017.project/root-panel.canonical.json",
+      "sha256": "67fa61c8311ac741d64db86678dc85133be6f418b3c8a5b43ba0da71a0021bfc",
+      "size": 371195,
+      "source": "tier2"
+    },
+    "panel/018": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r018.project/root-panel.canonical.json",
+      "sha256": "0420cb98b5f31b85dc03fbd4f78e3d9021348054a6607f146c1ebbe72010065b",
+      "size": 371022,
+      "source": "tier2"
+    },
+    "panel/019": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r019.project/root-panel.canonical.json",
+      "sha256": "a7b210f23792f58a6103f553ce7e0d574dca0e4746db90bd8559c0d220e2d9e2",
+      "size": 371059,
+      "source": "tier2"
+    },
+    "panel/020": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r020.project/root-panel.canonical.json",
+      "sha256": "14a86b134956c78d1b6b1b803f71b9a0970c1e110c5c6ada9bf2f7eb7c852642",
+      "size": 370892,
+      "source": "tier2"
+    },
+    "panel/021": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r021.project/root-panel.canonical.json",
+      "sha256": "860a56cfdafb9907146e8dfb921f64969f6147eebb95067d71787b8921a09137",
+      "size": 371049,
+      "source": "tier2"
+    },
+    "panel/022": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r022.project/root-panel.canonical.json",
+      "sha256": "a474a8ff86dab60d87fb762630a06a6a2bd6010b69c068cd13c3be07599b4060",
+      "size": 370928,
+      "source": "tier2"
+    },
+    "panel/023": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/t2-screen.r023.project/root-panel.canonical.json",
+      "sha256": "e709da9a2d5f9e041d485de2b7609becef8af8ba4aafee5a677ba37d0d6acb2c",
+      "size": 371039,
+      "source": "tier2"
+    },
+    "receipt-index": {
+      "path": "r27/artifacts/original-tier2-screen-01/records.json",
+      "sha256": "d1bcc3e06fd501617098eab31b707daf00705f669ca21fa8ca3edc35d10d510a",
+      "size": 8088,
+      "source": "series"
+    },
+    "scientific-adjudication": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/cc1-finite-lawhood-v1.m5.screen/scientific-adjudication.canonical.json",
+      "sha256": "4db6736fc44a91eb4b496119a8f952816810803d3ec8cb5769c70b3e024eeb83",
+      "size": 9913,
+      "source": "tier2"
+    },
+    "screen-result": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/cc1-finite-lawhood-v1.m5.screen/screen-result.canonical.json",
+      "sha256": "161e7f28433b275bce9e1104cef4cea7381e8d0308b77a931a3d7e6eb4f8412c",
+      "size": 74527,
+      "source": "tier2"
+    },
+    "upper-freeze": {
+      "path": "runs/cc1-finite-lawhood-v1.m5.production-v2/outputs/cc1-finite-lawhood-v1.m5.screen/upper-freeze.canonical.json",
+      "sha256": "7c109be5fff077970dac1fe62c3d4b666d5fbb0c1455e8807df842ab86148b16",
+      "size": 463,
+      "source": "tier2"
+    }
+  },
+  "study": "r27"
+}
